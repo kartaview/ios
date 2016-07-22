@@ -1,0 +1,50 @@
+
+/* Class = "UIButton"; normalTitle = "Delete Selected"; ObjectID = "8KY-zG-bEZ"; */
+"8KY-zG-bEZ.normalTitle" = "Delete Selected";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "AjO-S0-Md9"; */
+"AjO-S0-Md9.text" = "Label";
+
+/* Class = "UIViewController"; title = "My OpenStreetView"; ObjectID = "E30-yn-dpb"; */
+"E30-yn-dpb.title" = "My OpenStreetView";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "GAT-rX-vtR"; */
+"GAT-rX-vtR.text" = "Label";
+
+/* Class = "UILabel"; text = "Uploading track"; ObjectID = "H7w-57-zz8"; */
+"H7w-57-zz8.text" = "Uploading track";
+
+/* Class = "UIButton"; normalTitle = "5m"; ObjectID = "LuH-Qx-Fjv"; */
+"LuH-Qx-Fjv.normalTitle" = "5m";
+
+/* Class = "UILabel"; text = "Debug"; ObjectID = "M1N-rc-S42"; */
+"M1N-rc-S42.text" = "Debug";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "MDT-q7-xFp"; */
+"MDT-q7-xFp.text" = "Label";
+
+/* Class = "UILabel"; text = "Positioner 
+Real/Simulation"; ObjectID = "MF1-NM-5CO"; */
+"MF1-NM-5CO.text" = "Positioner 
+Real/Simulation";
+
+/* Class = "UILabel"; text = "Revision xx"; ObjectID = "SKY-PP-CGv"; */
+"SKY-PP-CGv.text" = "Revision xx";
+
+/* Class = "UILabel"; text = "Date Created"; ObjectID = "TPI-ti-hYs"; */
+"TPI-ti-hYs.text" = "-";
+
+/* Class = "UILabel"; text = "More"; ObjectID = "Xts-0d-dsh"; */
+"Xts-0d-dsh.text" = "More";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "elV-fr-FvI"; */
+"elV-fr-FvI.text" = "Label";
+
+/* Class = "UILabel"; text = "Protos taken: 0  Distance covered: 0 m"; ObjectID = "kUY-Cj-GQW"; */
+"kUY-Cj-GQW.text" = "Protos taken: 0  Distance covered: 0 m";
+
+/* Class = "UIButton"; normalTitle = "Telenav Simulator"; ObjectID = "uOk-OA-hvu"; */
+"uOk-OA-hvu.normalTitle" = "Telenav Simulator";
+
+/* Class = "UINavigationItem"; title = "My OpenStreetView"; ObjectID = "yCh-YK-kRN"; */
+"yCh-YK-kRN.title" = "My OpenStreetView";

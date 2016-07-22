@@ -1,0 +1,10 @@
+//
+//  Config.xcconfig
+//  OpenStreetView
+//
+//  Created by Bogdan Sala on 25/11/15.
+//  Copyright © 2015 Bogdan Sala. All rights reserved.
+//
+ENABLED_DEBUG_VAR=ENABLED_DEBUG
+
+GCC_PREPROCESSOR_DEFINITIONS=$(ENABLED_DEBUG_VAR)

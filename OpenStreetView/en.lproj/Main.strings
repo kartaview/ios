@@ -1,0 +1,77 @@
+
+/* Class = "UIButton"; normalTitle = "Delete Selected"; ObjectID = "8KY-zG-bEZ"; */
+"8KY-zG-bEZ.normalTitle" = "Delete Selected";
+
+/* Class = "UITabBarItem"; title = "Map"; ObjectID = "A3g-E1-q9e"; */
+"A3g-E1-q9e.title" = "Map";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "AjO-S0-Md9"; */
+"AjO-S0-Md9.text" = "Label";
+
+/* Class = "UITabBarItem"; title = "Settings"; ObjectID = "DBy-Ou-QMP"; */
+"DBy-Ou-QMP.title" = "Settings";
+
+/* Class = "UITabBarItem"; title = "Record"; ObjectID = "DR4-Nc-blA"; */
+"DR4-Nc-blA.title" = "Record";
+
+/* Class = "UIViewController"; title = "My OpenStreetView"; ObjectID = "E30-yn-dpb"; */
+"E30-yn-dpb.title" = "My OpenStreetView";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "GAT-rX-vtR"; */
+"GAT-rX-vtR.text" = "Label";
+
+/* Class = "UILabel"; text = "Uploading track"; ObjectID = "H7w-57-zz8"; */
+"H7w-57-zz8.text" = "Uploading track";
+
+/* Class = "UIButton"; normalTitle = "5m"; ObjectID = "LuH-Qx-Fjv"; */
+"LuH-Qx-Fjv.normalTitle" = "5m";
+
+/* Class = "UILabel"; text = "Debug"; ObjectID = "M1N-rc-S42"; */
+"M1N-rc-S42.text" = "Debug";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "MDT-q7-xFp"; */
+"MDT-q7-xFp.text" = "Label";
+
+/* Class = "UILabel"; text = "Positioner 
+Real/Simulation"; ObjectID = "MF1-NM-5CO"; */
+"MF1-NM-5CO.text" = "Positioner 
+Real/Simulation";
+
+/* Class = "UILabel"; text = "Revision xx"; ObjectID = "SKY-PP-CGv"; */
+"SKY-PP-CGv.text" = "Revision xx";
+
+/* Class = "UILabel"; text = "Date Created"; ObjectID = "TPI-ti-hYs"; */
+"TPI-ti-hYs.text" = "-";
+
+/* Class = "UILabel"; text = "More"; ObjectID = "Xts-0d-dsh"; */
+"Xts-0d-dsh.text" = "More";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "elV-fr-FvI"; */
+"elV-fr-FvI.text" = "Label";
+
+/* Class = "UILabel"; text = "Environment"; ObjectID = "eqC-Vi-ykF"; */
+"eqC-Vi-ykF.text" = "Environment";
+
+/* Class = "UIButton"; normalTitle = "Test"; ObjectID = "kBR-4D-zZx"; */
+"kBR-4D-zZx.normalTitle" = "Test";
+
+/* Class = "UILabel"; text = "Protos taken: 0  Distance covered: 0 m"; ObjectID = "kUY-Cj-GQW"; */
+"kUY-Cj-GQW.text" = "Protos taken: 0  Distance covered: 0 m";
+
+/* Class = "UIButton"; normalTitle = "Telenav Simulator"; ObjectID = "uOk-OA-hvu"; */
+"uOk-OA-hvu.normalTitle" = "Telenav Simulator";
+
+/* Class = "UILabel"; text = "HDR Images"; ObjectID = "um2-hx-gCC"; */
+"um2-hx-gCC.text" = "HDR Images";
+
+/* Class = "UIButton"; normalTitle = "Staging"; ObjectID = "vdk-t3-lhK"; */
+"vdk-t3-lhK.normalTitle" = "Staging";
+
+/* Class = "UITabBarItem"; title = "MyRecordings"; ObjectID = "w9d-hJ-yuA"; */
+"w9d-hJ-yuA.title" = "MyRecordings";
+
+/* Class = "UINavigationItem"; title = "My OpenStreetView"; ObjectID = "yCh-YK-kRN"; */
+"yCh-YK-kRN.title" = "My OpenStreetView";
+
+/* Class = "UIButton"; normalTitle = "Production"; ObjectID = "yLd-nh-h70"; */
+"yLd-nh-h70.normalTitle" = "Production";
