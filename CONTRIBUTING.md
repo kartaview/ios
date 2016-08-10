@@ -6,25 +6,27 @@ To get started, <a href="https://www.clahub.com/agreements/openstreetview/ios">s
 
 ### Interface (Click-Click way)
 
-Install [CocoPods](https://cocoapods.org/app) app and CocoPods command line.
+* Install [CocoPods](https://cocoapods.org/app) app.
 
-Install project dependencies:
-1. Select OpenStreetView project.
-2. Click "Install".
+* Install CocoPods command line by clicking "Install comand line" in the CocoPods app.
+
+* Install project dependencies: 
+
+    * Select OpenStreetView project.
+    * Click "Install".
 
 ### OR Terminal
 
-Install [CocoPods](https://cocoapods.org) :
-```bash
-gem install cocoapods
-```
-
-Clone a copy of the repo:
-```bash
-git clone https://github.com/openstreetview/ios.git
-```
-Install project dependencies
-```bash
-cd #TO_OpenStreetView_Folder#
-pod install
-```
+* Install [CocoPods](https://cocoapods.org) :
+    ```bash
+    gem install cocoapods
+    ```
+* Clone a copy of the repo:
+    ```bash
+    git clone https://github.com/openstreetview/ios.git
+    ```
+* Install project dependencies
+    ```bash
+    cd #TO_OpenStreetView_Folder#
+    pod install
+    ```
