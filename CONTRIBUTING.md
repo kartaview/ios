@@ -7,6 +7,7 @@ To get started, <a href="https://www.clahub.com/agreements/openstreetview/ios">s
 ### Interface (Click-Click way)
 
 Install [CocoPods](https://cocoapods.org/app) app and CocoPods command line.
+
 Install project dependencies:
 1. Select OpenStreetView project.
 2. Click "Install".
