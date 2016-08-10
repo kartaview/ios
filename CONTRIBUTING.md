@@ -18,15 +18,15 @@ To get started, <a href="https://www.clahub.com/agreements/openstreetview/ios">s
 ### OR Terminal
 
 * Install [CocoPods](https://cocoapods.org) :
-    ```bash
-    gem install cocoapods
-    ```
+```bash
+gem install cocoapods
+```
 * Clone a copy of the repo:
-    ```bash
-    git clone https://github.com/openstreetview/ios.git
-    ```
+```bash
+git clone https://github.com/openstreetview/ios.git
+```
 * Install project dependencies
-    ```bash
-    cd #TO_OpenStreetView_Folder#
-    pod install
-    ```
+```bash
+cd #TO_OpenStreetView_Folder#
+pod install
+```
