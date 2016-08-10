@@ -9,12 +9,12 @@
 #import "OSVAPIConfigurator.h"
 
 //#ifdef ENABLED_DEBUG
-////#define kBaseURLOSV             @"http://open-street-view.skobbler.net"
-////#define kBaseURLOSV             @"http://tst.open-street-view.skobbler.net"
-//#define kBaseURLOSV             @"http://staging.open-street-view.skobbler.net"
+////#define kBaseURLOSV             @"http://openstreetview.com"
+////#define kBaseURLOSV             @"http://testing.openstreetview.com"
+//#define kBaseURLOSV             @"http://staging.openstreetview.com"
 //#else
 #define kBaseURLOSV             @"http://openstreetview.com"
-//#define kBaseURLOSV             @"http://staging.open-street-view.skobbler.net"
+//#define kBaseURLOSV             @"http://staging.openstreetview.com"
 //#endif
 
 #define kAPIVersion             @"1.0/"

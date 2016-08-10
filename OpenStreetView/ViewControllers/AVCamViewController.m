@@ -2,38 +2,22 @@
 #import "AVCamViewController.h"
 #import "AVCamPreviewView.h"
 #import "OSVUserDefaults.h"
-#import "UIDevice+Aditions.h"
 
+static void *CapturingStillImageContext = &CapturingStillImageContext;
 
-static void * CapturingStillImageContext = &CapturingStillImageContext;
-static void * RecordingContext = &RecordingContext;
-static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDeviceAuthorizedContext;
-
-@interface AVCamViewController () <AVCaptureFileOutputRecordingDelegate, AVCaptureVideoDataOutputSampleBufferDelegate>
-
-// For use in the storyboards.
-@property (nonatomic, weak) IBOutlet UIButton *recordButton;
-@property (nonatomic, weak) IBOutlet UIButton *cameraButton;
-@property (nonatomic, weak) IBOutlet UIButton *stillButton;
-
-- (IBAction)changeCamera:(id)sender;
+@interface AVCamViewController ()
 
 // Session management.
-@property (nonatomic) dispatch_queue_t sessionQueue; // Communicate with the session and other session objects on this queue.
-@property (nonatomic) AVCaptureSession *session;
-@property (nonatomic) AVCaptureDeviceInput *videoDeviceInput;
-@property (nonatomic) AVCaptureStillImageOutput *stillImageOutput;
-@property (nonatomic, strong) AVCaptureVideoDataOutput  *videoOutput;
-
-
+@property (nonatomic) dispatch_queue_t              sessionQueue; // Communicate with the session and other session objects on this queue.
+@property (nonatomic) AVCaptureSession              *session;
+@property (nonatomic) AVCaptureDeviceInput          *videoDeviceInput;
+@property (nonatomic) AVCaptureStillImageOutput     *stillImageOutput;
 // Utilities.
-@property (nonatomic) UIBackgroundTaskIdentifier backgroundRecordingID;
-@property (nonatomic, getter = isDeviceAuthorized) BOOL deviceAuthorized;
-@property (nonatomic, readonly, getter = isSessionRunningAndDeviceAuthorized) BOOL sessionRunningAndDeviceAuthorized;
-@property (nonatomic) BOOL lockInterfaceRotation;
-@property (nonatomic) id runtimeErrorHandlingObserver;
-
-@property (nonatomic) BOOL  processing;
+@property (nonatomic) UIBackgroundTaskIdentifier                                    backgroundRecordingID;
+@property (nonatomic, getter = isDeviceAuthorized) BOOL                             deviceAuthorized;
+@property (nonatomic, readonly, getter = isSessionRunningAndDeviceAuthorized) BOOL  sessionRunningAndDeviceAuthorized;
+@property (nonatomic) BOOL                                                          lockInterfaceRotation;
+@property (nonatomic) id                                                            runtimeErrorHandlingObserver;
 
 @end
 
@@ -49,7 +33,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
-    
+        
 	// Create the AVCaptureSession
 	AVCaptureSession *session = [[AVCaptureSession alloc] init];
 	[self setSession:session];
@@ -69,11 +53,13 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     
 	dispatch_queue_t sessionQueue = dispatch_queue_create("session queue", DISPATCH_QUEUE_SERIAL);
 	[self setSessionQueue:sessionQueue];
-	
+    
+    __weak typeof(self) welf = self;
+    
 	dispatch_async(sessionQueue, ^{
-		[self setBackgroundRecordingID:UIBackgroundTaskInvalid];
+		[welf setBackgroundRecordingID:UIBackgroundTaskInvalid];
 		
-        [self configureActiveFormat];
+        [welf configureActiveFormat];
         
 		AVCaptureStillImageOutput *stillImageOutput = [[AVCaptureStillImageOutput alloc] init];
 		if ([session canAddOutput:stillImageOutput]) {
@@ -81,15 +67,7 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 			[session addOutput:stillImageOutput];
 			[self setStillImageOutput:stillImageOutput];
 		}
-//TODO investigate Colorspace
-//        AVCaptureVideoDataOutput *output = [[AVCaptureVideoDataOutput alloc] init] ;
-//        [output setAlwaysDiscardsLateVideoFrames:YES];
-//        [output setVideoSettings:@{(id)kCVPixelBufferPixelFormatTypeKey:@(kCVPixelFormatType_32BGRA)}];
-//        if ([session canAddOutput:output]) {
-//            [session addOutput:output];
-//            self.videoOutput = output;
-//        }
-//        [output setSampleBufferDelegate:self queue:[self sessionQueue]];
+
 	});
 }
 
@@ -98,39 +76,38 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
     
     [self configureDeviceFormat];
     
-	dispatch_async([self sessionQueue], ^{
+    __weak typeof(self) welf = self;
+
+	dispatch_async([welf sessionQueue], ^{
         CMVideoDimensions dim = CMVideoFormatDescriptionGetDimensions(self.videoDeviceInput.device.activeFormat.formatDescription);
         CMVideoDimensions requestedDim = [OSVUserDefaults sharedInstance].videoQualityDimension;
         
         if (dim.width != requestedDim.width && dim.height != requestedDim.height) {
-            [self configureActiveFormat];
+            [welf configureActiveFormat];
         }
-		[self addObserver:self forKeyPath:@"sessionRunningAndDeviceAuthorized" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew) context:SessionRunningAndDeviceAuthorizedContext];
-		[self addObserver:self forKeyPath:@"stillImageOutput.capturingStillImage" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew) context:CapturingStillImageContext];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(subjectAreaDidChange:) name:AVCaptureDeviceSubjectAreaDidChangeNotification object:[[self videoDeviceInput] device]];
+		[welf addObserver:welf forKeyPath:@"stillImageOutput.capturingStillImage" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew) context:CapturingStillImageContext];
+		[[NSNotificationCenter defaultCenter] addObserver:welf selector:@selector(subjectAreaDidChange:) name:AVCaptureDeviceSubjectAreaDidChangeNotification object:[[welf videoDeviceInput] device]];
 		
-		__weak AVCamViewController *weakSelf = self;
-		[self setRuntimeErrorHandlingObserver:[[NSNotificationCenter defaultCenter] addObserverForName:AVCaptureSessionRuntimeErrorNotification object:[self session] queue:nil usingBlock:^(NSNotification *note) {
-			AVCamViewController *strongSelf = weakSelf;
+		[welf setRuntimeErrorHandlingObserver:[[NSNotificationCenter defaultCenter] addObserverForName:AVCaptureSessionRuntimeErrorNotification object:[welf session] queue:nil usingBlock:^(NSNotification *note) {
+			AVCamViewController *strongSelf = welf;
 			dispatch_async([strongSelf sessionQueue], ^{
 				// Manually restarting the session since it must have been stopped due to an error.
 				[[strongSelf session] startRunning];
-				[[strongSelf recordButton] setTitle:NSLocalizedString(@"Record", @"Recording button record title") forState:UIControlStateNormal];
 			});
 		}]];
-		[[self session] startRunning];
+		[[welf session] startRunning];
 	});
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
+
 	dispatch_async([self sessionQueue], ^{
 		[[self session] stopRunning];
 		
 		[[NSNotificationCenter defaultCenter] removeObserver:self name:AVCaptureDeviceSubjectAreaDidChangeNotification object:[[self videoDeviceInput] device]];
 		[[NSNotificationCenter defaultCenter] removeObserver:[self runtimeErrorHandlingObserver]];
 		
-		[self removeObserver:self forKeyPath:@"sessionRunningAndDeviceAuthorized" context:SessionRunningAndDeviceAuthorizedContext];
 		[self removeObserver:self forKeyPath:@"stillImageOutput.capturingStillImage" context:CapturingStillImageContext];
 	});
 }
@@ -155,91 +132,12 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 		if (isCapturingStillImage) {
 			[self runStillImageCaptureAnimation];
 		}
-	} else if (context == RecordingContext) {
-		BOOL isRecording = [change[NSKeyValueChangeNewKey] boolValue];
-		
-		dispatch_async(dispatch_get_main_queue(), ^{
-			if (isRecording) {
-				[[self cameraButton] setEnabled:NO];
-				[[self recordButton] setTitle:NSLocalizedString(@"Stop", @"Recording button stop title") forState:UIControlStateNormal];
-				[[self recordButton] setEnabled:YES];
-			} else {
-				[[self cameraButton] setEnabled:YES];
-				[[self recordButton] setTitle:NSLocalizedString(@"Record", @"Recording button record title") forState:UIControlStateNormal];
-				[[self recordButton] setEnabled:YES];
-			}
-		});
-	} else if (context == SessionRunningAndDeviceAuthorizedContext) {
-		BOOL isRunning = [change[NSKeyValueChangeNewKey] boolValue];
-		
-		dispatch_async(dispatch_get_main_queue(), ^{
-			if (isRunning) {
-				[[self cameraButton] setEnabled:YES];
-				[[self recordButton] setEnabled:YES];
-				[[self stillButton] setEnabled:YES];
-			} else {
-				[[self cameraButton] setEnabled:NO];
-				[[self recordButton] setEnabled:NO];
-				[[self stillButton] setEnabled:NO];
-			}
-		});
-	} else {
+    } else {
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 	}
 }
 
 #pragma mark Actions
-
-- (IBAction)changeCamera:(id)sender {
-	[[self cameraButton] setEnabled:NO];
-	[[self recordButton] setEnabled:NO];
-	[[self stillButton] setEnabled:NO];
-	
-	dispatch_async([self sessionQueue], ^{
-		AVCaptureDevice *currentVideoDevice = [[self videoDeviceInput] device];
-		AVCaptureDevicePosition preferredPosition = AVCaptureDevicePositionUnspecified;
-		AVCaptureDevicePosition currentPosition = [currentVideoDevice position];
-		
-		switch (currentPosition) {
-			case AVCaptureDevicePositionUnspecified:
-				preferredPosition = AVCaptureDevicePositionBack;
-				break;
-			case AVCaptureDevicePositionBack:
-				preferredPosition = AVCaptureDevicePositionFront;
-				break;
-			case AVCaptureDevicePositionFront:
-				preferredPosition = AVCaptureDevicePositionBack;
-				break;
-		}
-		
-		AVCaptureDevice *videoDevice = [AVCamViewController deviceWithMediaType:AVMediaTypeVideo preferringPosition:preferredPosition];
-		AVCaptureDeviceInput *videoDeviceInput = [AVCaptureDeviceInput deviceInputWithDevice:videoDevice error:nil];
-		
-		[[self session] beginConfiguration];
-		
-		[[self session] removeInput:[self videoDeviceInput]];
-        
-		if ([[self session] canAddInput:videoDeviceInput]) {
-			[[NSNotificationCenter defaultCenter] removeObserver:self name:AVCaptureDeviceSubjectAreaDidChangeNotification object:currentVideoDevice];
-			
-			[AVCamViewController setFlashMode:AVCaptureFlashModeAuto forDevice:videoDevice];
-			[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(subjectAreaDidChange:) name:AVCaptureDeviceSubjectAreaDidChangeNotification object:videoDevice];
-			
-			[[self session] addInput:videoDeviceInput];
-			[self setVideoDeviceInput:videoDeviceInput];
-		} else {
-			[[self session] addInput:[self videoDeviceInput]];
-		}
-		
-		[[self session] commitConfiguration];
-		
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[[self cameraButton] setEnabled:YES];
-			[[self recordButton] setEnabled:YES];
-			[[self stillButton] setEnabled:YES];
-		});
-	});
-}
 
 - (void)subjectAreaDidChange:(NSNotification *)notification {
 	CGPoint devicePoint = CGPointMake(.5, .5);
@@ -331,26 +229,28 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
         [self.session addInput:videoDeviceInput];
         
         if (!self.videoDeviceInput) {
+            __weak typeof(self) welf = self;
+
             dispatch_async(dispatch_get_main_queue(), ^{
                 // Why are we dispatching this to the main queue?
                 // Because AVCaptureVideoPreviewLayer is the backing layer for AVCamPreviewView and UIView can only be manipulated on main thread.
                 // Note: As an exception to the above rule, it is not necessary to serialize video orientation changes on the AVCaptureVideoPreviewLayer’s connection with other session manipulation.
                 
-                [[(AVCaptureVideoPreviewLayer *)[[self previewView] layer] connection] setVideoOrientation:(AVCaptureVideoOrientation)[self interfaceOrientation]];
-                ((AVCaptureVideoPreviewLayer *)[[self previewView] layer]).videoGravity = AVLayerVideoGravityResizeAspectFill;
+                [[(AVCaptureVideoPreviewLayer *)[[welf previewView] layer] connection] setVideoOrientation:(AVCaptureVideoOrientation)[welf interfaceOrientation]];
+                ((AVCaptureVideoPreviewLayer *)[[welf previewView] layer]).videoGravity = AVLayerVideoGravityResizeAspectFill;
             });
         }
         self.videoDeviceInput = videoDeviceInput;
     }
     
-    
-    
     return succes;
 }
 
 - (void)focusWithMode:(AVCaptureFocusMode)focusMode exposeWithMode:(AVCaptureExposureMode)exposureMode atDevicePoint:(CGPoint)point monitorSubjectAreaChange:(BOOL)monitorSubjectAreaChange {
-	dispatch_async([self sessionQueue], ^{
-		AVCaptureDevice *device = [[self videoDeviceInput] device];
+    __weak typeof(self) welf = self;
+
+	dispatch_async([welf sessionQueue], ^{
+		AVCaptureDevice *device = [[welf videoDeviceInput] device];
 		NSError *error = nil;
 		if ([device lockForConfiguration:&error]) {
 			if ([device isFocusPointOfInterestSupported] && [device isFocusModeSupported:focusMode]) {
@@ -413,19 +313,21 @@ static void * SessionRunningAndDeviceAuthorizedContext = &SessionRunningAndDevic
 - (void)checkDeviceAuthorizationStatus {
 	NSString *mediaType = AVMediaTypeVideo;
 	
+    __weak typeof(self) welf = self;
+
 	[AVCaptureDevice requestAccessForMediaType:mediaType completionHandler:^(BOOL granted) {
 		if (granted) {
 			//Granted access to mediaType
-			[self setDeviceAuthorized:YES];
+			[welf setDeviceAuthorized:YES];
 		} else {
 			//Not granted access to mediaType
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Camera!", @"")
 											message:NSLocalizedString(@"OSV doesn't have permission to use Camera, please change privacy settings", @"")
-										   delegate:self
+										   delegate:welf
                                   cancelButtonTitle:NSLocalizedString(@"OK", @"")
 								  otherButtonTitles:nil] show];
-				[self setDeviceAuthorized:NO];
+				[welf setDeviceAuthorized:NO];
 			});
 		}
 	}];

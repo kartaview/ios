@@ -20,6 +20,17 @@
 
 @implementation OSVSettingsDetails
 
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [[NSNotificationCenter defaultCenter] addObserver:self.tableView selector:@selector(reloadData) name:@"kReloadDetails" object:nil];
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+#pragma mark - Orientation 
+
 - (BOOL)shouldAutorotate {
     return NO;
 }
@@ -27,6 +38,8 @@
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskPortrait;
 }
+
+#pragma mark - TableView DataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.item.rowItems.count;
@@ -43,6 +56,8 @@
     return cell;
 }
 
+#pragma mark - TableView Delegate
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     OSVMenuItem *item = self.item.rowItems[indexPath.row];
     
@@ -56,9 +71,16 @@
     [self.tableView reloadData];
 }
 
+#pragma mark - Actions
+
 - (IBAction)didTapBack:(id)sender {
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+#pragma mark - Public 
+
+- (void)reloadData {
+    [self.tableView reloadData];
+}
 
 @end

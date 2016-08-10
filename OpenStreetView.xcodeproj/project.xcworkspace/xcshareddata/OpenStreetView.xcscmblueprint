@@ -1,0 +1,25 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "b83d054a-0364-4dbc-b21a-410ba2f1b1d5",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+    "b83d054a-0364-4dbc-b21a-410ba2f1b1d5" : {
+
+    }
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "b83d054a-0364-4dbc-b21a-410ba2f1b1d5" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "913A63F1-3EC2-4341-846C-227865D31FB8",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "b83d054a-0364-4dbc-b21a-410ba2f1b1d5" : "OpenStreetViewReleaseBrach\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "OpenStreetView",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "trunk\/OpenStreetView.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "svn:\/\/bogdan.sala@svn-srv\/OpenStreetView",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Subversion",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "b83d054a-0364-4dbc-b21a-410ba2f1b1d5"
+    }
+  ]
+}

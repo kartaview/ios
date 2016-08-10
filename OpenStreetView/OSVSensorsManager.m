@@ -19,7 +19,6 @@
 @property (nonatomic, strong) CMAltimeter       *altimeter;
 @property (nonatomic, strong) OSVOBDController  *OBD;
 
-
 @property (nonatomic, strong) NSOperationQueue *accelerometerQueue;
 @property (nonatomic, strong) NSOperationQueue *gyroQueue;
 @property (nonatomic, strong) NSOperationQueue *magnetometerQueue;
@@ -123,12 +122,15 @@
         if (self.shouldLog) {
             [[OSVSyncController sharedInstance].logger logItems:@[item] inFileForSequenceID:0];
         }
-
     }];
 }
 
 - (void)startUpdatingOBD {
     [self.OBD startOBDUpdates];
+}
+
+- (void)startBLEOBDScan {
+    [self.OBD scanBLEOBD];
 }
 
 - (void)stopUpdatingAccelerometer {

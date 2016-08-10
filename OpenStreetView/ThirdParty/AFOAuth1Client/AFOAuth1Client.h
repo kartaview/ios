@@ -28,6 +28,7 @@ typedef NS_ENUM(NSUInteger, AFOAuthSignatureMethod) {
 };
 
 @class AFOAuth1Token;
+@class UIViewController;
 
 /**
  `AFOAuth1Client` encapsulates common patterns to authenticate against a resource server conforming to the behavior outlined in the OAuth 1.0a specification.
@@ -94,6 +95,7 @@ typedef NS_ENUM(NSUInteger, AFOAuthSignatureMethod) {
                                 accessTokenPath:(NSString *)accessTokenPath
                                    accessMethod:(NSString *)accessMethod
                                           scope:(NSString *)scope
+                                   presentation:(void (^)(UIViewController *vc))present
                                         success:(void (^)(AFOAuth1Token *accessToken, id responseObject))success
                                         failure:(void (^)(NSError *error))failure;
 

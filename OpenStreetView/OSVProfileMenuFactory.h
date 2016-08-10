@@ -13,7 +13,7 @@
 
 @interface OSVProfileMenuFactory : NSObject
 
-+ (NSArray *)settingsMenuWithOBDStatus:(int)connectionStatus;
++ (NSArray *)settingsMenuWithWiFiOBDStatus:(int)connectionStatus BLEStatus:(int)bleStat;
 
 + (OSVSectionItem *)defaultUserFunctionalitySection;
 + (OSVSectionItem *)settingsSection;

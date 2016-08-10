@@ -11,10 +11,11 @@
 #import "OSVUserDefaults.h"
 #import "OSVLocationManager.h"
 #import <Crashlytics/Crashlytics.h>
+#import <AVFoundation/AVFoundation.h>
 
 #define kProductionBaseURLOSV           @"http://openstreetview.com"
-#define kTstBaseURLOSV                  @"http://tst.open-street-view.skobbler.net"
-#define kStagingBaseURLOSV              @"http://staging.open-street-view.skobbler.net"
+#define kTstBaseURLOSV                  @"http://testing.openstreetview.com"
+#define kStagingBaseURLOSV              @"http://staging.openstreetview.com"
 
 @interface OSVDebugViewController ()
 
@@ -29,6 +30,17 @@
 @property (weak, nonatomic) IBOutlet UISwitch           *hdrSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch           *debugLogsOBD;
 @property (weak, nonatomic) IBOutlet UISwitch           *debugSLUS;
+
+@property (weak, nonatomic) IBOutlet UITextField        *frameRate;
+@property (weak, nonatomic) IBOutlet UITextField        *frameMaxDimension;
+@property (weak, nonatomic) IBOutlet UILabel            *frameMaxDimensionLabel;
+@property (weak, nonatomic) IBOutlet UILabel            *frameRateLabel;
+@property (weak, nonatomic) IBOutlet UILabel            *hqLabel;
+@property (weak, nonatomic) IBOutlet UILabel            *bitrateLabel;
+
+@property (weak, nonatomic) IBOutlet UIButton *encodingMediumQ;
+@property (weak, nonatomic) IBOutlet UIButton *encodingLowQ;
+@property (weak, nonatomic) IBOutlet UIButton *encodingHighQ;
 
 @end
 
@@ -47,12 +59,28 @@
     self.stagingEnvironment.selected = [[OSVUserDefaults sharedInstance].environment isEqualToString:kStagingBaseURLOSV];
     self.productionEnvironment.selected = [[OSVUserDefaults sharedInstance].environment isEqualToString:kProductionBaseURLOSV];
     
+    self.encodingLowQ.selected = [[OSVUserDefaults sharedInstance].debugEncoding isEqualToString:AVVideoProfileLevelH264BaselineAutoLevel];
+    self.encodingHighQ.selected = [[OSVUserDefaults sharedInstance].debugEncoding isEqualToString:AVVideoProfileLevelH264HighAutoLevel];
+    self.encodingMediumQ.selected = [[OSVUserDefaults sharedInstance].debugEncoding isEqualToString:AVVideoProfileLevelH264MainAutoLevel];
+    
     [self.hdrSwitch setOn:[OSVUserDefaults sharedInstance].hdrOption animated:NO];
     
     [self.debugLogsOBD setOn:[OSVUserDefaults sharedInstance].debugLogOBD animated:NO];
     [self.debugSLUS setOn:[OSVUserDefaults sharedInstance].debugSLUS animated:NO];
 
+    double value = [OSVUserDefaults sharedInstance].debugFrameRate;
+    self.frameRateLabel.text = [NSString stringWithFormat:@"%.f frames/sec when possible", value];
+    value = [OSVUserDefaults sharedInstance].debugFrameSize;
+    self.frameMaxDimensionLabel.text = [NSString stringWithFormat:@"%.f w x %.f h (landscape)\n %.f w x %.f h (portrait)", value, floorf(value/1.33), floorf(value/1.33), value];
     
+    if ([OSVUserDefaults sharedInstance].debugHighDesintyOn) {
+        self.hqLabel.text = @"HighQualityVideoLowDensity ON";
+    } else {
+        self.hqLabel.text = @"HighQualityVideoLowDensity OFF";
+    }
+    
+    value = [OSVUserDefaults sharedInstance].debugBitRate;
+    self.bitrateLabel.text = [NSString stringWithFormat:@"%.1f Mb bitrate", value];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -111,6 +139,24 @@
     }
 }
 
+- (IBAction)didTouchEncodingButton:(UIButton *)sender {
+    sender.selected = YES;
+    
+    if (sender == self.encodingHighQ) {
+        self.encodingMediumQ.selected = NO;
+        self.encodingLowQ.selected = NO;
+        [OSVUserDefaults sharedInstance].debugEncoding = AVVideoProfileLevelH264HighAutoLevel;
+    } else if (sender == self.encodingLowQ){
+        self.encodingMediumQ.selected = NO;
+        self.encodingHighQ.selected = NO;
+        [OSVUserDefaults sharedInstance].debugEncoding = AVVideoProfileLevelH264BaselineAutoLevel;
+    } else if (sender == self.encodingMediumQ){
+        self.encodingHighQ.selected = NO;
+        self.encodingLowQ.selected = NO;
+        [OSVUserDefaults sharedInstance].debugEncoding = AVVideoProfileLevelH264MainAutoLevel;
+    }
+}
+
 - (IBAction)didChangeHDROption:(UISwitch *)sender {
     [OSVUserDefaults sharedInstance].hdrOption = sender.on;
 }
@@ -126,6 +172,46 @@
 
 - (IBAction)didChangeSLSwitch:(UISwitch *)sender {
     [OSVUserDefaults sharedInstance].debugSLUS = sender.on;
+}
+
+
+- (IBAction)didChangeFrameRate:(UITextField *)sender {
+    double value = [sender.text doubleValue];
+    [OSVUserDefaults sharedInstance].debugFrameRate = value;
+    [[OSVUserDefaults sharedInstance] save];
+    self.frameRateLabel.text = [NSString stringWithFormat:@"%.f frames/sec when possible", value];
+    [sender resignFirstResponder];
+}
+
+- (IBAction)didChangeFrameSize:(UITextField *)sender {
+    double value = [sender.text doubleValue];
+    [OSVUserDefaults sharedInstance].debugFrameSize = value;
+    [[OSVUserDefaults sharedInstance] save];
+    
+    self.frameMaxDimensionLabel.text = [NSString stringWithFormat:@"%.f w x %.f h (landscape)\n %.f w x %.f h (portrait)", value, floorf(value/1.33), floorf(value/1.33), value];
+    
+    [sender resignFirstResponder];
+
+}
+
+- (IBAction)didChangeBitRate:(UITextField *)sender {
+    double value = [sender.text doubleValue];
+    [OSVUserDefaults sharedInstance].debugBitRate = value;
+    [[OSVUserDefaults sharedInstance] save];
+    
+    self.bitrateLabel.text = [NSString stringWithFormat:@"%.1f Mb bitrate", value];
+
+    [sender resignFirstResponder];
+
+}
+
+- (IBAction)didChangeHQSwitch:(UISwitch *)sender {
+    [OSVUserDefaults sharedInstance].debugHighDesintyOn = sender.on;
+    if (sender.on) {
+        self.hqLabel.text = @"HighQualityVideoLowDensity ON";
+    } else {
+        self.hqLabel.text = @"HighQualityVideoLowDensity OFF";
+    }
 }
 
 @end

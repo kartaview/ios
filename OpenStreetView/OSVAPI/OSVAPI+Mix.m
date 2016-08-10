@@ -77,7 +77,6 @@
             completion(user, nil);
         }
         
-        
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         completion(nil, error);
     }];

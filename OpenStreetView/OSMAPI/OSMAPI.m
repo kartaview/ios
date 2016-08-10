@@ -130,7 +130,12 @@
 #pragma mark - Private methods
 
 - (void)authorize {
-    [self.osmClient authorizeUsingOAuthWithRequestTokenPath:kOSMAPITokenRequestPath userAuthorizationPath:@"/oauth/authorize" callbackURL:[NSURL URLWithString:@"osmLogin://success"] accessTokenPath:@"/oauth/access_token" accessMethod:@"GET" scope:nil success:^(AFOAuth1Token *accessToken, id responseObject) {
+    [self.osmClient authorizeUsingOAuthWithRequestTokenPath:kOSMAPITokenRequestPath userAuthorizationPath:@"/oauth/authorize" callbackURL:[NSURL URLWithString:@"osmLogin://success"] accessTokenPath:@"/oauth/access_token" accessMethod:@"GET" scope:nil presentation:^(UIViewController *vc) {
+        UIViewController *mainController = [UIApplication sharedApplication].keyWindow.rootViewController;
+        [mainController presentViewController:vc animated:YES completion:^{
+            
+        }];
+    } success:^(AFOAuth1Token *accessToken, id responseObject) {
         self.osmClient.accessToken = accessToken;
         [self requestAccountInfo];
     } failure:^(NSError *error) {
@@ -142,7 +147,7 @@
     }];
 }
 
--(void)requestAccountInfo{
+- (void)requestAccountInfo{
     [self.osmClient registerHTTPOperationClass:[AFXMLRequestOperation class]];
     [self.osmClient getPath:kOSMAPIUserInfoPath parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
         OSMParser *parser = [[OSMParser alloc] init];

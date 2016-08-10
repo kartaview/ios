@@ -14,14 +14,14 @@ typedef enum {
     LogLevelDEBUG
 }LogLevel;
 
-//#ifdef ENABLED_DEBUG
-//
-//#else
+#ifdef ENABLED_DEBUG
+
+#else
 
 #undef NSLog
 #define NSLog(...)
 
-//#endif
+#endif
 
 
 @interface OSVLogger : NSObject

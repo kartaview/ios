@@ -25,14 +25,14 @@
 
 #pragma mark - Menu Factory
 
-+ (NSArray *)settingsMenuWithOBDStatus:(int)connectionStatus {
++ (NSArray *)settingsMenuWithWiFiOBDStatus:(int)connectionStatus BLEStatus:(int)bleStat {
 
 // Enable debug for all builds for now.
-//#ifdef ENABLED_DEBUG
-//    NSArray *array = @[[self settingsSection], [self obdSectionWithStatus:connectionStatus], [self feedbackSection], [self aboutSection], [self debugSection]];
-//#else
-   NSArray *array = @[[self settingsSection], [self obdSectionWithStatus:connectionStatus], [self feedbackSection], [self aboutSection]];
-//#endif
+#ifdef ENABLED_DEBUG
+    NSArray *array = @[[self settingsSection], [self obdSectionWithWiFiStatus:connectionStatus BLEStatus:bleStat], [self feedbackSection], [self aboutSection], [self debugSection]];
+#else
+    NSArray *array = @[[self settingsSection], [self obdSectionWithWiFiStatus:connectionStatus BLEStatus:bleStat], [self feedbackSection], [self aboutSection]];
+#endif
     return array;
 }
 
@@ -48,7 +48,7 @@
 
 + (OSVSectionItem *)settingsSection {
     OSVSectionItem *settingsSection = [OSVSectionItem new];
-    settingsSection.rowItems = [@[[self wifiItem], [self autoUploadItem], [self metricItem], [self videoQualityItem]]mutableCopy];
+    settingsSection.rowItems = [@[[self wifiItem], [self autoUploadItem], [self metricItem], [self videoQualityItem], [self signDetection]]mutableCopy];
     settingsSection.title = NSLocalizedString(@"GENERAL", nil);
     
     return settingsSection;
@@ -70,7 +70,7 @@
     return aboutItem;
 }
 
-+ (OSVSectionItem *)obdSectionWithStatus:(int)connected {
++ (OSVSectionItem *)obdSectionWithWiFiStatus:(int)connected BLEStatus:(int)connectedBLE {
     OSVSectionItem *section = [OSVSectionItem new];
     if (connected == 0) {
         section.rowItems = [@[[self obdDisconnected]] mutableCopy];
@@ -78,6 +78,14 @@
         section.rowItems = [@[[self obdConnecting]] mutableCopy];
     } else {
         section.rowItems = [@[[self obdConnected]] mutableCopy];
+    }
+    
+    if (connectedBLE == 0) {
+        [section.rowItems addObject:[self obdBLEDisconnected]];
+    } else if (connectedBLE == 1) {
+        [section.rowItems addObject:[self obdConnecting]];
+    } else {
+        [section.rowItems addObject:[self obdBLEConnected]];
     }
     
     section.title = NSLocalizedString(@"OBD2 CONNECTION", @"");
@@ -397,11 +405,11 @@
 
 + (OSVMenuItem *)obdDisconnected {
     OSVMenuItem *item = [OSVMenuItem new];
-    item.title = NSLocalizedString(@"Not connected", nil);
+    item.title = NSLocalizedString(@"WiFi Not connected", nil);
     item.subtitle = NSLocalizedString(@"Connect", nil);
     item.type = OSVMenuItemButton;
     item.action = ^(OSVSettingsViewController *sender, id indexPath) {
-        sender.obdConnectionStatus = 1;
+        sender.obdWIFIConnectionStatus = 1;
         [[OSVLocationManager sharedInstance].sensorsManager startUpdatingOBD];
         [sender reloadData];
     };
@@ -419,11 +427,48 @@
 
 + (OSVMenuItem *)obdConnected {
     OSVMenuItem *item = [OSVMenuItem new];
-    item.title = NSLocalizedString(@"Connected to OBD 2", nil);
+    item.title = NSLocalizedString(@"WiFi Connected to OBD 2", nil);
     item.subtitle = NSLocalizedString(@"Disconnect", nil);
     item.type = OSVMenuItemButton;
     item.action = ^(OSVSettingsViewController *sender, id indexPath) {
-        sender.obdConnectionStatus = 2;
+        sender.obdWIFIConnectionStatus = 2;
+        [[OSVLocationManager sharedInstance].sensorsManager stopUpdatingOBD];
+        [sender reloadData];
+    };
+    
+    return item;
+}
+
++ (OSVMenuItem *)obdBLEDisconnected {
+    OSVMenuItem *item = [OSVMenuItem new];
+    item.title = NSLocalizedString(@"BLE Not connected", nil);
+    item.subtitle = [OSVUserDefaults sharedInstance].bleDevice;
+    item.type = OSVMenuItemDetails;
+    item.action = ^(OSVSettingsViewController *sender, id indexPath) {
+        sender.obdBLEConnectionStatus = 1;
+        [[OSVLocationManager sharedInstance].sensorsManager startBLEOBDScan];
+        OSVSectionItem *dataItem = [self obdBLE];
+        dataItem.key = @"bleDevice";
+        [sender performSegueWithIdentifier:@"showSettingsDetails" sender:dataItem];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"BLEDatasource" object:nil userInfo:@{@"datasource":dataItem}];
+        [sender reloadData];
+    };
+    
+    return item;
+}
+
++ (OSVSectionItem *)obdBLE {
+    OSVSectionItem *item = [OSVSectionItem new];
+    return item;
+}
+
++ (OSVMenuItem *)obdBLEConnected {
+    OSVMenuItem *item = [OSVMenuItem new];
+    item.title = NSLocalizedString(@"BLE Connected to OBD 2", nil);
+    item.subtitle = NSLocalizedString(@"Disconnect", nil);
+    item.type = OSVMenuItemButton;
+    item.action = ^(OSVSettingsViewController *sender, id indexPath) {
+        sender.obdBLEConnectionStatus = 2;
         [[OSVLocationManager sharedInstance].sensorsManager stopUpdatingOBD];
         [sender reloadData];
     };

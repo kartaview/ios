@@ -39,8 +39,8 @@
 		CC06B6481C75F71C00E2B0DB /* OSVSegmentedViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CC06B6461C75F71C00E2B0DB /* OSVSegmentedViewCell.xib */; };
 		CC06B6961C776A1A00E2B0DB /* OSVPolyline.m in Sources */ = {isa = PBXBuildFile; fileRef = CC06B6951C776A1A00E2B0DB /* OSVPolyline.m */; };
 		CC09AD7D1C73672100443761 /* UIDevice+Aditions.m in Sources */ = {isa = PBXBuildFile; fileRef = CC09AD7C1C73672100443761 /* UIDevice+Aditions.m */; };
-		CC12A1DE1C2404240019DB21 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC12A1DC1C2404240019DB21 /* Fabric.framework */; };
-		CC12A1DF1C2404240019DB21 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC12A1DD1C2404240019DB21 /* Crashlytics.framework */; };
+		CC12FCFA1D51DA1A00EB1177 /* OSVCameraManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CC12FCF91D51DA1A00EB1177 /* OSVCameraManager.m */; };
+		CC12FCFB1D51DA1A00EB1177 /* OSVCameraManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CC12FCF91D51DA1A00EB1177 /* OSVCameraManager.m */; };
 		CC1529201C02618D00BD29DC /* OSVFullScreenImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC15291F1C02618D00BD29DC /* OSVFullScreenImageViewController.m */; };
 		CC1529771C039DC500BD29DC /* OSVBaseUser.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1529761C039DC500BD29DC /* OSVBaseUser.m */; };
 		CC15297B1C039F3100BD29DC /* OSVBaseUser+OSM.m in Sources */ = {isa = PBXBuildFile; fileRef = CC15297A1C039F3100BD29DC /* OSVBaseUser+OSM.m */; };
@@ -74,6 +74,12 @@
 		CC1E50411BF26B1200BD4A1A /* OSVProfileMenuFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1E50401BF26B1200BD4A1A /* OSVProfileMenuFactory.m */; };
 		CC1E50521BF2986900BD4A1A /* UIAlertView+Blocks.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1E50511BF2986900BD4A1A /* UIAlertView+Blocks.m */; };
 		CC1E50571BF3A38A00BD4A1A /* OSVBasicMapController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1E50561BF3A38A00BD4A1A /* OSVBasicMapController.m */; };
+		CC1FFCE51D58A48300958B8E /* OBDService.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1FFCDB1D58A48300958B8E /* OBDService.m */; };
+		CC1FFCE61D58A48300958B8E /* OBDService.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1FFCDB1D58A48300958B8E /* OBDService.m */; };
+		CC1FFCE71D58A48300958B8E /* OBDDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1FFCDE1D58A48300958B8E /* OBDDevice.m */; };
+		CC1FFCE81D58A48300958B8E /* OBDDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1FFCDE1D58A48300958B8E /* OBDDevice.m */; };
+		CC1FFCE91D58A48300958B8E /* OBDUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1FFCE31D58A48300958B8E /* OBDUtils.m */; };
+		CC1FFCEA1D58A48300958B8E /* OBDUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1FFCE31D58A48300958B8E /* OBDUtils.m */; };
 		CC225EC51D227A65000EC04C /* OSVDotedPolyline.m in Sources */ = {isa = PBXBuildFile; fileRef = CC225EC41D227A65000EC04C /* OSVDotedPolyline.m */; };
 		CC225EC61D227A65000EC04C /* OSVDotedPolyline.m in Sources */ = {isa = PBXBuildFile; fileRef = CC225EC41D227A65000EC04C /* OSVDotedPolyline.m */; };
 		CC2573CF1C003D16000EDB3E /* UIColor+OSVColor.m in Sources */ = {isa = PBXBuildFile; fileRef = CC2573CE1C003D16000EDB3E /* UIColor+OSVColor.m */; };
@@ -111,6 +117,10 @@
 		CC410AE41D12B9C7000220BA /* OSVFullScreenAnimationController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC410AE21D12B9C7000220BA /* OSVFullScreenAnimationController.m */; };
 		CC410AE71D12B9E9000220BA /* OSVDissmissFullScreenAnimationController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC410AE61D12B9E9000220BA /* OSVDissmissFullScreenAnimationController.m */; };
 		CC410AE81D12B9E9000220BA /* OSVDissmissFullScreenAnimationController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC410AE61D12B9E9000220BA /* OSVDissmissFullScreenAnimationController.m */; };
+		CC42A3741D5B4DCA001541DD /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC42A36C1D5B4649001541DD /* Crashlytics.framework */; };
+		CC42A3751D5B4DE2001541DD /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC42A36E1D5B464F001541DD /* Fabric.framework */; };
+		CC42A3761D5B4DF0001541DD /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC42A36C1D5B4649001541DD /* Crashlytics.framework */; };
+		CC42A3771D5B4DFC001541DD /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC42A36E1D5B464F001541DD /* Fabric.framework */; };
 		CC4536541CA59363005C4490 /* ELM327.m in Sources */ = {isa = PBXBuildFile; fileRef = CC65DF721CA1601400EC3F70 /* ELM327.m */; };
 		CC4536551CA59365005C4490 /* ELM327Command.m in Sources */ = {isa = PBXBuildFile; fileRef = CC65DF741CA1601400EC3F70 /* ELM327Command.m */; };
 		CC4536561CA59368005C4490 /* ELM327ResponseParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CC65DF761CA1601400EC3F70 /* ELM327ResponseParser.m */; };
@@ -142,8 +152,6 @@
 		CC65DF851CA1674F00EC3F70 /* OSVOBDController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC65DF841CA1674F00EC3F70 /* OSVOBDController.m */; };
 		CC6E45911CCE7577007DB5CA /* OSVTipView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CC6E45901CCE7577007DB5CA /* OSVTipView.xib */; };
 		CC6E45941CCE75F4007DB5CA /* OSVTipView.m in Sources */ = {isa = PBXBuildFile; fileRef = CC6E45931CCE75F4007DB5CA /* OSVTipView.m */; };
-		CC6E45AD1CD0C59B007DB5CA /* OSVCamView.m in Sources */ = {isa = PBXBuildFile; fileRef = CC6E45AC1CD0C59B007DB5CA /* OSVCamView.m */; };
-		CC6E45AE1CD0C59B007DB5CA /* OSVCamView.m in Sources */ = {isa = PBXBuildFile; fileRef = CC6E45AC1CD0C59B007DB5CA /* OSVCamView.m */; };
 		CC791E5C1BF0A0E700E5CBD3 /* OSVUploadCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CC791E5B1BF0A0E700E5CBD3 /* OSVUploadCell.m */; };
 		CC791E5F1BF0A11100E5CBD3 /* OSVSettingsSwitchCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CC791E5E1BF0A11100E5CBD3 /* OSVSettingsSwitchCell.m */; };
 		CC7A63FD1CA2CFE8007C9F3B /* OSVSettingsButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CC7A63FB1CA2CFE8007C9F3B /* OSVSettingsButtonCell.m */; };
@@ -157,10 +165,6 @@
 		CC7C6A421CF5E03400C03051 /* CERangeSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = CC7C6A3A1CF5E01F00C03051 /* CERangeSlider.m */; };
 		CC7C6A431CF5E03700C03051 /* CERangeSliderKnobLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CC7C6A3C1CF5E01F00C03051 /* CERangeSliderKnobLayer.m */; };
 		CC7C6A441CF5E03900C03051 /* CERangeSliderTrackLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = CC7C6A3E1CF5E01F00C03051 /* CERangeSliderTrackLayer.m */; };
-		CC7CED1C1D427CBF00A50A8E /* SKMaps.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCF394741BC26CA9003F81AF /* SKMaps.framework */; };
-		CC7CED1D1D427CBF00A50A8E /* SKMaps.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CCF394741BC26CA9003F81AF /* SKMaps.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CC7CED1F1D427CD600A50A8E /* SKMaps.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCF394741BC26CA9003F81AF /* SKMaps.framework */; };
-		CC7CED201D427CD600A50A8E /* SKMaps.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CCF394741BC26CA9003F81AF /* SKMaps.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CC7F06391C6B6D5100441593 /* OSVTrackSyncController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC7F06381C6B6D5100441593 /* OSVTrackSyncController.m */; };
 		CC7F063C1C6B6D7E00441593 /* OSVPhotoSyncController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC7F063B1C6B6D7E00441593 /* OSVPhotoSyncController.m */; };
 		CC7F06461C6B7E6A00441593 /* OSVSyncUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = CC7F06451C6B7E6A00441593 /* OSVSyncUtils.m */; };
@@ -184,7 +188,6 @@
 		CC8960F71D2B9E5300501341 /* OSVMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC8960F51D2B9E5300501341 /* OSVMainViewController.m */; };
 		CC8960FA1D2B9ECF00501341 /* OSVLeftMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC8960F91D2B9ECF00501341 /* OSVLeftMenuViewController.m */; };
 		CC8960FB1D2B9ECF00501341 /* OSVLeftMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC8960F91D2B9ECF00501341 /* OSVLeftMenuViewController.m */; };
-		CC90C5D41BFB5F1800F7C69D /* SDWebImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC90C5D21BFB5F1000F7C69D /* SDWebImage.framework */; };
 		CC90C5D71BFB620800F7C69D /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC90C5D61BFB620800F7C69D /* ImageIO.framework */; };
 		CC91D5D01BFC751E003A6409 /* OSVExpandableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CC91D5CF1BFC751E003A6409 /* OSVExpandableCell.m */; };
 		CC91D5D31BFDE88E003A6409 /* OSVSequenceSectionHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = CC91D5D21BFDE88E003A6409 /* OSVSequenceSectionHeaderView.m */; };
@@ -207,7 +210,6 @@
 		CC9458661BDA32D300DFFD1A /* OSVUtils+FileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CC9458651BDA32D300DFFD1A /* OSVUtils+FileManager.m */; };
 		CC97264B1C1634A80034DE96 /* TPPropertyAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = CC9726481C1634A80034DE96 /* TPPropertyAnimation.m */; };
 		CCA16C1F1C92D1DA001EEB57 /* InfoBeta.plist in Resources */ = {isa = PBXBuildFile; fileRef = CCA16C1E1C92D1DA001EEB57 /* InfoBeta.plist */; };
-		CCA16C231C92F295001EEB57 /* SKMaps.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CCA16C221C92F295001EEB57 /* SKMaps.bundle */; };
 		CCA16C261C92F64B001EEB57 /* OSVSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CCC2C6481BA84F4A00A4CDEE /* OSVSettingsViewController.m */; };
 		CCA16C271C92F64B001EEB57 /* AVCamPreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = CCC2C6931BA850BB00A4CDEE /* AVCamPreviewView.m */; };
 		CCA16C281C92F64B001EEB57 /* OSVSyncController.m in Sources */ = {isa = PBXBuildFile; fileRef = CCC2C6851BA8506400A4CDEE /* OSVSyncController.m */; };
@@ -302,29 +304,24 @@
 		CCA16C8C1C92F64B001EEB57 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC06B6261C75BBB700E2B0DB /* CoreTelephony.framework */; };
 		CCA16C8D1C92F64B001EEB57 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC7F068E1C6DEF3900441593 /* MobileCoreServices.framework */; };
 		CCA16C8E1C92F64B001EEB57 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC90C5D61BFB620800F7C69D /* ImageIO.framework */; };
-		CCA16C8F1C92F64B001EEB57 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = CCFD49CD1BA02F25005B5E9A /* libc++.dylib */; };
-		CCA16C901C92F64B001EEB57 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = CCFD49CB1BA02F19005B5E9A /* libz.dylib */; };
 		CCA16C911C92F64B001EEB57 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCFD49C91BA02F0F005B5E9A /* CoreMotion.framework */; };
-		CCA16C921C92F64B001EEB57 /* SDWebImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC90C5D21BFB5F1000F7C69D /* SDWebImage.framework */; };
 		CCA16C931C92F64B001EEB57 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCFD49C71BA02F07005B5E9A /* CoreGraphics.framework */; };
 		CCA16C941C92F64B001EEB57 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCFD49C51BA02EFF005B5E9A /* QuartzCore.framework */; };
 		CCA16C961C92F64B001EEB57 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCFD49C31BA02EF7005B5E9A /* OpenGLES.framework */; };
 		CCA16C971C92F64B001EEB57 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCFD49C11BA02EEE005B5E9A /* CoreLocation.framework */; };
-		CCA16C981C92F64B001EEB57 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC12A1DD1C2404240019DB21 /* Crashlytics.framework */; };
 		CCA16C991C92F64B001EEB57 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCFD49BF1BA02EE7005B5E9A /* Foundation.framework */; };
-		CCA16C9A1C92F64B001EEB57 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC12A1DC1C2404240019DB21 /* Fabric.framework */; };
 		CCA16C9B1C92F64B001EEB57 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCFD49BD1BA02EDA005B5E9A /* UIKit.framework */; };
-		CCA16C9C1C92F64B001EEB57 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCFD4A551BA06605005B5E9A /* Realm.framework */; };
 		CCA16C9F1C92F64B001EEB57 /* OSVSegmentedViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CC06B6461C75F71C00E2B0DB /* OSVSegmentedViewCell.xib */; };
 		CCA16CA01C92F64B001EEB57 /* InfoEnterprise.plist in Resources */ = {isa = PBXBuildFile; fileRef = CC29AD9B1BA8807700538BD3 /* InfoEnterprise.plist */; };
 		CCA16CA11C92F64B001EEB57 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CCFD499E1BA02455005B5E9A /* Main.storyboard */; };
 		CCA16CA21C92F64B001EEB57 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCFD49A31BA02455005B5E9A /* LaunchScreen.xib */; };
 		CCA16CA31C92F64B001EEB57 /* InfoBeta.plist in Resources */ = {isa = PBXBuildFile; fileRef = CCA16C1E1C92D1DA001EEB57 /* InfoBeta.plist */; };
-		CCA16CA41C92F64B001EEB57 /* SKMaps.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CCA16C221C92F295001EEB57 /* SKMaps.bundle */; };
 		CCA16CA51C92F64B001EEB57 /* OSVFullScreenImageCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCBE0F161C8F1D9D00A43F37 /* OSVFullScreenImageCell.xib */; };
 		CCA16CA61C92F64B001EEB57 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CCB56F541C28072D00FFFC39 /* Localizable.strings */; };
 		CCA16CA71C92F64B001EEB57 /* OSVSequenceSectionHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CC91D5D41BFDE8AA003A6409 /* OSVSequenceSectionHeaderView.xib */; };
 		CCA16CA81C92F64B001EEB57 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CCFD49A11BA02455005B5E9A /* Images.xcassets */; };
+		CCAF7EC11D59C33600802D1B /* OBDBLEDeviceList.m in Sources */ = {isa = PBXBuildFile; fileRef = CCAF7EC01D59C33600802D1B /* OBDBLEDeviceList.m */; };
+		CCAF7EC21D59C33600802D1B /* OBDBLEDeviceList.m in Sources */ = {isa = PBXBuildFile; fileRef = CCAF7EC01D59C33600802D1B /* OBDBLEDeviceList.m */; };
 		CCB56F551C28072D00FFFC39 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CCB56F541C28072D00FFFC39 /* Localizable.strings */; };
 		CCB69D551C3E856D00832788 /* OSVAPIConfigurator.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB69D541C3E856D00832788 /* OSVAPIConfigurator.m */; };
 		CCB952D01CE5EAD3006D5BBD /* OSVAPI+Video.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB952CF1CE5EAD3006D5BBD /* OSVAPI+Video.m */; };
@@ -375,23 +372,11 @@
 		CCFD49C61BA02EFF005B5E9A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCFD49C51BA02EFF005B5E9A /* QuartzCore.framework */; };
 		CCFD49C81BA02F07005B5E9A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCFD49C71BA02F07005B5E9A /* CoreGraphics.framework */; };
 		CCFD49CA1BA02F10005B5E9A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCFD49C91BA02F0F005B5E9A /* CoreMotion.framework */; };
-		CCFD49CC1BA02F19005B5E9A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = CCFD49CB1BA02F19005B5E9A /* libz.dylib */; };
-		CCFD49CE1BA02F25005B5E9A /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = CCFD49CD1BA02F25005B5E9A /* libc++.dylib */; };
-		CCFD4A561BA06605005B5E9A /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCFD4A551BA06605005B5E9A /* Realm.framework */; };
+		D82CA580ABF5EE3A56569CAD /* Pods_OpenStreetViewRelease.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D96C56BCF2E540BBEFFA744 /* Pods_OpenStreetViewRelease.framework */; };
+		DC811D40DA55683BAC93A812 /* Pods_OpenStreetView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53A86B025D720FA16CBA4524 /* Pods_OpenStreetView.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		CC7CED1E1D427CBF00A50A8E /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				CC7CED1D1D427CBF00A50A8E /* SKMaps.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		CCA16CAA1C92F64B001EEB57 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -407,7 +392,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				CC7CED201D427CD600A50A8E /* SKMaps.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -424,6 +408,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0D96C56BCF2E540BBEFFA744 /* Pods_OpenStreetViewRelease.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OpenStreetViewRelease.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		244418F01B0BB9BE8E5468A5 /* Pods-OpenStreetViewRelease.enterprise.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenStreetViewRelease.enterprise.xcconfig"; path = "Pods/Target Support Files/Pods-OpenStreetViewRelease/Pods-OpenStreetViewRelease.enterprise.xcconfig"; sourceTree = "<group>"; };
+		53A86B025D720FA16CBA4524 /* Pods_OpenStreetView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OpenStreetView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		568DA0768A3FBE3F9CED9C76 /* Pods-OpenStreetView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenStreetView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-OpenStreetView/Pods-OpenStreetView.debug.xcconfig"; sourceTree = "<group>"; };
+		61065ED006F711614BE2E2D3 /* Pods-OpenStreetViewRelease.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenStreetViewRelease.release.xcconfig"; path = "Pods/Target Support Files/Pods-OpenStreetViewRelease/Pods-OpenStreetViewRelease.release.xcconfig"; sourceTree = "<group>"; };
+		76EFDE20412EDAEF4D2AEAC5 /* Pods-OpenStreetView.enterprise.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenStreetView.enterprise.xcconfig"; path = "Pods/Target Support Files/Pods-OpenStreetView/Pods-OpenStreetView.enterprise.xcconfig"; sourceTree = "<group>"; };
+		918840F1F96F2026A7C60A46 /* Pods-OpenStreetView.beta.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenStreetView.beta.xcconfig"; path = "Pods/Target Support Files/Pods-OpenStreetView/Pods-OpenStreetView.beta.xcconfig"; sourceTree = "<group>"; };
+		B5994CEE8F0652F6972FCE4A /* Pods-OpenStreetViewRelease.beta.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenStreetViewRelease.beta.xcconfig"; path = "Pods/Target Support Files/Pods-OpenStreetViewRelease/Pods-OpenStreetViewRelease.beta.xcconfig"; sourceTree = "<group>"; };
+		BCCC682778267DD5632A0C68 /* Pods-OpenStreetViewRelease.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenStreetViewRelease.debug.xcconfig"; path = "Pods/Target Support Files/Pods-OpenStreetViewRelease/Pods-OpenStreetViewRelease.debug.xcconfig"; sourceTree = "<group>"; };
 		CC0167271D2D647D00E8297D /* OSVMyTracksCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVMyTracksCell.h; sourceTree = "<group>"; };
 		CC0167281D2D647D00E8297D /* OSVMyTracksCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVMyTracksCell.m; sourceTree = "<group>"; };
 		CC01672B1D2D654100E8297D /* OSVTrackCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVTrackCell.h; sourceTree = "<group>"; };
@@ -459,8 +452,8 @@
 		CC06B6951C776A1A00E2B0DB /* OSVPolyline.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVPolyline.m; sourceTree = "<group>"; };
 		CC09AD7B1C73672100443761 /* UIDevice+Aditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice+Aditions.h"; sourceTree = "<group>"; };
 		CC09AD7C1C73672100443761 /* UIDevice+Aditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+Aditions.m"; sourceTree = "<group>"; };
-		CC12A1DC1C2404240019DB21 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
-		CC12A1DD1C2404240019DB21 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
+		CC12FCF81D51DA1A00EB1177 /* OSVCameraManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSVCameraManager.h; path = ViewControllers/OSVCameraManager.h; sourceTree = "<group>"; };
+		CC12FCF91D51DA1A00EB1177 /* OSVCameraManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OSVCameraManager.m; path = ViewControllers/OSVCameraManager.m; sourceTree = "<group>"; };
 		CC15291E1C02618D00BD29DC /* OSVFullScreenImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVFullScreenImageViewController.h; sourceTree = "<group>"; };
 		CC15291F1C02618D00BD29DC /* OSVFullScreenImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVFullScreenImageViewController.m; sourceTree = "<group>"; };
 		CC1529751C039DC500BD29DC /* OSVBaseUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVBaseUser.h; sourceTree = "<group>"; };
@@ -524,6 +517,17 @@
 		CC1E50511BF2986900BD4A1A /* UIAlertView+Blocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertView+Blocks.m"; sourceTree = "<group>"; };
 		CC1E50551BF3A38A00BD4A1A /* OSVBasicMapController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVBasicMapController.h; sourceTree = "<group>"; };
 		CC1E50561BF3A38A00BD4A1A /* OSVBasicMapController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVBasicMapController.m; sourceTree = "<group>"; };
+		CC1FFCDA1D58A48300958B8E /* OBDService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OBDService.h; sourceTree = "<group>"; };
+		CC1FFCDB1D58A48300958B8E /* OBDService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OBDService.m; sourceTree = "<group>"; };
+		CC1FFCDC1D58A48300958B8E /* OBDServiceDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OBDServiceDelegate.h; sourceTree = "<group>"; };
+		CC1FFCDD1D58A48300958B8E /* OBDDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OBDDevice.h; sourceTree = "<group>"; };
+		CC1FFCDE1D58A48300958B8E /* OBDDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OBDDevice.m; sourceTree = "<group>"; };
+		CC1FFCDF1D58A48300958B8E /* OBDDevice+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "OBDDevice+Internal.h"; sourceTree = "<group>"; };
+		CC1FFCE01D58A48300958B8E /* OBDDeviceDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OBDDeviceDelegate.h; sourceTree = "<group>"; };
+		CC1FFCE11D58A48300958B8E /* OBDSensors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OBDSensors.h; sourceTree = "<group>"; };
+		CC1FFCE21D58A48300958B8E /* OBDUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OBDUtils.h; sourceTree = "<group>"; };
+		CC1FFCE31D58A48300958B8E /* OBDUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OBDUtils.m; sourceTree = "<group>"; };
+		CC1FFCE41D58A48300958B8E /* OBDLib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OBDLib.h; sourceTree = "<group>"; };
 		CC225EC31D227A65000EC04C /* OSVDotedPolyline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSVDotedPolyline.h; path = Views/OSVDotedPolyline.h; sourceTree = "<group>"; };
 		CC225EC41D227A65000EC04C /* OSVDotedPolyline.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OSVDotedPolyline.m; path = Views/OSVDotedPolyline.m; sourceTree = "<group>"; };
 		CC2573CD1C003D16000EDB3E /* UIColor+OSVColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+OSVColor.h"; sourceTree = "<group>"; };
@@ -562,6 +566,8 @@
 		CC410AE21D12B9C7000220BA /* OSVFullScreenAnimationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVFullScreenAnimationController.m; sourceTree = "<group>"; };
 		CC410AE51D12B9E9000220BA /* OSVDissmissFullScreenAnimationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVDissmissFullScreenAnimationController.h; sourceTree = "<group>"; };
 		CC410AE61D12B9E9000220BA /* OSVDissmissFullScreenAnimationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVDissmissFullScreenAnimationController.m; sourceTree = "<group>"; };
+		CC42A36C1D5B4649001541DD /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Crashlytics.framework; path = Pods/Crashlytics/iOS/Crashlytics.framework; sourceTree = "<group>"; };
+		CC42A36E1D5B464F001541DD /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Fabric.framework; path = Pods/Fabric/iOS/Fabric.framework; sourceTree = "<group>"; };
 		CC4C7B3F1D3D3C1200B902E8 /* OSVLayersViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSVLayersViewController.h; path = ViewControllers/OSVLayersViewController.h; sourceTree = "<group>"; };
 		CC4C7B401D3D3C1200B902E8 /* OSVLayersViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OSVLayersViewController.m; path = ViewControllers/OSVLayersViewController.m; sourceTree = "<group>"; };
 		CC5492DD1C48DA190081AC56 /* OSVUploadViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVUploadViewController.h; sourceTree = "<group>"; };
@@ -570,6 +576,11 @@
 		CC5CC2751D2BC2AC002963D2 /* OSVMainMenuFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVMainMenuFactory.m; sourceTree = "<group>"; };
 		CC5EB4131C46741F006F3FD0 /* OSVLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSVLogger.h; path = BuisnessLogic/OSVLogger.h; sourceTree = "<group>"; };
 		CC5EB4141C46741F006F3FD0 /* OSVLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OSVLogger.m; path = BuisnessLogic/OSVLogger.m; sourceTree = "<group>"; };
+		CC648E831D4B5DA300F8F2DC /* opencv2 */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = opencv2; path = lib/opencv2; sourceTree = "<group>"; };
+		CC648E841D4B5DA300F8F2DC /* sl */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = sl; path = lib/sl; sourceTree = "<group>"; };
+		CC648E851D4B5DA300F8F2DC /* sl_foundation */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = sl_foundation; path = lib/sl_foundation; sourceTree = "<group>"; };
+		CC648E861D4B5DA300F8F2DC /* sl_jsoncpp */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = sl_jsoncpp; path = lib/sl_jsoncpp; sourceTree = "<group>"; };
+		CC648E871D4B5DA300F8F2DC /* sl_utils */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = sl_utils; path = lib/sl_utils; sourceTree = "<group>"; };
 		CC65DF5E1CA1601400EC3F70 /* FLScanTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLScanTool.h; sourceTree = "<group>"; };
 		CC65DF5F1CA1601400EC3F70 /* FLScanTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLScanTool.m; sourceTree = "<group>"; };
 		CC65DF601CA1601400EC3F70 /* FLScanTool_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLScanTool_Private.h; sourceTree = "<group>"; };
@@ -595,11 +606,67 @@
 		CC65DF781CA1601400EC3F70 /* FLWifiScanTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLWifiScanTool.m; sourceTree = "<group>"; };
 		CC65DF831CA1674F00EC3F70 /* OSVOBDController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVOBDController.h; sourceTree = "<group>"; };
 		CC65DF841CA1674F00EC3F70 /* OSVOBDController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVOBDController.m; sourceTree = "<group>"; };
+		CC69E11D1D4F97AF00D0511B /* affine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = affine.hpp; sourceTree = "<group>"; };
+		CC69E11E1D4F97AF00D0511B /* base.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = base.hpp; sourceTree = "<group>"; };
+		CC69E11F1D4F97AF00D0511B /* bufferpool.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = bufferpool.hpp; sourceTree = "<group>"; };
+		CC69E1201D4F97AF00D0511B /* core.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = core.hpp; sourceTree = "<group>"; };
+		CC69E1211D4F97AF00D0511B /* core_c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = core_c.h; sourceTree = "<group>"; };
+		CC69E1221D4F97AF00D0511B /* cuda.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cuda.hpp; sourceTree = "<group>"; };
+		CC69E1231D4F97AF00D0511B /* cuda.inl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cuda.inl.hpp; sourceTree = "<group>"; };
+		CC69E1241D4F97AF00D0511B /* cuda_stream_accessor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cuda_stream_accessor.hpp; sourceTree = "<group>"; };
+		CC69E1251D4F97AF00D0511B /* cuda_types.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cuda_types.hpp; sourceTree = "<group>"; };
+		CC69E1261D4F97AF00D0511B /* cvdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cvdef.h; sourceTree = "<group>"; };
+		CC69E1271D4F97AF00D0511B /* cvstd.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cvstd.hpp; sourceTree = "<group>"; };
+		CC69E1281D4F97AF00D0511B /* cvstd.inl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cvstd.inl.hpp; sourceTree = "<group>"; };
+		CC69E1291D4F97AF00D0511B /* directx.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = directx.hpp; sourceTree = "<group>"; };
+		CC69E12A1D4F97AF00D0511B /* eigen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = eigen.hpp; sourceTree = "<group>"; };
+		CC69E12B1D4F97AF00D0511B /* ippasync.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ippasync.hpp; sourceTree = "<group>"; };
+		CC69E12C1D4F97AF00D0511B /* mat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mat.hpp; sourceTree = "<group>"; };
+		CC69E12D1D4F97AF00D0511B /* mat.inl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mat.inl.hpp; sourceTree = "<group>"; };
+		CC69E12E1D4F97AF00D0511B /* matx.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = matx.hpp; sourceTree = "<group>"; };
+		CC69E12F1D4F97AF00D0511B /* ocl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ocl.hpp; sourceTree = "<group>"; };
+		CC69E1301D4F97AF00D0511B /* ocl_genbase.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ocl_genbase.hpp; sourceTree = "<group>"; };
+		CC69E1311D4F97AF00D0511B /* opengl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = opengl.hpp; sourceTree = "<group>"; };
+		CC69E1321D4F97AF00D0511B /* operations.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = operations.hpp; sourceTree = "<group>"; };
+		CC69E1331D4F97AF00D0511B /* optim.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = optim.hpp; sourceTree = "<group>"; };
+		CC69E1341D4F97AF00D0511B /* persistence.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = persistence.hpp; sourceTree = "<group>"; };
+		CC69E1351D4F97AF00D0511B /* private.cuda.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = private.cuda.hpp; sourceTree = "<group>"; };
+		CC69E1361D4F97AF00D0511B /* private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = private.hpp; sourceTree = "<group>"; };
+		CC69E1371D4F97AF00D0511B /* ptr.inl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ptr.inl.hpp; sourceTree = "<group>"; };
+		CC69E1381D4F97AF00D0511B /* sse_utils.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = sse_utils.hpp; sourceTree = "<group>"; };
+		CC69E1391D4F97AF00D0511B /* traits.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = traits.hpp; sourceTree = "<group>"; };
+		CC69E13A1D4F97AF00D0511B /* types.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = types.hpp; sourceTree = "<group>"; };
+		CC69E13B1D4F97AF00D0511B /* types_c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = types_c.h; sourceTree = "<group>"; };
+		CC69E13C1D4F97AF00D0511B /* utility.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = utility.hpp; sourceTree = "<group>"; };
+		CC69E13D1D4F97AF00D0511B /* version.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = version.hpp; sourceTree = "<group>"; };
+		CC69E13E1D4F97AF00D0511B /* wimage.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = wimage.hpp; sourceTree = "<group>"; };
+		CC69E13F1D4F97AF00D0511B /* core.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = core.hpp; sourceTree = "<group>"; };
+		CC69E1411D4F97AF00D0511B /* defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = defs.h; sourceTree = "<group>"; };
+		CC69E1421D4F97AF00D0511B /* intrin.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = intrin.hpp; sourceTree = "<group>"; };
+		CC69E1431D4F97AF00D0511B /* intrin_cpp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = intrin_cpp.hpp; sourceTree = "<group>"; };
+		CC69E1441D4F97AF00D0511B /* intrin_neon.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = intrin_neon.hpp; sourceTree = "<group>"; };
+		CC69E1451D4F97AF00D0511B /* intrin_sse.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = intrin_sse.hpp; sourceTree = "<group>"; };
+		CC69E1461D4F97AF00D0511B /* hal.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = hal.hpp; sourceTree = "<group>"; };
+		CC69E1481D4F97AF00D0511B /* imgcodecs.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = imgcodecs.hpp; sourceTree = "<group>"; };
+		CC69E1491D4F97AF00D0511B /* imgcodecs_c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imgcodecs_c.h; sourceTree = "<group>"; };
+		CC69E14A1D4F97AF00D0511B /* ios.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ios.h; sourceTree = "<group>"; };
+		CC69E14B1D4F97AF00D0511B /* imgcodecs.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = imgcodecs.hpp; sourceTree = "<group>"; };
+		CC69E14D1D4F97AF00D0511B /* imgproc.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = imgproc.hpp; sourceTree = "<group>"; };
+		CC69E14E1D4F97AF00D0511B /* imgproc_c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imgproc_c.h; sourceTree = "<group>"; };
+		CC69E14F1D4F97AF00D0511B /* types_c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = types_c.h; sourceTree = "<group>"; };
+		CC69E1501D4F97AF00D0511B /* imgproc.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = imgproc.hpp; sourceTree = "<group>"; };
+		CC69E1521D4F97AF00D0511B /* SensorLib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SensorLib.h; sourceTree = "<group>"; };
+		CC69E1531D4F97AF00D0511B /* SensorLibExports.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SensorLibExports.h; sourceTree = "<group>"; };
+		CC69E1541D4F97AF00D0511B /* settings_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = settings_defines.h; sourceTree = "<group>"; };
+		CC69E1551D4F97AF00D0511B /* settings_factory_singleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = settings_factory_singleton.h; sourceTree = "<group>"; };
+		CC69E1561D4F97AF00D0511B /* Singleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Singleton.h; sourceTree = "<group>"; };
+		CC69E1571D4F97AF00D0511B /* SLSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SLSettings.h; sourceTree = "<group>"; };
+		CC69E1581D4F97AF00D0511B /* Strategos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Strategos.h; sourceTree = "<group>"; };
+		CC69E1591D4F97AF00D0511B /* VideoTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoTools.h; sourceTree = "<group>"; };
+		CC69E15B1D4F97AF00D0511B /* visibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = visibility.h; sourceTree = "<group>"; };
 		CC6E45901CCE7577007DB5CA /* OSVTipView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OSVTipView.xib; sourceTree = "<group>"; };
 		CC6E45921CCE75F4007DB5CA /* OSVTipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSVTipView.h; path = Views/OSVTipView.h; sourceTree = "<group>"; };
 		CC6E45931CCE75F4007DB5CA /* OSVTipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OSVTipView.m; path = Views/OSVTipView.m; sourceTree = "<group>"; };
-		CC6E45AB1CD0C59A007DB5CA /* OSVCamView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSVCamView.h; path = Views/OSVCamView.h; sourceTree = "<group>"; };
-		CC6E45AC1CD0C59B007DB5CA /* OSVCamView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OSVCamView.m; path = Views/OSVCamView.m; sourceTree = "<group>"; };
 		CC700FDC1BE25C3D007A646F /* OSVAPITests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVAPITests.m; sourceTree = "<group>"; };
 		CC700FDE1BE25C52007A646F /* OSMAPITests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSMAPITests.m; sourceTree = "<group>"; };
 		CC700FE01BE25C79007A646F /* OSVPersistenceManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVPersistenceManagerTests.m; sourceTree = "<group>"; };
@@ -659,7 +726,6 @@
 		CC8960F51D2B9E5300501341 /* OSVMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OSVMainViewController.m; path = ViewControllers/OSVMainViewController.m; sourceTree = "<group>"; };
 		CC8960F81D2B9ECF00501341 /* OSVLeftMenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVLeftMenuViewController.h; sourceTree = "<group>"; };
 		CC8960F91D2B9ECF00501341 /* OSVLeftMenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVLeftMenuViewController.m; sourceTree = "<group>"; };
-		CC90C5D21BFB5F1000F7C69D /* SDWebImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SDWebImage.framework; sourceTree = "<group>"; };
 		CC90C5D61BFB620800F7C69D /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		CC91D5CE1BFC751E003A6409 /* OSVExpandableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVExpandableCell.h; sourceTree = "<group>"; };
 		CC91D5CF1BFC751E003A6409 /* OSVExpandableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVExpandableCell.m; sourceTree = "<group>"; };
@@ -685,8 +751,9 @@
 		CC9726471C1634A80034DE96 /* TPPropertyAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TPPropertyAnimation.h; sourceTree = "<group>"; };
 		CC9726481C1634A80034DE96 /* TPPropertyAnimation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TPPropertyAnimation.m; sourceTree = "<group>"; };
 		CCA16C1E1C92D1DA001EEB57 /* InfoBeta.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = InfoBeta.plist; sourceTree = "<group>"; };
-		CCA16C221C92F295001EEB57 /* SKMaps.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = SKMaps.bundle; sourceTree = "<group>"; };
 		CCA16CB61C92F64B001EEB57 /* OSV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OSV.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CCAF7EBF1D59C33600802D1B /* OBDBLEDeviceList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OBDBLEDeviceList.h; sourceTree = "<group>"; };
+		CCAF7EC01D59C33600802D1B /* OBDBLEDeviceList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OBDBLEDeviceList.m; sourceTree = "<group>"; };
 		CCB56F541C28072D00FFFC39 /* Localizable.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		CCB56F561C28088B00FFFC39 /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/Main.strings; sourceTree = "<group>"; };
 		CCB56F571C28088B00FFFC39 /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -743,7 +810,6 @@
 		CCE6C45F1C105008005DC6FF /* OSVCropedLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVCropedLabel.m; sourceTree = "<group>"; };
 		CCF10DA01BF4A3C200A620EF /* OSVSequenceMapController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVSequenceMapController.h; sourceTree = "<group>"; };
 		CCF10DA11BF4A3C200A620EF /* OSVSequenceMapController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVSequenceMapController.m; sourceTree = "<group>"; };
-		CCF394741BC26CA9003F81AF /* SKMaps.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SKMaps.framework; sourceTree = "<group>"; };
 		CCF822971C05B0C700E607D9 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Config.xcconfig; path = ../Config.xcconfig; sourceTree = "<group>"; };
 		CCF822DD1C06FDAE00E607D9 /* OSVImageCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVImageCollectionViewCell.h; sourceTree = "<group>"; };
 		CCF822DE1C06FDAE00E607D9 /* OSVImageCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVImageCollectionViewCell.m; sourceTree = "<group>"; };
@@ -770,9 +836,7 @@
 		CCFD49C51BA02EFF005B5E9A /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		CCFD49C71BA02F07005B5E9A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		CCFD49C91BA02F0F005B5E9A /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
-		CCFD49CB1BA02F19005B5E9A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		CCFD49CD1BA02F25005B5E9A /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
-		CCFD4A551BA06605005B5E9A /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = "<group>"; };
+		D3A9DC100926C3AD8E6C6DA0 /* Pods-OpenStreetView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenStreetView.release.xcconfig"; path = "Pods/Target Support Files/Pods-OpenStreetView/Pods-OpenStreetView.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -780,25 +844,21 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CC42A3751D5B4DE2001541DD /* Fabric.framework in Frameworks */,
+				CC42A3741D5B4DCA001541DD /* Crashlytics.framework in Frameworks */,
 				CCA16C8A1C92F64B001EEB57 /* AVFoundation.framework in Frameworks */,
 				CCA16C8B1C92F64B001EEB57 /* SystemConfiguration.framework in Frameworks */,
 				CCA16C8C1C92F64B001EEB57 /* CoreTelephony.framework in Frameworks */,
 				CCA16C8D1C92F64B001EEB57 /* MobileCoreServices.framework in Frameworks */,
 				CCA16C8E1C92F64B001EEB57 /* ImageIO.framework in Frameworks */,
-				CCA16C8F1C92F64B001EEB57 /* libc++.dylib in Frameworks */,
-				CCA16C901C92F64B001EEB57 /* libz.dylib in Frameworks */,
 				CCA16C911C92F64B001EEB57 /* CoreMotion.framework in Frameworks */,
-				CCA16C921C92F64B001EEB57 /* SDWebImage.framework in Frameworks */,
 				CCA16C931C92F64B001EEB57 /* CoreGraphics.framework in Frameworks */,
 				CCA16C941C92F64B001EEB57 /* QuartzCore.framework in Frameworks */,
 				CCA16C961C92F64B001EEB57 /* OpenGLES.framework in Frameworks */,
 				CCA16C971C92F64B001EEB57 /* CoreLocation.framework in Frameworks */,
-				CCA16C981C92F64B001EEB57 /* Crashlytics.framework in Frameworks */,
-				CC7CED1F1D427CD600A50A8E /* SKMaps.framework in Frameworks */,
 				CCA16C991C92F64B001EEB57 /* Foundation.framework in Frameworks */,
-				CCA16C9A1C92F64B001EEB57 /* Fabric.framework in Frameworks */,
 				CCA16C9B1C92F64B001EEB57 /* UIKit.framework in Frameworks */,
-				CCA16C9C1C92F64B001EEB57 /* Realm.framework in Frameworks */,
+				D82CA580ABF5EE3A56569CAD /* Pods_OpenStreetViewRelease.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -806,26 +866,22 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CC42A3771D5B4DFC001541DD /* Fabric.framework in Frameworks */,
+				CC42A3761D5B4DF0001541DD /* Crashlytics.framework in Frameworks */,
 				CC0167EA1D2F9A8200E8297D /* CoreMedia.framework in Frameworks */,
 				CC06B62B1C75BBD900E2B0DB /* AVFoundation.framework in Frameworks */,
 				CC06B6291C75BBC300E2B0DB /* SystemConfiguration.framework in Frameworks */,
 				CC06B6271C75BBB700E2B0DB /* CoreTelephony.framework in Frameworks */,
 				CC7F068F1C6DEF3900441593 /* MobileCoreServices.framework in Frameworks */,
 				CC90C5D71BFB620800F7C69D /* ImageIO.framework in Frameworks */,
-				CCFD49CE1BA02F25005B5E9A /* libc++.dylib in Frameworks */,
-				CC7CED1C1D427CBF00A50A8E /* SKMaps.framework in Frameworks */,
-				CCFD49CC1BA02F19005B5E9A /* libz.dylib in Frameworks */,
 				CCFD49CA1BA02F10005B5E9A /* CoreMotion.framework in Frameworks */,
-				CC90C5D41BFB5F1800F7C69D /* SDWebImage.framework in Frameworks */,
 				CCFD49C81BA02F07005B5E9A /* CoreGraphics.framework in Frameworks */,
 				CCFD49C61BA02EFF005B5E9A /* QuartzCore.framework in Frameworks */,
 				CCFD49C41BA02EF7005B5E9A /* OpenGLES.framework in Frameworks */,
 				CCFD49C21BA02EEE005B5E9A /* CoreLocation.framework in Frameworks */,
-				CC12A1DF1C2404240019DB21 /* Crashlytics.framework in Frameworks */,
 				CCFD49C01BA02EE7005B5E9A /* Foundation.framework in Frameworks */,
-				CC12A1DE1C2404240019DB21 /* Fabric.framework in Frameworks */,
 				CCFD49BE1BA02EDA005B5E9A /* UIKit.framework in Frameworks */,
-				CCFD4A561BA06605005B5E9A /* Realm.framework in Frameworks */,
+				DC811D40DA55683BAC93A812 /* Pods_OpenStreetView.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1000,6 +1056,24 @@
 			name = MapState;
 			sourceTree = "<group>";
 		};
+		CC1FFCD91D58A43800958B8E /* OBDLib */ = {
+			isa = PBXGroup;
+			children = (
+				CC1FFCDA1D58A48300958B8E /* OBDService.h */,
+				CC1FFCDB1D58A48300958B8E /* OBDService.m */,
+				CC1FFCDC1D58A48300958B8E /* OBDServiceDelegate.h */,
+				CC1FFCDD1D58A48300958B8E /* OBDDevice.h */,
+				CC1FFCDE1D58A48300958B8E /* OBDDevice.m */,
+				CC1FFCDF1D58A48300958B8E /* OBDDevice+Internal.h */,
+				CC1FFCE01D58A48300958B8E /* OBDDeviceDelegate.h */,
+				CC1FFCE11D58A48300958B8E /* OBDSensors.h */,
+				CC1FFCE21D58A48300958B8E /* OBDUtils.h */,
+				CC1FFCE31D58A48300958B8E /* OBDUtils.m */,
+				CC1FFCE41D58A48300958B8E /* OBDLib.h */,
+			);
+			name = OBDLib;
+			sourceTree = "<group>";
+		};
 		CC2573E81C0055DF000EDB3E /* UIKit+Aditions */ = {
 			isa = PBXGroup;
 			children = (
@@ -1147,6 +1221,8 @@
 				CC0168961D3514AF00E8297D /* Settings */,
 				CC4C7B3F1D3D3C1200B902E8 /* OSVLayersViewController.h */,
 				CC4C7B401D3D3C1200B902E8 /* OSVLayersViewController.m */,
+				CCAF7EBF1D59C33600802D1B /* OBDBLEDeviceList.h */,
+				CCAF7EC01D59C33600802D1B /* OBDBLEDeviceList.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -1220,6 +1296,127 @@
 				CC65DF761CA1601400EC3F70 /* ELM327ResponseParser.m */,
 			);
 			path = elm327;
+			sourceTree = "<group>";
+		};
+		CC69E11A1D4F97AF00D0511B /* include */ = {
+			isa = PBXGroup;
+			children = (
+				CC69E11B1D4F97AF00D0511B /* opencv2 */,
+				CC69E1511D4F97AF00D0511B /* sl */,
+				CC69E15A1D4F97AF00D0511B /* utils */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		CC69E11B1D4F97AF00D0511B /* opencv2 */ = {
+			isa = PBXGroup;
+			children = (
+				CC69E11C1D4F97AF00D0511B /* core */,
+				CC69E13F1D4F97AF00D0511B /* core.hpp */,
+				CC69E1401D4F97AF00D0511B /* hal */,
+				CC69E1461D4F97AF00D0511B /* hal.hpp */,
+				CC69E1471D4F97AF00D0511B /* imgcodecs */,
+				CC69E14B1D4F97AF00D0511B /* imgcodecs.hpp */,
+				CC69E14C1D4F97AF00D0511B /* imgproc */,
+				CC69E1501D4F97AF00D0511B /* imgproc.hpp */,
+			);
+			path = opencv2;
+			sourceTree = "<group>";
+		};
+		CC69E11C1D4F97AF00D0511B /* core */ = {
+			isa = PBXGroup;
+			children = (
+				CC69E11D1D4F97AF00D0511B /* affine.hpp */,
+				CC69E11E1D4F97AF00D0511B /* base.hpp */,
+				CC69E11F1D4F97AF00D0511B /* bufferpool.hpp */,
+				CC69E1201D4F97AF00D0511B /* core.hpp */,
+				CC69E1211D4F97AF00D0511B /* core_c.h */,
+				CC69E1221D4F97AF00D0511B /* cuda.hpp */,
+				CC69E1231D4F97AF00D0511B /* cuda.inl.hpp */,
+				CC69E1241D4F97AF00D0511B /* cuda_stream_accessor.hpp */,
+				CC69E1251D4F97AF00D0511B /* cuda_types.hpp */,
+				CC69E1261D4F97AF00D0511B /* cvdef.h */,
+				CC69E1271D4F97AF00D0511B /* cvstd.hpp */,
+				CC69E1281D4F97AF00D0511B /* cvstd.inl.hpp */,
+				CC69E1291D4F97AF00D0511B /* directx.hpp */,
+				CC69E12A1D4F97AF00D0511B /* eigen.hpp */,
+				CC69E12B1D4F97AF00D0511B /* ippasync.hpp */,
+				CC69E12C1D4F97AF00D0511B /* mat.hpp */,
+				CC69E12D1D4F97AF00D0511B /* mat.inl.hpp */,
+				CC69E12E1D4F97AF00D0511B /* matx.hpp */,
+				CC69E12F1D4F97AF00D0511B /* ocl.hpp */,
+				CC69E1301D4F97AF00D0511B /* ocl_genbase.hpp */,
+				CC69E1311D4F97AF00D0511B /* opengl.hpp */,
+				CC69E1321D4F97AF00D0511B /* operations.hpp */,
+				CC69E1331D4F97AF00D0511B /* optim.hpp */,
+				CC69E1341D4F97AF00D0511B /* persistence.hpp */,
+				CC69E1351D4F97AF00D0511B /* private.cuda.hpp */,
+				CC69E1361D4F97AF00D0511B /* private.hpp */,
+				CC69E1371D4F97AF00D0511B /* ptr.inl.hpp */,
+				CC69E1381D4F97AF00D0511B /* sse_utils.hpp */,
+				CC69E1391D4F97AF00D0511B /* traits.hpp */,
+				CC69E13A1D4F97AF00D0511B /* types.hpp */,
+				CC69E13B1D4F97AF00D0511B /* types_c.h */,
+				CC69E13C1D4F97AF00D0511B /* utility.hpp */,
+				CC69E13D1D4F97AF00D0511B /* version.hpp */,
+				CC69E13E1D4F97AF00D0511B /* wimage.hpp */,
+			);
+			path = core;
+			sourceTree = "<group>";
+		};
+		CC69E1401D4F97AF00D0511B /* hal */ = {
+			isa = PBXGroup;
+			children = (
+				CC69E1411D4F97AF00D0511B /* defs.h */,
+				CC69E1421D4F97AF00D0511B /* intrin.hpp */,
+				CC69E1431D4F97AF00D0511B /* intrin_cpp.hpp */,
+				CC69E1441D4F97AF00D0511B /* intrin_neon.hpp */,
+				CC69E1451D4F97AF00D0511B /* intrin_sse.hpp */,
+			);
+			path = hal;
+			sourceTree = "<group>";
+		};
+		CC69E1471D4F97AF00D0511B /* imgcodecs */ = {
+			isa = PBXGroup;
+			children = (
+				CC69E1481D4F97AF00D0511B /* imgcodecs.hpp */,
+				CC69E1491D4F97AF00D0511B /* imgcodecs_c.h */,
+				CC69E14A1D4F97AF00D0511B /* ios.h */,
+			);
+			path = imgcodecs;
+			sourceTree = "<group>";
+		};
+		CC69E14C1D4F97AF00D0511B /* imgproc */ = {
+			isa = PBXGroup;
+			children = (
+				CC69E14D1D4F97AF00D0511B /* imgproc.hpp */,
+				CC69E14E1D4F97AF00D0511B /* imgproc_c.h */,
+				CC69E14F1D4F97AF00D0511B /* types_c.h */,
+			);
+			path = imgproc;
+			sourceTree = "<group>";
+		};
+		CC69E1511D4F97AF00D0511B /* sl */ = {
+			isa = PBXGroup;
+			children = (
+				CC69E1521D4F97AF00D0511B /* SensorLib.h */,
+				CC69E1531D4F97AF00D0511B /* SensorLibExports.h */,
+				CC69E1541D4F97AF00D0511B /* settings_defines.h */,
+				CC69E1551D4F97AF00D0511B /* settings_factory_singleton.h */,
+				CC69E1561D4F97AF00D0511B /* Singleton.h */,
+				CC69E1571D4F97AF00D0511B /* SLSettings.h */,
+				CC69E1581D4F97AF00D0511B /* Strategos.h */,
+				CC69E1591D4F97AF00D0511B /* VideoTools.h */,
+			);
+			path = sl;
+			sourceTree = "<group>";
+		};
+		CC69E15A1D4F97AF00D0511B /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				CC69E15B1D4F97AF00D0511B /* visibility.h */,
+			);
+			path = utils;
 			sourceTree = "<group>";
 		};
 		CC735C771BE8C2E4001E7E03 /* OpenStreetViewUITests */ = {
@@ -1392,6 +1589,8 @@
 		CCC2C64D1BA84FD700A4CDEE /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
+				CC1FFCD91D58A43800958B8E /* OBDLib */,
+				CC69E11A1D4F97AF00D0511B /* include */,
 				CCD2E7191D423410007C2A32 /* ATAppUpdater.h */,
 				CCD2E71A1D423410007C2A32 /* ATAppUpdater.m */,
 				CC8960EE1D2B935500501341 /* SideMenu */,
@@ -1413,8 +1612,8 @@
 				CCC2C6421BA84F4A00A4CDEE /* AVCamViewController.m */,
 				CCC2C6431BA84F4A00A4CDEE /* OSVCamViewController.h */,
 				CCC2C6441BA84F4A00A4CDEE /* OSVCamViewController.m */,
-				CC6E45AB1CD0C59A007DB5CA /* OSVCamView.h */,
-				CC6E45AC1CD0C59B007DB5CA /* OSVCamView.m */,
+				CC12FCF81D51DA1A00EB1177 /* OSVCameraManager.h */,
+				CC12FCF91D51DA1A00EB1177 /* OSVCameraManager.m */,
 			);
 			name = Camera;
 			sourceTree = "<group>";
@@ -1501,6 +1700,7 @@
 				CCFD49CF1BA03156005B5E9A /* Resources */,
 				CCFD49BA1BA028F0005B5E9A /* Frameworks */,
 				CCFD49921BA02455005B5E9A /* Products */,
+				D53B87E3951A9F6256E47AF7 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1570,26 +1770,28 @@
 		CCFD49BA1BA028F0005B5E9A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CC42A36E1D5B464F001541DD /* Fabric.framework */,
+				CC42A36C1D5B4649001541DD /* Crashlytics.framework */,
+				CC648E831D4B5DA300F8F2DC /* opencv2 */,
+				CC648E841D4B5DA300F8F2DC /* sl */,
+				CC648E851D4B5DA300F8F2DC /* sl_foundation */,
+				CC648E861D4B5DA300F8F2DC /* sl_jsoncpp */,
+				CC648E871D4B5DA300F8F2DC /* sl_utils */,
 				CC0167E91D2F9A8200E8297D /* CoreMedia.framework */,
 				CC06B62A1C75BBD900E2B0DB /* AVFoundation.framework */,
 				CCFD49C71BA02F07005B5E9A /* CoreGraphics.framework */,
 				CCFD49C11BA02EEE005B5E9A /* CoreLocation.framework */,
 				CCFD49C91BA02F0F005B5E9A /* CoreMotion.framework */,
 				CC06B6261C75BBB700E2B0DB /* CoreTelephony.framework */,
-				CC12A1DD1C2404240019DB21 /* Crashlytics.framework */,
-				CC12A1DC1C2404240019DB21 /* Fabric.framework */,
 				CCFD49BF1BA02EE7005B5E9A /* Foundation.framework */,
 				CC90C5D61BFB620800F7C69D /* ImageIO.framework */,
-				CCFD49CD1BA02F25005B5E9A /* libc++.dylib */,
-				CCFD49CB1BA02F19005B5E9A /* libz.dylib */,
 				CC7F068E1C6DEF3900441593 /* MobileCoreServices.framework */,
 				CCFD49C31BA02EF7005B5E9A /* OpenGLES.framework */,
 				CCFD49C51BA02EFF005B5E9A /* QuartzCore.framework */,
-				CCFD4A551BA06605005B5E9A /* Realm.framework */,
-				CC90C5D21BFB5F1000F7C69D /* SDWebImage.framework */,
-				CCF394741BC26CA9003F81AF /* SKMaps.framework */,
 				CC06B6281C75BBC300E2B0DB /* SystemConfiguration.framework */,
 				CCFD49BD1BA02EDA005B5E9A /* UIKit.framework */,
+				53A86B025D720FA16CBA4524 /* Pods_OpenStreetView.framework */,
+				0D96C56BCF2E540BBEFFA744 /* Pods_OpenStreetViewRelease.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1598,7 +1800,6 @@
 			isa = PBXGroup;
 			children = (
 				CC359D9E1CC4DBF6007DBD49 /* photoShutter2.caf */,
-				CCA16C221C92F295001EEB57 /* SKMaps.bundle */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1613,6 +1814,21 @@
 			name = Persistence;
 			sourceTree = "<group>";
 		};
+		D53B87E3951A9F6256E47AF7 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				568DA0768A3FBE3F9CED9C76 /* Pods-OpenStreetView.debug.xcconfig */,
+				D3A9DC100926C3AD8E6C6DA0 /* Pods-OpenStreetView.release.xcconfig */,
+				76EFDE20412EDAEF4D2AEAC5 /* Pods-OpenStreetView.enterprise.xcconfig */,
+				918840F1F96F2026A7C60A46 /* Pods-OpenStreetView.beta.xcconfig */,
+				BCCC682778267DD5632A0C68 /* Pods-OpenStreetViewRelease.debug.xcconfig */,
+				61065ED006F711614BE2E2D3 /* Pods-OpenStreetViewRelease.release.xcconfig */,
+				244418F01B0BB9BE8E5468A5 /* Pods-OpenStreetViewRelease.enterprise.xcconfig */,
+				B5994CEE8F0652F6972FCE4A /* Pods-OpenStreetViewRelease.beta.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1620,14 +1836,17 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = CCA16CB11C92F64B001EEB57 /* Build configuration list for PBXNativeTarget "OpenStreetViewRelease" */;
 			buildPhases = (
+				CCA1BE655A028522632548C6 /* 📦 Check Pods Manifest.lock */,
 				CCA16C251C92F64B001EEB57 /* Sources */,
 				CCA16C881C92F64B001EEB57 /* Frameworks */,
 				CCA16C9E1C92F64B001EEB57 /* Resources */,
 				CCA16CAA1C92F64B001EEB57 /* CopyFiles */,
 				CCA16CAB1C92F64B001EEB57 /* Embed Frameworks */,
 				CCA16CAD1C92F64B001EEB57 /* Revision Number Script */,
-				CCA16CAE1C92F64B001EEB57 /* ShellScript */,
 				CCA16CB01C92F64B001EEB57 /* RemoveUnusedArch */,
+				4C4043EDB8BCA142998D7A1D /* 📦 Embed Pods Frameworks */,
+				6063DEECC26DDED4B8869791 /* 📦 Copy Pods Resources */,
+				CC42A3731D5B47C2001541DD /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1642,13 +1861,15 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = CCFD49B41BA02455005B5E9A /* Build configuration list for PBXNativeTarget "OpenStreetView" */;
 			buildPhases = (
+				4EED58DA2B525129B9BB1CD5 /* 📦 Check Pods Manifest.lock */,
 				CCFD498D1BA02455005B5E9A /* Sources */,
 				CCFD498E1BA02455005B5E9A /* Frameworks */,
 				CCFD498F1BA02455005B5E9A /* Resources */,
 				CCFD4A4A1BA05D06005B5E9A /* CopyFiles */,
 				CC8C01331BDE3D950011BE4D /* Revision Number Script */,
-				CC12A1DB1C23FF5A0019DB21 /* ShellScript */,
-				CC7CED1E1D427CBF00A50A8E /* Embed Frameworks */,
+				A04AAF56780F19FAE1F2F2CD /* 📦 Embed Pods Frameworks */,
+				7327978942410886812C037A /* 📦 Copy Pods Resources */,
+				CC42A3721D5B4724001541DD /* CrashlyticsRunScript */,
 			);
 			buildRules = (
 			);
@@ -1669,9 +1890,12 @@
 				LastUpgradeCheck = 0730;
 				ORGANIZATIONNAME = "Bogdan Sala";
 				TargetAttributes = {
+					CCA16C241C92F64B001EEB57 = {
+						DevelopmentTeam = 2BF96UN6UZ;
+					};
 					CCFD49901BA02455005B5E9A = {
 						CreatedOnToolsVersion = 6.4;
-						DevelopmentTeam = F86PKNGLDF;
+						DevelopmentTeam = 2BF96UN6UZ;
 					};
 				};
 			};
@@ -1708,7 +1932,6 @@
 				CC38A7461D40CC7D0027D5F1 /* oSVLogoV1@3x.png in Resources */,
 				CC4ACCDD1CF8DD9A009562C3 /* OSVTipView.xib in Resources */,
 				CCA16CA31C92F64B001EEB57 /* InfoBeta.plist in Resources */,
-				CCA16CA41C92F64B001EEB57 /* SKMaps.bundle in Resources */,
 				CCBBCFE61D1D638700B9104F /* OSVTipPageViewController.xib in Resources */,
 				CC38A7421D40CC7D0027D5F1 /* oSVLogoV1.png in Resources */,
 				CCA16CA51C92F64B001EEB57 /* OSVFullScreenImageCell.xib in Resources */,
@@ -1731,7 +1954,6 @@
 				CCFD49A51BA02455005B5E9A /* LaunchScreen.xib in Resources */,
 				CCA16C1F1C92D1DA001EEB57 /* InfoBeta.plist in Resources */,
 				CC6E45911CCE7577007DB5CA /* OSVTipView.xib in Resources */,
-				CCA16C231C92F295001EEB57 /* SKMaps.bundle in Resources */,
 				CCBE0F181C8F1D9D00A43F37 /* OSVFullScreenImageCell.xib in Resources */,
 				CCB56F551C28072D00FFFC39 /* Localizable.strings in Resources */,
 				CC38A7451D40CC7D0027D5F1 /* oSVLogoV1@3x.png in Resources */,
@@ -1744,7 +1966,96 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		CC12A1DB1C23FF5A0019DB21 /* ShellScript */ = {
+		4C4043EDB8BCA142998D7A1D /* 📦 Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-OpenStreetViewRelease/Pods-OpenStreetViewRelease-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4EED58DA2B525129B9BB1CD5 /* 📦 Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		6063DEECC26DDED4B8869791 /* 📦 Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-OpenStreetViewRelease/Pods-OpenStreetViewRelease-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		7327978942410886812C037A /* 📦 Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-OpenStreetView/Pods-OpenStreetView-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A04AAF56780F19FAE1F2F2CD /* 📦 Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-OpenStreetView/Pods-OpenStreetView-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CC42A3721D5B4724001541DD /* CrashlyticsRunScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = CrashlyticsRunScript;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Fabric/run\" c1f1517ab073bd0f7235948145e059192e8cb582 f470f12af6aba9998ff32f1b52dc7da58584fa85cf3dfef0ad54bcf55ceb12d0";
+		};
+		CC42A3731D5B47C2001541DD /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1755,7 +2066,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "./Fabric.framework/run c1f1517ab073bd0f7235948145e059192e8cb582 f470f12af6aba9998ff32f1b52dc7da58584fa85cf3dfef0ad54bcf55ceb12d0";
+			shellScript = "\"${PODS_ROOT}/Fabric/run\" c1f1517ab073bd0f7235948145e059192e8cb582 f470f12af6aba9998ff32f1b52dc7da58584fa85cf3dfef0ad54bcf55ceb12d0";
 		};
 		CC8C01331BDE3D950011BE4D /* Revision Number Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1785,19 +2096,6 @@
 			shellPath = /bin/sh;
 			shellScript = "#revision genereation script\nREV=`svnversion -nc | /usr/bin/sed -e 's/^[^:]*://;s/[A-Za-z]//'`\necho \"REV=$REV\"\necho \"$REV\" > ${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/revision.osv\n";
 		};
-		CCA16CAE1C92F64B001EEB57 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "./Fabric.framework/run c1f1517ab073bd0f7235948145e059192e8cb582 f470f12af6aba9998ff32f1b52dc7da58584fa85cf3dfef0ad54bcf55ceb12d0";
-		};
 		CCA16CB01C92F64B001EEB57 /* RemoveUnusedArch */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1811,6 +2109,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "APP_PATH=\"${TARGET_BUILD_DIR}/${WRAPPER_NAME}\"\n\n# This script loops through the frameworks embedded in the application and\n# removes unused architectures.\nfind \"$APP_PATH\" -name '*.framework' -type d | while read -r FRAMEWORK\ndo\nFRAMEWORK_EXECUTABLE_NAME=$(defaults read \"$FRAMEWORK/Info.plist\" CFBundleExecutable)\nFRAMEWORK_EXECUTABLE_PATH=\"$FRAMEWORK/$FRAMEWORK_EXECUTABLE_NAME\"\necho \"Executable is $FRAMEWORK_EXECUTABLE_PATH\"\n\nEXTRACTED_ARCHS=()\n\nfor ARCH in $ARCHS\ndo\necho \"Extracting $ARCH from $FRAMEWORK_EXECUTABLE_NAME\"\nlipo -extract \"$ARCH\" \"$FRAMEWORK_EXECUTABLE_PATH\" -o \"$FRAMEWORK_EXECUTABLE_PATH-$ARCH\"\nEXTRACTED_ARCHS+=(\"$FRAMEWORK_EXECUTABLE_PATH-$ARCH\")\ndone\n\necho \"Merging extracted architectures: ${ARCHS}\"\nlipo -o \"$FRAMEWORK_EXECUTABLE_PATH-merged\" -create \"${EXTRACTED_ARCHS[@]}\"\nrm \"${EXTRACTED_ARCHS[@]}\"\n\necho \"Replacing original executable with thinned version\"\nrm \"$FRAMEWORK_EXECUTABLE_PATH\"\nmv \"$FRAMEWORK_EXECUTABLE_PATH-merged\" \"$FRAMEWORK_EXECUTABLE_PATH\"\n\ndone";
+		};
+		CCA1BE655A028522632548C6 /* 📦 Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1830,6 +2143,7 @@
 				CCA16C2D1C92F64B001EEB57 /* OSVBasicMapController.m in Sources */,
 				CCA16C2E1C92F64B001EEB57 /* AFPropertyListRequestOperation.m in Sources */,
 				CCA16C2F1C92F64B001EEB57 /* OSVPhotoSyncController.m in Sources */,
+				CC1FFCEA1D58A48300958B8E /* OBDUtils.m in Sources */,
 				CCA16C301C92F64B001EEB57 /* OSVServerSequence+Convertor.m in Sources */,
 				CCA16C311C92F64B001EEB57 /* OSVButton.m in Sources */,
 				CCA16C321C92F64B001EEB57 /* OSVPolyline.m in Sources */,
@@ -1886,7 +2200,6 @@
 				CC40CEB31D1BF3E60006D619 /* OSVAPI+Mix.m in Sources */,
 				CCA16C531C92F64B001EEB57 /* OSVRedButton.m in Sources */,
 				CC16AE301CE4826E001EA02A /* OSVVideoPlayer.m in Sources */,
-				CC6E45AE1CD0C59B007DB5CA /* OSVCamView.m in Sources */,
 				CCA16C541C92F64B001EEB57 /* OSVFullScreenImageViewController.m in Sources */,
 				CC0167DF1D2E856100E8297D /* OSVSensorLibManager.mm in Sources */,
 				CCA16C561C92F64B001EEB57 /* UIDevice+Aditions.m in Sources */,
@@ -1914,6 +2227,7 @@
 				CCA16C651C92F64B001EEB57 /* OSVLocationManager.m in Sources */,
 				CC0168901D35104B00E8297D /* OSVSettingsDetails.m in Sources */,
 				CC8960FB1D2B9ECF00501341 /* OSVLeftMenuViewController.m in Sources */,
+				CCAF7EC21D59C33600802D1B /* OBDBLEDeviceList.m in Sources */,
 				CCA16C671C92F64B001EEB57 /* OSVLogger.m in Sources */,
 				CC4C7B421D3D3C1200B902E8 /* OSVLayersViewController.m in Sources */,
 				CC92B0AE1D37C5D4004F7EF8 /* UIView+Additions.m in Sources */,
@@ -1927,6 +2241,7 @@
 				CC0167E31D2EB0CF00E8297D /* OSVWaitingViewController.m in Sources */,
 				CC40F3A81D14028A0028E488 /* NSData+Godzippa.m in Sources */,
 				CCA16C6E1C92F64B001EEB57 /* OSVCropedLabel.m in Sources */,
+				CC1FFCE61D58A48300958B8E /* OBDService.m in Sources */,
 				CCA16C6F1C92F64B001EEB57 /* OSVFullScreenImageCell.m in Sources */,
 				CC7C6A421CF5E03400C03051 /* CERangeSlider.m in Sources */,
 				CCA16C701C92F64B001EEB57 /* OSVGalleryViewController.m in Sources */,
@@ -1958,6 +2273,7 @@
 				CCA16C7F1C92F64B001EEB57 /* OSMUser.m in Sources */,
 				CCA16C801C92F64B001EEB57 /* OSVUploadCell.m in Sources */,
 				CCA16C811C92F64B001EEB57 /* SKSearchResult+Aditions.m in Sources */,
+				CC12FCFB1D51DA1A00EB1177 /* OSVCameraManager.m in Sources */,
 				CC7C6A441CF5E03900C03051 /* CERangeSliderTrackLayer.m in Sources */,
 				CCA16C831C92F64B001EEB57 /* OSVTrackLogger.m in Sources */,
 				CCA16C841C92F64B001EEB57 /* AFOAuth1Client.m in Sources */,
@@ -1967,6 +2283,7 @@
 				CC7A64011CA2CFF6007C9F3B /* OSVOBDController.m in Sources */,
 				CC225EC61D227A65000EC04C /* OSVDotedPolyline.m in Sources */,
 				CCA16C871C92F64B001EEB57 /* OSVUtils.m in Sources */,
+				CC1FFCE81D58A48300958B8E /* OBDDevice.m in Sources */,
 				CC45365C1CA59380005C4490 /* FLScanToolResponse.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1985,8 +2302,8 @@
 				CC1E50571BF3A38A00BD4A1A /* OSVBasicMapController.m in Sources */,
 				CC1862141BCF73F900FE0F75 /* AFPropertyListRequestOperation.m in Sources */,
 				CC7F063C1C6B6D7E00441593 /* OSVPhotoSyncController.m in Sources */,
-				CC6E45AD1CD0C59B007DB5CA /* OSVCamView.m in Sources */,
 				CC19F2D81BAC2CFF006C8FCC /* OSVServerSequence+Convertor.m in Sources */,
+				CC1FFCE91D58A48300958B8E /* OBDUtils.m in Sources */,
 				CC65DF801CA1601400EC3F70 /* ELM327Command.m in Sources */,
 				CC7C6A401CF5E01F00C03051 /* CERangeSliderKnobLayer.m in Sources */,
 				CCD2E71B1D423410007C2A32 /* ATAppUpdater.m in Sources */,
@@ -2070,6 +2387,7 @@
 				CC8960FA1D2B9ECF00501341 /* OSVLeftMenuViewController.m in Sources */,
 				CC01688F1D35104B00E8297D /* OSVSettingsDetails.m in Sources */,
 				CC65DF7D1CA1601400EC3F70 /* FLECUSensor.m in Sources */,
+				CCAF7EC11D59C33600802D1B /* OBDBLEDeviceList.m in Sources */,
 				CC5EB4151C46741F006F3FD0 /* OSVLogger.m in Sources */,
 				CC4C7B411D3D3C1200B902E8 /* OSVLayersViewController.m in Sources */,
 				CC92B0AD1D37C5D4004F7EF8 /* UIView+Additions.m in Sources */,
@@ -2083,6 +2401,7 @@
 				CC0167E21D2EB0CF00E8297D /* OSVWaitingViewController.m in Sources */,
 				CC1529771C039DC500BD29DC /* OSVBaseUser.m in Sources */,
 				CC881E431C2025440089CA0B /* OSVAPI+Sequences.m in Sources */,
+				CC1FFCE51D58A48300958B8E /* OBDService.m in Sources */,
 				CCE6C4611C106288005DC6FF /* OSVCropedLabel.m in Sources */,
 				CCBE0F171C8F1D9D00A43F37 /* OSVFullScreenImageCell.m in Sources */,
 				CC19F3161BB05A65006C8FCC /* OSVGalleryViewController.m in Sources */,
@@ -2114,6 +2433,7 @@
 				CC881E341C2012A40089CA0B /* OSMUser.m in Sources */,
 				CC791E5C1BF0A0E700E5CBD3 /* OSVUploadCell.m in Sources */,
 				CC2573EC1C00570D000EDB3E /* SKSearchResult+Aditions.m in Sources */,
+				CC12FCFA1D51DA1A00EB1177 /* OSVCameraManager.m in Sources */,
 				CC65DF7A1CA1601400EC3F70 /* FLScanToolCommand.m in Sources */,
 				CC65DF851CA1674F00EC3F70 /* OSVOBDController.m in Sources */,
 				CC7C6A411CF5E01F00C03051 /* CERangeSliderTrackLayer.m in Sources */,
@@ -2123,6 +2443,7 @@
 				CC1862101BCF73F900FE0F75 /* AFHTTPRequestOperation.m in Sources */,
 				CC225EC51D227A65000EC04C /* OSVDotedPolyline.m in Sources */,
 				CC7F06521C6CD9D300441593 /* OSVLogItem.m in Sources */,
+				CC1FFCE71D58A48300958B8E /* OBDDevice.m in Sources */,
 				CCC2C68F1BA8506400A4CDEE /* OSVUtils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2198,13 +2519,16 @@
 		};
 		CCA16C1D1C92D18B001EEB57 /* Beta */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 918840F1F96F2026A7C60A46 /* Pods-OpenStreetView.beta.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Telenav GmbH (2BF96UN6UZ)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Telenav GmbH (2BF96UN6UZ)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Pods/Crashlytics/iOS",
+					"$(PROJECT_DIR)/Pods/Fabric/iOS",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"PROJECT_DIR=@\\\"\"$PROJECT_DIR\"\\\"",
@@ -2219,24 +2543,28 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/OpenStreetView",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/lib",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				OTHER_LIBTOOLFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.telenav.OpenStreetView;
 				PRODUCT_NAME = OSV;
-				PROVISIONING_PROFILE = "ef27eecf-af41-4b3d-862c-c56054a4e7e8";
+				PROVISIONING_PROFILE = "e8ca2ea0-21cd-416b-b469-b5cdfe1f57e5";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Beta;
 		};
 		CCA16CB21C92F64B001EEB57 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BCCC682778267DD5632A0C68 /* Pods-OpenStreetViewRelease.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Pods/Crashlytics/iOS",
+					"$(PROJECT_DIR)/Pods/Fabric/iOS",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"PROJECT_DIR=@\\\"\"$PROJECT_DIR\"\\\"",
@@ -2251,24 +2579,28 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/OpenStreetView",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/lib",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				OTHER_LIBTOOLFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.telenav.OpenStreetView;
+				PRODUCT_BUNDLE_IDENTIFIER = com.skobbler.OpenStreetView;
 				PRODUCT_NAME = OSV;
-				PROVISIONING_PROFILE = "cf01a71c-46f7-4816-a32b-061d37ba21f6";
+				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
 		CCA16CB31C92F64B001EEB57 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 61065ED006F711614BE2E2D3 /* Pods-OpenStreetViewRelease.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Pods/Crashlytics/iOS",
+					"$(PROJECT_DIR)/Pods/Fabric/iOS",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"PROJECT_DIR=@\\\"\"$PROJECT_DIR\"\\\"",
@@ -2282,25 +2614,29 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/OpenStreetView",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/lib",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				OTHER_LIBTOOLFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.telenav.OpenStreetView;
 				PRODUCT_NAME = OSV;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "79955e22-e9b6-445b-bdec-76c5b07289cb";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
 		CCA16CB41C92F64B001EEB57 /* Enterprise */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 244418F01B0BB9BE8E5468A5 /* Pods-OpenStreetViewRelease.enterprise.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: skobbler GmbH (Ent)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: skobbler GmbH (Ent)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Pods/Crashlytics/iOS",
+					"$(PROJECT_DIR)/Pods/Fabric/iOS",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"PROJECT_DIR=@\\\"\"$PROJECT_DIR\"\\\"",
@@ -2314,10 +2650,11 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/OpenStreetView",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/lib",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				OTHER_LIBTOOLFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.telenav.OpenStreetView;
+				PRODUCT_BUNDLE_IDENTIFIER = com.skobbler.OpenStreetView;
 				PRODUCT_NAME = OSV;
 				PROVISIONING_PROFILE = "a6602be9-6f47-4f8d-9837-a5d49b2b0043";
 				TARGETED_DEVICE_FAMILY = 1;
@@ -2326,13 +2663,16 @@
 		};
 		CCA16CB51C92F64B001EEB57 /* Beta */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B5994CEE8F0652F6972FCE4A /* Pods-OpenStreetViewRelease.beta.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Telenav GmbH (2BF96UN6UZ)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Telenav GmbH (2BF96UN6UZ)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Pods/Crashlytics/iOS",
+					"$(PROJECT_DIR)/Pods/Fabric/iOS",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"PROJECT_DIR=@\\\"\"$PROJECT_DIR\"\\\"",
@@ -2347,12 +2687,13 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/OpenStreetView",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/lib",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				OTHER_LIBTOOLFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.telenav.OpenStreetView;
 				PRODUCT_NAME = OSV;
-				PROVISIONING_PROFILE = "ef27eecf-af41-4b3d-862c-c56054a4e7e8";
+				PROVISIONING_PROFILE = "79955e22-e9b6-445b-bdec-76c5b07289cb";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Beta;
@@ -2402,13 +2743,16 @@
 		};
 		CCC2C69D1BA86E1D00A4CDEE /* Enterprise */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 76EFDE20412EDAEF4D2AEAC5 /* Pods-OpenStreetView.enterprise.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: skobbler GmbH (Ent)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: skobbler GmbH (Ent)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Pods/Crashlytics/iOS",
+					"$(PROJECT_DIR)/Pods/Fabric/iOS",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"PROJECT_DIR=@\\\"\"$PROJECT_DIR\"\\\"",
@@ -2422,6 +2766,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/OpenStreetView",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/lib",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				OTHER_LIBTOOLFLAGS = "";
@@ -2528,6 +2873,7 @@
 		};
 		CCFD49B51BA02455005B5E9A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 568DA0768A3FBE3F9CED9C76 /* Pods-OpenStreetView.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -2535,6 +2881,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Pods/Crashlytics/iOS",
+					"$(PROJECT_DIR)/Pods/Fabric/iOS",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"PROJECT_DIR=@\\\"\"$PROJECT_DIR\"\\\"",
@@ -2549,24 +2897,28 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/OpenStreetView",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/lib",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				OTHER_LIBTOOLFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.skobbler.OpenStreetView;
 				PRODUCT_NAME = OSV;
-				PROVISIONING_PROFILE = "20a66f56-f65a-4db5-8724-8c87c96f4bb2";
+				PROVISIONING_PROFILE = "f506cc43-281e-4faf-804c-83213bae87d1";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
 		CCFD49B61BA02455005B5E9A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D3A9DC100926C3AD8E6C6DA0 /* Pods-OpenStreetView.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Pods/Crashlytics/iOS",
+					"$(PROJECT_DIR)/Pods/Fabric/iOS",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"PROJECT_DIR=@\\\"\"$PROJECT_DIR\"\\\"",
@@ -2580,12 +2932,13 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/OpenStreetView",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/lib",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				OTHER_LIBTOOLFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.telenav.OpenStreetView;
 				PRODUCT_NAME = OSV;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "e8ca2ea0-21cd-416b-b469-b5cdfe1f57e5";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;

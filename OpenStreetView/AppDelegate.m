@@ -36,8 +36,8 @@
     [Fabric with:@[[Crashlytics class]]];
 
     SKMapsInitSettings *mapsettings = [SKMapsInitSettings mapsInitSettings];
-#warning change the key
-    [[SKMapsService sharedInstance] initializeSKMapsWithAPIKey:@"somekey" settings:mapsettings];
+    
+    [[SKMapsService sharedInstance] initializeSKMapsWithAPIKey:@"47c0589b94694c04e757f6c36157f13b21d30d051d662b7c8034bf3988bd9843" settings:mapsettings];
     [[OSVLocationManager sharedInstance].sensorsManager startUpdatingOBD];
 
     if ([CLLocationManager authorizationStatus] !=  kCLAuthorizationStatusNotDetermined) {
@@ -95,7 +95,7 @@
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
-    [[ATAppUpdater sharedUpdater] showUpdateWithForce];
+    [[ATAppUpdater sharedUpdater] showUpdateWithConfirmation];
     
     [[OSVLocationManager sharedInstance].sensorsManager startUpdatingOBD];
     if (([OSVReachablityController hasWiFiAccess] || [OSVReachablityController hasCellularAcces]) &&

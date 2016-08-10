@@ -18,7 +18,8 @@
 
 + (instancetype)sharedInstance;
 
-- (void)speedLimitsFromSampleBuffer:(CMSampleBufferRef)sampleBuffer withCompletion:(void (^)(NSArray *))completion;
+- (void)speedLimitsFromSampleBuffer:(CMSampleBufferRef)sampleBuffer
+                     withCompletion:(void (^)(NSArray *, CVImageBufferRef pixelsBuffer))completion;
 
 - (UIImage *)imageForSpeedLimit:(NSString *)speedLimit;
 

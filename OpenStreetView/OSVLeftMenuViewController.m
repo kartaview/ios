@@ -29,6 +29,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.menu = [OSVMainMenuFactory mainMenu];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willDisplayView) name:kLGSideMenuControllerWillShowLeftViewNotification object:nil];
+}
+
+- (void)willDisplayView {
     if (![[OSVSyncController sharedInstance].tracksController userIsLoggedIn]) {
         self.titleButton.text = NSLocalizedString(@"Sign In", @"");
     } else {
@@ -69,9 +73,9 @@
         [[OSVSyncController sharedInstance].tracksController loginWithCompletion:^(NSError *error) {
             if (error) {
                 [[OSVSyncController sharedInstance].tracksController logout];
+            } else {
+                self.titleButton.text = NSLocalizedString(@"Sign Out", @"");
             }
-            
-            self.titleButton.text = NSLocalizedString(@"Sign Out", @"");
         }];
     } else {
         [UIAlertView showWithTitle:@""

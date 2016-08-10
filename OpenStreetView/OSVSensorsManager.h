@@ -25,6 +25,7 @@
 
 - (void)startUpdatingOBD;
 - (void)reconnectOBD;
+- (void)startBLEOBDScan;
 
 - (void)startUpdatingDeviceMotion;
 

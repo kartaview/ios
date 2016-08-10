@@ -13,8 +13,13 @@
 #import "OSVLogger.h"
 #import "Reachability.h"
 #import "ConnectivityHandler.h"
+#import "OBDLib.h"
 
-@interface OSVOBDController () <FLScanToolDelegate>
+#import "OSVSectionItem.h"
+#import "OSVMenuItem.h"
+#import "OSVUserDefaults.h"
+
+@interface OSVOBDController () <FLScanToolDelegate, OBDServiceDelegate, OBDDeviceDelegate>
 
 @property (strong, nonatomic) ELM327 *obdScanner;
 
@@ -24,18 +29,26 @@
 
 @property (strong, nonatomic) NSTimer *keepAlive;
 
+@property (strong, nonatomic) NSTimer *bleTimer;
+@property (strong, nonatomic) NSTimer *bleConnection;
+
 @property (strong, nonatomic) NSDate  *lastReceivedDataTimestamp;
 
 @property (assign, nonatomic) BOOL    isConnected;
 @property (assign, nonatomic) BOOL    isConnecting;
 
+@property (assign, nonatomic) BOOL    isConnectedBLE;
+@property (assign, nonatomic) BOOL    isConnectingBLE;
+
 @property (assign, nonatomic) BOOL    manualyDisconnected;
 @property (assign, nonatomic) BOOL    hasWiFiConnection;
-
 
 @property (nonatomic, strong) Reachability *r;
 
 @property (assign, nonatomic) NSInteger     retryCheckStatus;
+
+@property (strong, nonatomic) OSVSectionItem    *item;
+@property (strong, nonatomic) OBDDevice         *bleDevice;
 
 @end
 
@@ -49,16 +62,21 @@ const int connectionTimeOut = 7;
     self = [super init];
     if (self) {
         self.isConnected = NO;
+        self.isConnectedBLE = NO;
         self.manualyDisconnected = NO;
         self.shouldReconnect = YES;
         self.isConnecting = NO;
+        self.isConnectingBLE = NO;
         
         self.r = [Reachability reachabilityForLocalWiFi];
         [self.r startNotifier];
         self.handler = handler;
+        [OBDService sharedInstance].delegate = self;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(currentStatus) name:@"kOBDStatus" object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveNetworkStatusChange:) name:kReachabilityChangedNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveNewDatasourceItem:) name:@"BLEDatasource" object:nil];
+
     }
     
     return self;
@@ -71,7 +89,8 @@ const int connectionTimeOut = 7;
 #pragma mark - public methods
 
 - (void)startOBDUpdates {
-    if (self.isConnected || self.isConnecting) {
+    if (self.isConnected || self.isConnecting ||
+        self.isConnectedBLE || self.isConnectingBLE) {
         return;
     }
     
@@ -98,6 +117,8 @@ const int connectionTimeOut = 7;
         
         return sensors;
     }];
+    
+    [self scanBLEOBD];
 }
 
 - (void)checkForOBDScannerStatus {
@@ -154,13 +175,17 @@ const int connectionTimeOut = 7;
     [self.obdScanner setDelegate:nil];
     
     [[OSVLogger sharedInstance] logMessage:@"did stop obd upldates" withLevel:LogLevelDEBUG];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidDisconnect" object:nil userInfo:@{}];
-    NSLog(@"kOBDDidDisconnect");
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidDisconnect" object:nil userInfo:@{@"OBD" : @"WIFI"}];
     [self.timer invalidate];
     self.timer = nil;
     self.isConnected = NO;
     self.isConnecting = NO;
     self.manualyDisconnected = YES;
+}
+
+- (void)scanBLEOBD {
+    [[OBDService sharedInstance] stopDeviceSearch];
+    [[OBDService sharedInstance] searchForDevicesOnConnection:OBDConnectionTypeBluetoothLE];
 }
 
 #pragma mark - Private
@@ -170,7 +195,6 @@ const int connectionTimeOut = 7;
     NSTimeInterval timePassed = [[NSDate new] timeIntervalSinceDate:self.lastReceivedDataTimestamp];
     
     if (timePassed > secondsBetweenChecks && self.isConnected) {
-        NSLog(@"did not receive data will display -");
         [[OSVLogger sharedInstance] logMessage:@"did not receive data" withLevel:LogLevelDEBUG];
         if (self.handler) {
             self.handler(nil);
@@ -189,6 +213,8 @@ const int connectionTimeOut = 7;
             [self.obdScanner setSensorScanTargets:nil];
             [self.obdScanner setDelegate:nil];
             
+            [[OBDService sharedInstance] stopDeviceSearch];
+            
             self.isConnected = NO;
             self.isConnecting = NO;
         }
@@ -203,11 +229,19 @@ const int connectionTimeOut = 7;
 }
 
 - (void)currentStatus {
+    [[OBDService sharedInstance] stopDeviceSearch];
     if (self.isConnected) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidConnect" object:nil userInfo:@{}];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidConnect" object:nil userInfo:@{@"OBD" : @"WIFI"}];
     } else {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidDisconnect" object:nil userInfo:@{}];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidDisconnect" object:nil userInfo:@{@"OBD" : @"WIFI"}];
     }
+}
+
+- (BOOL)hasWiFiConnection {
+    Reachability *r = [Reachability reachabilityForLocalWiFi];
+    NetworkStatus status = [r currentReachabilityStatus];
+    
+    return status == ReachableViaWiFi;
 }
 
 #pragma mark - FLScanToolDelegate
@@ -216,7 +250,7 @@ const int connectionTimeOut = 7;
     self.isConnected = YES;
     self.isConnecting = NO;
     [[OSVLogger sharedInstance] logMessage:@"has connection" withLevel:LogLevelDEBUG];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidConnect" object:nil userInfo:@{}];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidConnect" object:nil userInfo:@{@"OBD" : @"WIFI"}];
 }
 
 - (void)scanTool:(FLScanTool *)scanTool didUpdateSensor:(FLECUSensor *)sensor {
@@ -265,7 +299,7 @@ const int connectionTimeOut = 7;
     }
 }
 
-#pragma mark - OBD2 notifications
+#pragma mark - WIFI notifications
 
 - (void)didReceiveNetworkStatusChange:(NSNotification *)notificaiton {
     if (self.hasWiFiConnection) {
@@ -278,7 +312,7 @@ const int connectionTimeOut = 7;
         self.isConnected = NO;
         self.isConnecting = NO;
         
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidDisconnect" object:nil userInfo:@{}];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidDisconnect" object:nil userInfo:@{@"OBD" : @"WIFI"}];
         
         [[OSVLogger sharedInstance] logMessage:@"did lost wifi connection" withLevel:LogLevelDEBUG];
         [self.obdScanner cancelScan];
@@ -287,11 +321,142 @@ const int connectionTimeOut = 7;
     }
 }
 
-- (BOOL)hasWiFiConnection {
-    Reachability *r = [Reachability reachabilityForLocalWiFi];
-    NetworkStatus status = [r currentReachabilityStatus];
+- (void)didReceiveNewDatasourceItem:(NSNotification *)notificaiton {
+    self.item = notificaiton.userInfo[@"datasource"];
+}
+
+#pragma mark - OBDServiceDelegate
+
+- (void)OBDService:(OBDService *)service didDidFindDevice:(OBDDevice *)device {
+    NSMutableArray *allDevices = [NSMutableArray array];
+    if (self.item) {
+        for (OBDDevice *someDev in service.discoveredDevices) {
+            OSVMenuItem *menuItem = [OSVMenuItem new];
+            menuItem.title = someDev.name != nil ? ([someDev.name isEqualToString:@""] ? someDev.UUID : someDev.name) : someDev.UUID;
+            menuItem.key = menuItem.title;
+            menuItem.action = ^(id sender, id index) {
+                [self.bleDevice disconnect];
+                [someDev connect];
+                someDev.delegate = self;
+                self.bleDevice = someDev;
+            };
+            
+            [allDevices addObject:menuItem];
+        }
+        self.item.rowItems = allDevices;
+        
+        __weak typeof(self) welf = self;
+        self.item.action = ^(id sender, NSIndexPath *index) {
+            ((OSVMenuItem *)welf.item.rowItems[index.row]).action(nil, nil);
+        };
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"kReloadDetails" object:@{}];
+        });
+    } else { // autoconnect
+        NSString *name = device.name != nil ? ([device.name isEqualToString:@""] ? device.UUID : device.name) : device.UUID;
+        if ([name isEqualToString:[OSVUserDefaults sharedInstance].bleDevice]) {
+            [device connect];
+            device.delegate = self;
+            [service stopDeviceSearch];
+        } else { // delete the automatic
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (!self.bleConnection) {
+                    self.bleConnection = [NSTimer scheduledTimerWithTimeInterval:7 target:self
+                                                                        selector:@selector(stopAutomaticSearch) userInfo:@{}
+                                                                         repeats:NO];
+
+                }
+            });
+        }
+    }
+}
+
+- (void)OBDService:(OBDService *)service unableToSearchForDevicesOnConnection:(OBDConnectionType)connection {
+    self.isConnectedBLE = NO;
+    self.isConnectingBLE = NO;
     
-    return status == ReachableViaWiFi;
+    if (connection == OBDConnectionTypeBluetoothLE) {
+        [service stopDeviceSearch];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidDisconnect" object:nil userInfo:@{@"OBD" : @"BLE"}];
+        });
+    }
+}
+
+#pragma mark - OBDDeviceDelegate
+
+- (void)OBDDeviceDidConnect:(OBDDevice *)device {
+    self.isConnectedBLE = YES;
+    self.isConnectingBLE = NO;
+
+    self.bleTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self
+                                                   selector:@selector(requestNewBLEData:) userInfo:@{@"bleSensor":device}
+                                                    repeats:YES];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidConnect" object:nil userInfo:@{@"OBD" : @"BLE"}];
+    });
+}
+
+- (void)OBDDeviceFailedToConnect:(OBDDevice *)device error:(NSError *)error {
+    self.isConnectedBLE = NO;
+    self.isConnectingBLE = NO;
+    [OSVUserDefaults sharedInstance].bleDevice = nil;
+    [[OSVUserDefaults sharedInstance] save];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidDisconnect" object:nil userInfo:@{@"OBD" : @"BLE"}];
+    });
+}
+
+- (void)OBDDeviceDidDisconnect:(OBDDevice *)device error:(NSError *)error {
+    self.isConnectedBLE = NO;
+    self.isConnectingBLE = NO;
+    
+    [self.bleTimer invalidate];
+    self.bleTimer = nil;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidDisconnect" object:nil userInfo:@{@"OBD" : @"BLE"}];
+    });
+}
+
+- (void)OBDDevice:(OBDDevice *)device didUpdateInteger:(int)value forSensor:(OBDSensor)sensor {
+    self.isConnectedBLE = YES;
+    self.isConnectingBLE = NO;
+    
+    switch (sensor) {
+        case OBDSensorVehicleSpeed: {
+            self.lastReceivedDataTimestamp = [NSDate new];
+            
+            OSVOBDData *data = [OSVOBDData new];
+            data.speed = value;
+            data.timestamp = [[NSDate new] timeIntervalSince1970];
+            if (self.handler) {
+                self.handler(data);
+            }
+            break;
+        }
+        default:
+            NSLog(@"default sensor");
+            
+            break;
+    }
+}
+
+#pragma mark - OBD BluethoothLE
+
+- (void)requestNewBLEData:(NSTimer *)timer {
+    OBDDevice *device = timer.userInfo[@"bleSensor"];
+    [device getValueForSensor:OBDSensorVehicleSpeed];
+}
+
+- (void)stopAutomaticSearch {
+    self.bleConnection = nil;
+    if (self.isConnectedBLE == NO) {
+        [OSVUserDefaults sharedInstance].bleDevice = nil;
+        [[OSVUserDefaults sharedInstance] save];
+        [[OBDService sharedInstance] stopDeviceSearch];
+    }
 }
 
 @end

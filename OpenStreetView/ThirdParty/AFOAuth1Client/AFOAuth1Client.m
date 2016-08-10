@@ -26,7 +26,7 @@
 #import <Security/Security.h>
 #import <CommonCrypto/CommonHMAC.h>
 #import <UIKit/UIKit.h>
-
+#import <SafariServices/SafariServices.h>
 typedef void (^AFServiceProviderRequestHandlerBlock)(NSURLRequest *request);
 typedef void (^AFServiceProviderRequestCompletionBlock)();
 
@@ -156,12 +156,14 @@ static NSDictionary * AFKeychainQueryDictionaryWithIdentifier(NSString *identifi
 
 #pragma mark -
 
-@interface AFOAuth1Client ()
+@interface AFOAuth1Client () <SFSafariViewControllerDelegate>
 @property (readwrite, nonatomic, copy) NSString *key;
 @property (readwrite, nonatomic, copy) NSString *secret;
 @property (readwrite, nonatomic, strong) id applicationLaunchNotificationObserver;
 @property (readwrite, nonatomic, copy) AFServiceProviderRequestHandlerBlock serviceProviderRequestHandler;
 @property (readwrite, nonatomic, copy) AFServiceProviderRequestCompletionBlock serviceProviderRequestCompletion;
+
+@property (nonatomic, strong)   SFSafariViewController  *safari;
 
 - (NSDictionary *)OAuthParameters;
 - (NSString *)OAuthSignatureForMethod:(NSString *)method
@@ -174,6 +176,9 @@ static NSDictionary * AFKeychainQueryDictionaryWithIdentifier(NSString *identifi
 @end
 
 @implementation AFOAuth1Client
+- (void)safariViewControllerDidFinish:(SFSafariViewController *)controller {
+    NSLog(@"did finish safari stuff");
+}
 
 - (id)initWithBaseURL:(NSURL *)url
                   key:(NSString *)clientID
@@ -289,8 +294,9 @@ static NSDictionary * AFKeychainQueryDictionaryWithIdentifier(NSString *identifi
                                 accessTokenPath:(NSString *)accessTokenPath
                                    accessMethod:(NSString *)accessMethod
                                           scope:(NSString *)scope
-                                        success:(void (^)(AFOAuth1Token *accessToken, id responseObject))success
-                                        failure:(void (^)(NSError *error))failure
+                                        presentation:(void (^)(UIViewController *))present
+                                        success:(void (^)(AFOAuth1Token *, id))success
+                                        failure:(void (^)(NSError *))failure
 {
     [self acquireOAuthRequestTokenWithPath:requestTokenPath callbackURL:callbackURL accessMethod:(NSString *)accessMethod scope:scope success:^(AFOAuth1Token *requestToken, id responseObject) {
         __block AFOAuth1Token *currentRequestToken = requestToken;
@@ -299,7 +305,7 @@ static NSDictionary * AFKeychainQueryDictionaryWithIdentifier(NSString *identifi
             NSURL *url = [[notification object] valueForKey:kAFApplicationLaunchOptionsURLKey];
 
             currentRequestToken.verifier = [AFParametersFromQueryString([url query]) valueForKey:@"oauth_verifier"];
-
+            
             [self acquireOAuthAccessTokenWithPath:accessTokenPath requestToken:currentRequestToken accessMethod:accessMethod success:^(AFOAuth1Token * accessToken, id responseObject) {
                 if (self.serviceProviderRequestCompletion) {
                     self.serviceProviderRequestCompletion();
@@ -308,17 +314,30 @@ static NSDictionary * AFKeychainQueryDictionaryWithIdentifier(NSString *identifi
                 self.applicationLaunchNotificationObserver = nil;
                 if (accessToken) {
                     self.accessToken = accessToken;
-                    
+                    if ([[SFSafariViewController alloc] respondsToSelector:@selector(initWithURL:)]) {
+                        [self.safari dismissViewControllerAnimated:YES completion:^{
+                            
+                        }];
+                    }
+
                     if (success) {
                         success(accessToken, responseObject);
                     }
                 } else {
+                    if ([[SFSafariViewController alloc] respondsToSelector:@selector(initWithURL:)]) {
+                        [self.safari dismissViewControllerAnimated:YES completion:^{
+                        }];
+                    }
                     if (failure) {
                         failure(nil);
                     }
                 }
             } failure:^(NSError *error) {
                 self.applicationLaunchNotificationObserver = nil;
+                if ([[SFSafariViewController alloc] respondsToSelector:@selector(initWithURL:)]) {
+                    [self.safari dismissViewControllerAnimated:YES completion:^{
+                    }];
+                }
                 if (failure) {
                     failure(error);
                 }
@@ -334,7 +353,13 @@ static NSDictionary * AFKeychainQueryDictionaryWithIdentifier(NSString *identifi
         if (self.serviceProviderRequestHandler) {
             self.serviceProviderRequestHandler(request);
         } else {
-            [[UIApplication sharedApplication] openURL:[request URL]];
+            if ([[SFSafariViewController alloc] respondsToSelector:@selector(initWithURL:)]) {
+                self.safari = [[SFSafariViewController alloc] initWithURL:[request URL]];
+                self.safari.delegate = self;
+                present(self.safari);
+            } else {
+                [[UIApplication sharedApplication] openURL:[request URL]];
+            }
         }
         
     } failure:^(NSError *error) {

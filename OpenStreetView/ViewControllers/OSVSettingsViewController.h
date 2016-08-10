@@ -10,7 +10,9 @@
 
 @interface OSVSettingsViewController : UIViewController
 
-@property (assign, nonatomic) int               obdConnectionStatus;
+@property (assign, nonatomic) int               obdWIFIConnectionStatus;
+@property (assign, nonatomic) int               obdBLEConnectionStatus;
+
 @property (weak, nonatomic) IBOutlet UIButton   *settingsTitle;
 
 - (void)reloadData;

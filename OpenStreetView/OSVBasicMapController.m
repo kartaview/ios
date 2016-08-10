@@ -209,9 +209,9 @@ int iii = 0;
 #pragma mark - Private
 
 - (void)requestAndDisplayAllSequencesOnMapInBoundingBox:(id<OSVBoundingBox>)box withZoom:(double)zoom {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        if ([OSVUtils getAirDistanceBetweenCoordinate:box.topLeftCoordinate andCoordinate:box.bottomRightCoordinate] < 400 * 1000) {
-            
+    if ([OSVUtils getAirDistanceBetweenCoordinate:box.topLeftCoordinate andCoordinate:box.bottomRightCoordinate] < 400 * 1000) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+
             [self.syncController.tracksController getServerTracksInBoundingBox:box withZoom:zoom withPartialCompletion:^(id<OSVSequence> sequence, OSVMetadata *metadata, NSError *error) {
     //TODO: refactor the line below..
                 if (![self.viewController.navigationController.viewControllers.firstObject isKindOfClass:[OSVMapViewController class]]) {
@@ -225,10 +225,10 @@ int iii = 0;
                     [self addSequenceOnMap:sequence];
                 }
             }];
-        } else {
-            [self.viewController.mapView clearAllOverlays];
-        }
-    });
+        });
+    } else {
+        [self.viewController.mapView clearAllOverlays];
+    }
 }
 
 - (void)addLocalSequences {

@@ -9,6 +9,7 @@
 #import <CoreMedia/CMFormatDescription.h>
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
+#import <UIKit/UIKit.h>
 
 #define k5MPQuality             @"k5MPQuality"
 #define k8MPQuality             @"k8MPQuality"
@@ -43,8 +44,15 @@
 
 @property (nonatomic, assign, readonly) CMVideoDimensions videoQualityDimension;
 
+@property (nonatomic, strong) NSString  *bleDevice;
+
 @property (nonatomic, assign) BOOL      debugLogOBD;
 @property (nonatomic, assign) BOOL      debugSLUS;
+@property (nonatomic, assign) float     debugFrameRate;
+@property (nonatomic, assign) float     debugFrameSize;
+@property (nonatomic, assign) float     debugBitRate;
+@property (nonatomic, assign) NSString  *debugEncoding;
+@property (nonatomic, assign) BOOL      debugHighDesintyOn;
 
 @property (nonatomic, assign) BOOL      useImageRecognition;
 

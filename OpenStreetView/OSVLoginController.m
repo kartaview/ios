@@ -82,7 +82,7 @@
 
 - (void)osvUserInfoWithCompletion:(void (^)(id<OSVUser> user, NSError *error))completion {
     [self.osvAPI getUserInfo:self.user withCompletion:^(id<OSVUser> user, NSError *error) {
-        completion(user, nil);
+        completion(user, error);
     }];
 }
 

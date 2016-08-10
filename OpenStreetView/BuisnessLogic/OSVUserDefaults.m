@@ -7,6 +7,7 @@
 //
 
 #import "OSVUserDefaults.h"
+#import <AVFoundation/AVFoundation.h>
 
 #define kUserNameKey                @"kUserNameKey"
 #define kRealPositionsKey           @"kRealPositionsKey"
@@ -23,9 +24,14 @@
 
 #define kisUploadingKey             @"kisUploadingKey"
 
-
 #define kDebugLogOBD                @"kDebugLogOBD"
 #define kDebugSLUS                  @"kDebugSLUS"
+#define kDebugFrameRate             @"kDebugFrameRate"
+#define kDebugFrameSize             @"kDebugFrameSize"
+#define kDebugBitRate               @"kDebugBitRate"
+#define kDebugEncoding              @"kDebugEncoding"
+#define kDebugHighDensityOn         @"kDebugHighDensityOn"
+
 
 @implementation OSVUserDefaults
 
@@ -59,8 +65,8 @@
         if (!self.environment) {
 #ifdef ENABLED_DEBUG
             self.environment = @"http://openstreetview.com";
-            //@"http://tst.open-street-view.skobbler.net"
-            //@"http://staging.open-street-view.skobbler.net"
+            //@"http://testing.openstreetview.com"
+            //@"http://staging.openstreetview.com"
             //@"http://openstreetview.com"
 #else
             self.environment = @"http://openstreetview.com";
@@ -81,6 +87,27 @@
         
         //reset the realPositions to yes in order to have a correct behaviour
         self.realPositions = YES;
+
+        if (self.debugFrameSize <= 0) {
+            self.debugFrameSize = 1024.0;
+        }
+        
+        if (self.debugFrameRate <= 0) {
+            self.debugFrameRate = 10;
+        }
+        
+        if (self.debugBitRate <= 0) {
+            self.debugBitRate = 1.5;
+        }
+        
+        if (!self.debugEncoding || [self.debugEncoding isEqualToString:@""]) {
+            self.debugEncoding = AVVideoProfileLevelH264HighAutoLevel;
+        }
+        
+        if (![[NSUserDefaults standardUserDefaults] valueForKey:kDebugHighDensityOn]) {
+            self.debugHighDesintyOn = YES;
+        }
+        
         [self save];
     }
     
@@ -193,6 +220,14 @@
     return [[NSUserDefaults standardUserDefaults] boolForKey:kisUploadingKey];
 }
 
+- (void)setBleDevice:(NSString *)bleDevice {
+    return [[NSUserDefaults standardUserDefaults] setObject:bleDevice forKey:@"kbleDevice"];
+}
+
+- (NSString *)bleDevice {
+    return [[NSUserDefaults standardUserDefaults] objectForKey:@"kbleDevice"];
+}
+
 - (void)save {
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
@@ -213,6 +248,46 @@
 
 - (void)setDebugSLUS:(BOOL)debugSLUS {
     return [[NSUserDefaults standardUserDefaults] setBool:debugSLUS forKey:kDebugSLUS];
+}
+
+- (void)setDebugFrameRate:(float)debugFrameRate {
+    return [[NSUserDefaults standardUserDefaults] setFloat:debugFrameRate forKey:kDebugFrameRate];
+}
+
+- (float)debugFrameRate {
+    return [[NSUserDefaults standardUserDefaults] floatForKey:kDebugFrameRate];
+}
+
+- (void)setDebugFrameSize:(float)debugFrameSize {
+    return [[NSUserDefaults standardUserDefaults] setFloat:debugFrameSize forKey:kDebugFrameSize];
+}
+
+- (float)debugFrameSize {
+    return [[NSUserDefaults standardUserDefaults] floatForKey:kDebugFrameSize];
+}
+
+- (void)setDebugBitRate:(float)debugBitRate {
+    return [[NSUserDefaults standardUserDefaults] setFloat:debugBitRate forKey:kDebugBitRate];
+}
+
+- (float)debugBitRate {
+    return [[NSUserDefaults standardUserDefaults] floatForKey:kDebugBitRate];
+}
+
+- (void)setDebugEncoding:(NSString *)debugEncoding {
+    return [[NSUserDefaults standardUserDefaults] setValue:debugEncoding forKey:kDebugEncoding];
+}
+
+- (NSString *)debugEncoding {
+    return [[NSUserDefaults standardUserDefaults] stringForKey:kDebugEncoding];
+}
+
+- (void)setDebugHighDesintyOn:(BOOL)debugHighDesintyOn {
+    return [[NSUserDefaults standardUserDefaults] setBool:debugHighDesintyOn forKey:kDebugHighDensityOn];
+}
+
+- (BOOL)debugHighDesintyOn{
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kDebugHighDensityOn];
 }
 
 @end

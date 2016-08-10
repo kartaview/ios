@@ -1,6 +1,6 @@
 //
-//  SKLogger.m
-//  SKMaps
+//  OSVLogger.m
+//
 //
 //  Created by Alex Ilisei on 5/13/13.
 //  Copyright (c) 2013 Skobbler. All rights reserved.

@@ -15,4 +15,6 @@
 @property (weak, nonatomic) IBOutlet UIButton   *titleButton;
 @property (nonatomic, strong) OSVSectionItem    *item;
 
+- (void)reloadData;
+
 @end

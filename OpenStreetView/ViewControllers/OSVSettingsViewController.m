@@ -40,13 +40,15 @@
     [super viewDidLoad];
     
     self.syncController = [OSVSyncController sharedInstance];
-    self.datasource = [OSVProfileMenuFactory settingsMenuWithOBDStatus:self.obdConnectionStatus];    
+    self.datasource = [OSVProfileMenuFactory settingsMenuWithWiFiOBDStatus:self.obdWIFIConnectionStatus BLEStatus:self.obdBLEConnectionStatus];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    self.obdConnectionStatus = 0;
+    self.obdWIFIConnectionStatus = 0;
+    self.obdBLEConnectionStatus = 0;
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(managerDidConnectToOBD:) name:@"kOBDDidConnect" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(managerDidDisconnectFromOBD:) name:@"kOBDDidDisconnect" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(managerDidFailToConnectOBD:) name:@"kOBDFailedToConnectInTime" object:nil];
@@ -70,7 +72,7 @@
 #pragma mark - Private
 
 - (void)reloadData {
-    self.datasource = [OSVProfileMenuFactory settingsMenuWithOBDStatus:self.obdConnectionStatus];
+    self.datasource = [OSVProfileMenuFactory settingsMenuWithWiFiOBDStatus:self.obdWIFIConnectionStatus BLEStatus:self.obdBLEConnectionStatus];
     [self.tableView reloadData];
 }
 
@@ -90,6 +92,7 @@
         
         OSVSettingsDetails *vc = segue.destinationViewController;
         vc.item = item;
+        
         [vc.titleButton setTitle:item.title forState:UIControlStateNormal];
     }
 }
@@ -198,25 +201,24 @@
 
 #pragma mark - private
 
-- (void)managerDidConnectToOBD:(OSVSensorsManager *)manager {
-    self.obdConnectionStatus = 2;
+- (void)managerDidConnectToOBD:(NSNotification *)notif {
+    self.obdWIFIConnectionStatus = 2;
     [self reloadData];
 }
 
-- (void)managerDidDisconnectFromOBD:(OSVSensorsManager *)manager {
-    self.obdConnectionStatus = 0;
+- (void)managerDidDisconnectFromOBD:(NSNotification *)notif {
+    self.obdWIFIConnectionStatus = 0;
     [self reloadData];
 }
 
-- (void)managerDidFailToConnectOBD:(OSVSensorsManager *)manager {
-    self.obdConnectionStatus = 0;
+- (void)managerDidFailToConnectOBD:(NSNotification *)notif {
+    self.obdWIFIConnectionStatus = 0;
     [self reloadData];
 }
-
 
 #pragma mark - MFMailComposeViewControllerDelegate
 
-- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(nullable NSError *)error __OSX_AVAILABLE_STARTING(__MAC_NA,__IPHONE_3_0) {
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(nullable NSError *)error {
     [controller dismissViewControllerAnimated:YES completion:^{
         
     }];

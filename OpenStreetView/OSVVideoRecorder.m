@@ -23,14 +23,31 @@
 
 @property (strong, nonatomic) NSURL                                 *videoURL;
 
+@property (strong, nonatomic) NSString                              *videoEncoding;
+@property (assign, nonatomic) NSInteger                             bitrate;
+
 @end
 
 @implementation OSVVideoRecorder
+
+- (instancetype)initWithVideoSize:(CMVideoDimensions)size encoding:(NSString *)encod bitrate:(NSInteger)bitrate {
+    self = [super init];
+    if (self) {
+        self.size = size;
+        self.videoEncoding = encod;
+        self.bitrate = bitrate;
+    }
+    
+    return self;
+}
+
 
 - (instancetype)initWithVideoSize:(CMVideoDimensions)size {
     self = [super init];
     if (self) {
         self.size = size;
+        self.videoEncoding = AVVideoProfileLevelH264HighAutoLevel;
+        self.bitrate = 40000000;
     }
     
     return self;
@@ -45,8 +62,8 @@
    
     NSDictionary *videoCompressionProps = [NSDictionary
                                            dictionaryWithObjectsAndKeys:
-                                           [NSNumber numberWithInt:40000000], AVVideoAverageBitRateKey, // 40 Mbps
-                                           AVVideoProfileLevelH264HighAutoLevel, AVVideoProfileLevelKey, // profiles...
+                                           [NSNumber numberWithInteger:self.bitrate], AVVideoAverageBitRateKey, // 40 Mbps
+                                           self.videoEncoding, AVVideoProfileLevelKey, // profiles...
                                            nil];
     
     CMVideoDimensions videoSize;
@@ -138,6 +155,48 @@
             } else {
                 [[OSVLogger sharedInstance] logMessage:@"Could not write frame in video. corected is nil." withLevel:LogLevelDEBUG];
 
+                block(false);
+            }
+            CVPixelBufferUnlockBaseAddress(corrected, 0);
+            CVPixelBufferRelease(corrected);
+        }
+    }
+}
+
+- (void)addPixelBuffer:(CVPixelBufferRef)pixelsBuffer withRotation:(NSInteger)rotation withDuration:(CMTime)duration completion:(void (^)(BOOL))block {
+    if (![self.videoWriterInput isReadyForMoreMediaData]) {
+        [[OSVLogger sharedInstance] logMessage:@"Could not write frame in video. videoWriter is not ready for more media data" withLevel:LogLevelDEBUG];
+        block(false);
+    } else {
+        @autoreleasepool {
+            CVPixelBufferRef corrected = pixelsBuffer;
+            if (!pixelsBuffer) {
+                [[OSVLogger sharedInstance] logMessage:@"Could not write frame in video. pixelsBuffer is nil." withLevel:LogLevelDEBUG];
+            }
+            
+            if (rotation != kRotate0DegreesClockwise) {
+                if (rotation == kRotate180DegreesClockwise) {
+                    corrected = [self correctBufferOrientation:pixelsBuffer withRotation:kRotate90DegreesClockwise];
+                    pixelsBuffer = [self correctBufferOrientation:corrected withRotation:kRotate90DegreesClockwise];
+                    CVPixelBufferRelease(corrected);
+                    corrected = pixelsBuffer;
+                } else {
+                    corrected = [self correctBufferOrientation:pixelsBuffer withRotation:rotation];
+                }
+            } else {
+                CVPixelBufferRetain(corrected);
+            }
+            
+            CVPixelBufferLockBaseAddress(corrected, 0);
+            if (corrected) {
+                BOOL success = [self.avAdaptor appendPixelBuffer:corrected withPresentationTime:self.time];
+                if (success) {
+                    self.time = CMTimeAdd(self.time, CMTimeMake(100, 1000));
+                }
+                block(success);
+            } else {
+                [[OSVLogger sharedInstance] logMessage:@"Could not write frame in video. corected is nil." withLevel:LogLevelDEBUG];
+                
                 block(false);
             }
             CVPixelBufferUnlockBaseAddress(corrected, 0);

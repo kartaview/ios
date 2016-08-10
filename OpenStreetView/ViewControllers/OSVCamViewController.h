@@ -10,7 +10,4 @@
 
 @interface OSVCamViewController : AVCamViewController
 
-@property (atomic, assign, readonly) BOOL                           isSnapping;
-@property (assign, nonatomic) UIBackgroundTaskIdentifier            backgroundRenderingID;
-
 @end
