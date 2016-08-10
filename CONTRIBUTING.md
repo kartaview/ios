@@ -15,7 +15,7 @@ To get started, <a href="https://www.clahub.com/agreements/openstreetview/ios">s
     * Select OpenStreetView project.
     * Click "Install".
 
-Open OpenStreetView.xcworkspace
+* Open OpenStreetView.xcworkspace
 
 ### OR Terminal
 
@@ -32,5 +32,4 @@ git clone https://github.com/openstreetview/ios.git
 cd #TO_OpenStreetView_Folder#
 pod install
 ```
-
-Open OpenStreetView.xcworkspace
+* Open OpenStreetView.xcworkspace
