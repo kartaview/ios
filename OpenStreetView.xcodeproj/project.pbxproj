@@ -67,6 +67,8 @@
 		CC19F2E41BAE9395006C8FCC /* OSVServerSequence.m in Sources */ = {isa = PBXBuildFile; fileRef = CC19F2E31BAE9395006C8FCC /* OSVServerSequence.m */; };
 		CC19F2EB1BAF15A1006C8FCC /* OSVServerPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = CC19F2EA1BAF15A1006C8FCC /* OSVServerPhoto.m */; };
 		CC19F3191BB05FFC006C8FCC /* OSVSequenceCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CC19F3181BB05FFC006C8FCC /* OSVSequenceCell.m */; };
+		CC1B3D521D74884700F07098 /* OSVCameraMapManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1B3D511D74884700F07098 /* OSVCameraMapManager.m */; };
+		CC1B3D551D74885C00F07098 /* OSVSettingsMenuFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1B3D541D74885C00F07098 /* OSVSettingsMenuFactory.m */; };
 		CC1E50371BF2048200BD4A1A /* OSVDebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1E50361BF2048200BD4A1A /* OSVDebugViewController.m */; };
 		CC1E503B1BF209BA00BD4A1A /* OSVMenuItem.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1E503A1BF209BA00BD4A1A /* OSVMenuItem.m */; };
 		CC1E503E1BF20A5100BD4A1A /* OSVSectionItem.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1E503D1BF20A5100BD4A1A /* OSVSectionItem.m */; };
@@ -115,6 +117,10 @@
 		CC410AE41D12B9C7000220BA /* OSVFullScreenAnimationController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC410AE21D12B9C7000220BA /* OSVFullScreenAnimationController.m */; };
 		CC410AE71D12B9E9000220BA /* OSVDissmissFullScreenAnimationController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC410AE61D12B9E9000220BA /* OSVDissmissFullScreenAnimationController.m */; };
 		CC410AE81D12B9E9000220BA /* OSVDissmissFullScreenAnimationController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC410AE61D12B9E9000220BA /* OSVDissmissFullScreenAnimationController.m */; };
+		CC42A3741D5B4DCA001541DD /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC42A36C1D5B4649001541DD /* Crashlytics.framework */; };
+		CC42A3751D5B4DE2001541DD /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC42A36E1D5B464F001541DD /* Fabric.framework */; };
+		CC42A3761D5B4DF0001541DD /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC42A36C1D5B4649001541DD /* Crashlytics.framework */; };
+		CC42A3771D5B4DFC001541DD /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC42A36E1D5B464F001541DD /* Fabric.framework */; };
 		CC4536541CA59363005C4490 /* ELM327.m in Sources */ = {isa = PBXBuildFile; fileRef = CC65DF721CA1601400EC3F70 /* ELM327.m */; };
 		CC4536551CA59365005C4490 /* ELM327Command.m in Sources */ = {isa = PBXBuildFile; fileRef = CC65DF741CA1601400EC3F70 /* ELM327Command.m */; };
 		CC4536561CA59368005C4490 /* ELM327ResponseParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CC65DF761CA1601400EC3F70 /* ELM327ResponseParser.m */; };
@@ -344,8 +350,6 @@
 		CCE6C45D1C102F12005DC6FF /* OSVGalleryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CCE6C45C1C102F12005DC6FF /* OSVGalleryCell.m */; };
 		CCE6C4611C106288005DC6FF /* OSVCropedLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = CCE6C45F1C105008005DC6FF /* OSVCropedLabel.m */; };
 		CCF10DA21BF4A3C200A620EF /* OSVSequenceMapController.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF10DA11BF4A3C200A620EF /* OSVSequenceMapController.m */; };
-		CCF58D0D1D74525700F1054C /* OSVSettingsMenuFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF58D0C1D74525700F1054C /* OSVSettingsMenuFactory.m */; };
-		CCF58D101D74527C00F1054C /* OSVCameraMapManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF58D0E1D74527C00F1054C /* OSVCameraMapManager.m */; };
 		CCF822DF1C06FDAE00E607D9 /* OSVImageCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF822DE1C06FDAE00E607D9 /* OSVImageCollectionViewCell.m */; };
 		CCF822E21C0745B900E607D9 /* OSVButton.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF822E11C0745B900E607D9 /* OSVButton.m */; };
 		CCF823061C0884DD00E607D9 /* OSVRedButton.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF823051C0884DD00E607D9 /* OSVRedButton.m */; };
@@ -493,6 +497,10 @@
 		CC19F2EA1BAF15A1006C8FCC /* OSVServerPhoto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVServerPhoto.m; sourceTree = "<group>"; };
 		CC19F3171BB05FFC006C8FCC /* OSVSequenceCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVSequenceCell.h; sourceTree = "<group>"; };
 		CC19F3181BB05FFC006C8FCC /* OSVSequenceCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVSequenceCell.m; sourceTree = "<group>"; };
+		CC1B3D501D74884700F07098 /* OSVCameraMapManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVCameraMapManager.h; sourceTree = "<group>"; };
+		CC1B3D511D74884700F07098 /* OSVCameraMapManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVCameraMapManager.m; sourceTree = "<group>"; };
+		CC1B3D531D74885C00F07098 /* OSVSettingsMenuFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVSettingsMenuFactory.h; sourceTree = "<group>"; };
+		CC1B3D541D74885C00F07098 /* OSVSettingsMenuFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVSettingsMenuFactory.m; sourceTree = "<group>"; };
 		CC1E50351BF2048200BD4A1A /* OSVDebugViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVDebugViewController.h; sourceTree = "<group>"; };
 		CC1E50361BF2048200BD4A1A /* OSVDebugViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVDebugViewController.m; sourceTree = "<group>"; };
 		CC1E50391BF209BA00BD4A1A /* OSVMenuItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVMenuItem.h; sourceTree = "<group>"; };
@@ -552,6 +560,8 @@
 		CC410AE21D12B9C7000220BA /* OSVFullScreenAnimationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVFullScreenAnimationController.m; sourceTree = "<group>"; };
 		CC410AE51D12B9E9000220BA /* OSVDissmissFullScreenAnimationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVDissmissFullScreenAnimationController.h; sourceTree = "<group>"; };
 		CC410AE61D12B9E9000220BA /* OSVDissmissFullScreenAnimationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVDissmissFullScreenAnimationController.m; sourceTree = "<group>"; };
+		CC42A36C1D5B4649001541DD /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Crashlytics.framework; path = Pods/Crashlytics/iOS/Crashlytics.framework; sourceTree = "<group>"; };
+		CC42A36E1D5B464F001541DD /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Fabric.framework; path = Pods/Fabric/iOS/Fabric.framework; sourceTree = "<group>"; };
 		CC4C7B3F1D3D3C1200B902E8 /* OSVLayersViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSVLayersViewController.h; path = ViewControllers/OSVLayersViewController.h; sourceTree = "<group>"; };
 		CC4C7B401D3D3C1200B902E8 /* OSVLayersViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OSVLayersViewController.m; path = ViewControllers/OSVLayersViewController.m; sourceTree = "<group>"; };
 		CC5492DD1C48DA190081AC56 /* OSVUploadViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVUploadViewController.h; sourceTree = "<group>"; };
@@ -727,10 +737,6 @@
 		CCE6C45F1C105008005DC6FF /* OSVCropedLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVCropedLabel.m; sourceTree = "<group>"; };
 		CCF10DA01BF4A3C200A620EF /* OSVSequenceMapController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVSequenceMapController.h; sourceTree = "<group>"; };
 		CCF10DA11BF4A3C200A620EF /* OSVSequenceMapController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVSequenceMapController.m; sourceTree = "<group>"; };
-		CCF58D0B1D74525700F1054C /* OSVSettingsMenuFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVSettingsMenuFactory.h; sourceTree = "<group>"; };
-		CCF58D0C1D74525700F1054C /* OSVSettingsMenuFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVSettingsMenuFactory.m; sourceTree = "<group>"; };
-		CCF58D0E1D74527C00F1054C /* OSVCameraMapManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVCameraMapManager.m; sourceTree = "<group>"; };
-		CCF58D0F1D74527C00F1054C /* OSVCameraMapManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVCameraMapManager.h; sourceTree = "<group>"; };
 		CCF822971C05B0C700E607D9 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Config.xcconfig; path = ../Config.xcconfig; sourceTree = "<group>"; };
 		CCF822DD1C06FDAE00E607D9 /* OSVImageCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVImageCollectionViewCell.h; sourceTree = "<group>"; };
 		CCF822DE1C06FDAE00E607D9 /* OSVImageCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVImageCollectionViewCell.m; sourceTree = "<group>"; };
@@ -765,6 +771,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CC42A3751D5B4DE2001541DD /* Fabric.framework in Frameworks */,
+				CC42A3741D5B4DCA001541DD /* Crashlytics.framework in Frameworks */,
 				CCA16C8A1C92F64B001EEB57 /* AVFoundation.framework in Frameworks */,
 				CCA16C8B1C92F64B001EEB57 /* SystemConfiguration.framework in Frameworks */,
 				CCA16C8C1C92F64B001EEB57 /* CoreTelephony.framework in Frameworks */,
@@ -785,6 +793,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CC42A3771D5B4DFC001541DD /* Fabric.framework in Frameworks */,
+				CC42A3761D5B4DF0001541DD /* Crashlytics.framework in Frameworks */,
 				CC0167EA1D2F9A8200E8297D /* CoreMedia.framework in Frameworks */,
 				CC06B62B1C75BBD900E2B0DB /* AVFoundation.framework in Frameworks */,
 				CC06B6291C75BBC300E2B0DB /* SystemConfiguration.framework in Frameworks */,
@@ -953,10 +963,10 @@
 				CC1E503A1BF209BA00BD4A1A /* OSVMenuItem.m */,
 				CC1E503C1BF20A5100BD4A1A /* OSVSectionItem.h */,
 				CC1E503D1BF20A5100BD4A1A /* OSVSectionItem.m */,
-				CCF58D0B1D74525700F1054C /* OSVSettingsMenuFactory.h */,
-				CCF58D0C1D74525700F1054C /* OSVSettingsMenuFactory.m */,
 				CC5CC2741D2BC2AC002963D2 /* OSVMainMenuFactory.h */,
 				CC5CC2751D2BC2AC002963D2 /* OSVMainMenuFactory.m */,
+				CC1B3D531D74885C00F07098 /* OSVSettingsMenuFactory.h */,
+				CC1B3D541D74885C00F07098 /* OSVSettingsMenuFactory.m */,
 			);
 			name = Menu;
 			sourceTree = "<group>";
@@ -1403,8 +1413,8 @@
 				CCC2C6441BA84F4A00A4CDEE /* OSVCamViewController.m */,
 				CC12FCF81D51DA1A00EB1177 /* OSVCameraManager.h */,
 				CC12FCF91D51DA1A00EB1177 /* OSVCameraManager.m */,
-				CCF58D0F1D74527C00F1054C /* OSVCameraMapManager.h */,
-				CCF58D0E1D74527C00F1054C /* OSVCameraMapManager.m */,
+				CC1B3D501D74884700F07098 /* OSVCameraMapManager.h */,
+				CC1B3D511D74884700F07098 /* OSVCameraMapManager.m */,
 			);
 			name = Camera;
 			sourceTree = "<group>";
@@ -1561,6 +1571,8 @@
 		CCFD49BA1BA028F0005B5E9A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CC42A36E1D5B464F001541DD /* Fabric.framework */,
+				CC42A36C1D5B4649001541DD /* Crashlytics.framework */,
 				CC0167E91D2F9A8200E8297D /* CoreMedia.framework */,
 				CC06B62A1C75BBD900E2B0DB /* AVFoundation.framework */,
 				CCFD49C71BA02F07005B5E9A /* CoreGraphics.framework */,
@@ -2124,6 +2136,7 @@
 				CCD92BBB1BE7709E002F9341 /* OSVUtils+Image.m in Sources */,
 				CC16AE371CE4892B001EA02A /* OSVVideoPlayerViewController.m in Sources */,
 				CC65DF811CA1601400EC3F70 /* ELM327ResponseParser.m in Sources */,
+				CC1B3D521D74884700F07098 /* OSVCameraMapManager.m in Sources */,
 				CC0168761D34ED7F00E8297D /* OSVBasicCell.m in Sources */,
 				CC92B0A21D3665D9004F7EF8 /* KAProgressLabel.m in Sources */,
 				CC91D5D31BFDE88E003A6409 /* OSVSequenceSectionHeaderView.m in Sources */,
@@ -2132,7 +2145,6 @@
 				CC0168721D34EC8700E8297D /* OSVDetailsCell.m in Sources */,
 				CC7C6A3F1CF5E01F00C03051 /* CERangeSlider.m in Sources */,
 				CCE6C45D1C102F12005DC6FF /* OSVGalleryCell.m in Sources */,
-				CCF58D101D74527C00F1054C /* OSVCameraMapManager.m in Sources */,
 				CC01686E1D34D92D00E8297D /* OSVSectionHeaderCell.m in Sources */,
 				CC881E411C2025440089CA0B /* OSVMetadata.m in Sources */,
 				CC40CEB21D1BF3E60006D619 /* OSVAPI+Mix.m in Sources */,
@@ -2171,7 +2183,6 @@
 				CC92B0AD1D37C5D4004F7EF8 /* UIView+Additions.m in Sources */,
 				CC7F06491C6B85E400441593 /* OSVTrackCache.m in Sources */,
 				CC881E451C2025440089CA0B /* OSVAPIUtils.m in Sources */,
-				CCF58D0D1D74525700F1054C /* OSVSettingsMenuFactory.m in Sources */,
 				CCB952D01CE5EAD3006D5BBD /* OSVAPI+Video.m in Sources */,
 				CC15297B1C039F3100BD29DC /* OSVBaseUser+OSM.m in Sources */,
 				CC7A64051CA2FE85007C9F3B /* OSVOBDData.m in Sources */,
@@ -2179,6 +2190,7 @@
 				CCC2C68C1BA8506400A4CDEE /* OSVPersistentManager.m in Sources */,
 				CC0167E21D2EB0CF00E8297D /* OSVWaitingViewController.m in Sources */,
 				CC1529771C039DC500BD29DC /* OSVBaseUser.m in Sources */,
+				CC1B3D551D74885C00F07098 /* OSVSettingsMenuFactory.m in Sources */,
 				CC881E431C2025440089CA0B /* OSVAPI+Sequences.m in Sources */,
 				CC1FFCE51D58A48300958B8E /* OBDService.m in Sources */,
 				CCE6C4611C106288005DC6FF /* OSVCropedLabel.m in Sources */,
