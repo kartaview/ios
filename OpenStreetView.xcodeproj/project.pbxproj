@@ -66,12 +66,10 @@
 		CC19F2E11BAE937B006C8FCC /* OSVSequence.m in Sources */ = {isa = PBXBuildFile; fileRef = CC19F2E01BAE937B006C8FCC /* OSVSequence.m */; };
 		CC19F2E41BAE9395006C8FCC /* OSVServerSequence.m in Sources */ = {isa = PBXBuildFile; fileRef = CC19F2E31BAE9395006C8FCC /* OSVServerSequence.m */; };
 		CC19F2EB1BAF15A1006C8FCC /* OSVServerPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = CC19F2EA1BAF15A1006C8FCC /* OSVServerPhoto.m */; };
-		CC19F3161BB05A65006C8FCC /* OSVGalleryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC19F3151BB05A65006C8FCC /* OSVGalleryViewController.m */; };
 		CC19F3191BB05FFC006C8FCC /* OSVSequenceCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CC19F3181BB05FFC006C8FCC /* OSVSequenceCell.m */; };
 		CC1E50371BF2048200BD4A1A /* OSVDebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1E50361BF2048200BD4A1A /* OSVDebugViewController.m */; };
 		CC1E503B1BF209BA00BD4A1A /* OSVMenuItem.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1E503A1BF209BA00BD4A1A /* OSVMenuItem.m */; };
 		CC1E503E1BF20A5100BD4A1A /* OSVSectionItem.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1E503D1BF20A5100BD4A1A /* OSVSectionItem.m */; };
-		CC1E50411BF26B1200BD4A1A /* OSVProfileMenuFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1E50401BF26B1200BD4A1A /* OSVProfileMenuFactory.m */; };
 		CC1E50521BF2986900BD4A1A /* UIAlertView+Blocks.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1E50511BF2986900BD4A1A /* UIAlertView+Blocks.m */; };
 		CC1E50571BF3A38A00BD4A1A /* OSVBasicMapController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1E50561BF3A38A00BD4A1A /* OSVBasicMapController.m */; };
 		CC1FFCE51D58A48300958B8E /* OBDService.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1FFCDB1D58A48300958B8E /* OBDService.m */; };
@@ -239,7 +237,6 @@
 		CCA16C461C92F64B001EEB57 /* OSVMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CCC2C6461BA84F4A00A4CDEE /* OSVMapViewController.m */; };
 		CCA16C471C92F64B001EEB57 /* AFJSONRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1861FB1BCF73F900FE0F75 /* AFJSONRequestOperation.m */; };
 		CCA16C491C92F64B001EEB57 /* OSVUtils+Image.m in Sources */ = {isa = PBXBuildFile; fileRef = CCD92BBA1BE7709E002F9341 /* OSVUtils+Image.m */; };
-		CCA16C4A1C92F64B001EEB57 /* OSVProfileMenuFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1E50401BF26B1200BD4A1A /* OSVProfileMenuFactory.m */; };
 		CCA16C4B1C92F64B001EEB57 /* OSVSequenceSectionHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = CC91D5D21BFDE88E003A6409 /* OSVSequenceSectionHeaderView.m */; };
 		CCA16C4D1C92F64B001EEB57 /* OSVCamViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CCC2C6441BA84F4A00A4CDEE /* OSVCamViewController.m */; };
 		CCA16C4E1C92F64B001EEB57 /* UIColor+OSVColor.m in Sources */ = {isa = PBXBuildFile; fileRef = CC2573CE1C003D16000EDB3E /* UIColor+OSVColor.m */; };
@@ -274,7 +271,6 @@
 		CCA16C6D1C92F64B001EEB57 /* OSVAPI+Sequences.m in Sources */ = {isa = PBXBuildFile; fileRef = CC881E3C1C2025440089CA0B /* OSVAPI+Sequences.m */; };
 		CCA16C6E1C92F64B001EEB57 /* OSVCropedLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = CCE6C45F1C105008005DC6FF /* OSVCropedLabel.m */; };
 		CCA16C6F1C92F64B001EEB57 /* OSVFullScreenImageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CCBE0F151C8F1D9D00A43F37 /* OSVFullScreenImageCell.m */; };
-		CCA16C701C92F64B001EEB57 /* OSVGalleryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC19F3151BB05A65006C8FCC /* OSVGalleryViewController.m */; };
 		CCA16C711C92F64B001EEB57 /* TPPropertyAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = CC9726481C1634A80034DE96 /* TPPropertyAnimation.m */; };
 		CCA16C721C92F64B001EEB57 /* OSVServerSequence.m in Sources */ = {isa = PBXBuildFile; fileRef = CC19F2E31BAE9395006C8FCC /* OSVServerSequence.m */; };
 		CCA16C731C92F64B001EEB57 /* RLMPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = CCC2C63C1BA84F2C00A4CDEE /* RLMPhoto.m */; };
@@ -316,8 +312,6 @@
 		CCA16CA61C92F64B001EEB57 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CCB56F541C28072D00FFFC39 /* Localizable.strings */; };
 		CCA16CA71C92F64B001EEB57 /* OSVSequenceSectionHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CC91D5D41BFDE8AA003A6409 /* OSVSequenceSectionHeaderView.xib */; };
 		CCA16CA81C92F64B001EEB57 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CCFD49A11BA02455005B5E9A /* Images.xcassets */; };
-		CCAF7EC11D59C33600802D1B /* OBDBLEDeviceList.m in Sources */ = {isa = PBXBuildFile; fileRef = CCAF7EC01D59C33600802D1B /* OBDBLEDeviceList.m */; };
-		CCAF7EC21D59C33600802D1B /* OBDBLEDeviceList.m in Sources */ = {isa = PBXBuildFile; fileRef = CCAF7EC01D59C33600802D1B /* OBDBLEDeviceList.m */; };
 		CCB56F551C28072D00FFFC39 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CCB56F541C28072D00FFFC39 /* Localizable.strings */; };
 		CCB69D551C3E856D00832788 /* OSVAPIConfigurator.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB69D541C3E856D00832788 /* OSVAPIConfigurator.m */; };
 		CCB952D01CE5EAD3006D5BBD /* OSVAPI+Video.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB952CF1CE5EAD3006D5BBD /* OSVAPI+Video.m */; };
@@ -344,8 +338,6 @@
 		CCC2C68F1BA8506400A4CDEE /* OSVUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = CCC2C6891BA8506400A4CDEE /* OSVUtils.m */; };
 		CCC2C6941BA850BB00A4CDEE /* AVCamPreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = CCC2C6931BA850BB00A4CDEE /* AVCamPreviewView.m */; };
 		CCC2C69A1BA850D900A4CDEE /* OSVPhoto+Relm.m in Sources */ = {isa = PBXBuildFile; fileRef = CCC2C6971BA850D900A4CDEE /* OSVPhoto+Relm.m */; };
-		CCD2E71B1D423410007C2A32 /* ATAppUpdater.m in Sources */ = {isa = PBXBuildFile; fileRef = CCD2E71A1D423410007C2A32 /* ATAppUpdater.m */; };
-		CCD2E71C1D423415007C2A32 /* ATAppUpdater.m in Sources */ = {isa = PBXBuildFile; fileRef = CCD2E71A1D423410007C2A32 /* ATAppUpdater.m */; };
 		CCD92BBB1BE7709E002F9341 /* OSVUtils+Image.m in Sources */ = {isa = PBXBuildFile; fileRef = CCD92BBA1BE7709E002F9341 /* OSVUtils+Image.m */; };
 		CCDEFA661C88864700A542BA /* OSVSensorsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CCDEFA641C88864700A542BA /* OSVSensorsManager.m */; };
 		CCE34A111BCD221000B54066 /* OSVLoadingCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CCE34A101BCD221000B54066 /* OSVLoadingCell.m */; };
@@ -499,8 +491,6 @@
 		CC19F2E31BAE9395006C8FCC /* OSVServerSequence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OSVServerSequence.m; path = Models/OSVServerSequence.m; sourceTree = "<group>"; };
 		CC19F2E91BAF15A1006C8FCC /* OSVServerPhoto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVServerPhoto.h; sourceTree = "<group>"; };
 		CC19F2EA1BAF15A1006C8FCC /* OSVServerPhoto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVServerPhoto.m; sourceTree = "<group>"; };
-		CC19F3141BB05A65006C8FCC /* OSVGalleryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVGalleryViewController.h; sourceTree = "<group>"; };
-		CC19F3151BB05A65006C8FCC /* OSVGalleryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVGalleryViewController.m; sourceTree = "<group>"; };
 		CC19F3171BB05FFC006C8FCC /* OSVSequenceCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVSequenceCell.h; sourceTree = "<group>"; };
 		CC19F3181BB05FFC006C8FCC /* OSVSequenceCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVSequenceCell.m; sourceTree = "<group>"; };
 		CC1E50351BF2048200BD4A1A /* OSVDebugViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVDebugViewController.h; sourceTree = "<group>"; };
@@ -509,8 +499,6 @@
 		CC1E503A1BF209BA00BD4A1A /* OSVMenuItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVMenuItem.m; sourceTree = "<group>"; };
 		CC1E503C1BF20A5100BD4A1A /* OSVSectionItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVSectionItem.h; sourceTree = "<group>"; };
 		CC1E503D1BF20A5100BD4A1A /* OSVSectionItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVSectionItem.m; sourceTree = "<group>"; };
-		CC1E503F1BF26B1200BD4A1A /* OSVProfileMenuFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVProfileMenuFactory.h; sourceTree = "<group>"; };
-		CC1E50401BF26B1200BD4A1A /* OSVProfileMenuFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVProfileMenuFactory.m; sourceTree = "<group>"; };
 		CC1E50501BF2986900BD4A1A /* UIAlertView+Blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIAlertView+Blocks.h"; sourceTree = "<group>"; };
 		CC1E50511BF2986900BD4A1A /* UIAlertView+Blocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertView+Blocks.m"; sourceTree = "<group>"; };
 		CC1E50551BF3A38A00BD4A1A /* OSVBasicMapController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVBasicMapController.h; sourceTree = "<group>"; };
@@ -685,8 +673,6 @@
 		CC9726481C1634A80034DE96 /* TPPropertyAnimation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TPPropertyAnimation.m; sourceTree = "<group>"; };
 		CCA16C1E1C92D1DA001EEB57 /* InfoBeta.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = InfoBeta.plist; sourceTree = "<group>"; };
 		CCA16CB61C92F64B001EEB57 /* OSV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OSV.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		CCAF7EBF1D59C33600802D1B /* OBDBLEDeviceList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OBDBLEDeviceList.h; sourceTree = "<group>"; };
-		CCAF7EC01D59C33600802D1B /* OBDBLEDeviceList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OBDBLEDeviceList.m; sourceTree = "<group>"; };
 		CCB56F541C28072D00FFFC39 /* Localizable.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		CCB56F561C28088B00FFFC39 /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/Main.strings; sourceTree = "<group>"; };
 		CCB56F571C28088B00FFFC39 /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -730,8 +716,6 @@
 		CCC2C6931BA850BB00A4CDEE /* AVCamPreviewView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AVCamPreviewView.m; path = Views/AVCamPreviewView.m; sourceTree = "<group>"; };
 		CCC2C6961BA850D900A4CDEE /* OSVPhoto+Relm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "OSVPhoto+Relm.h"; path = "Models/Categories/OSVPhoto+Relm.h"; sourceTree = "<group>"; };
 		CCC2C6971BA850D900A4CDEE /* OSVPhoto+Relm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "OSVPhoto+Relm.m"; path = "Models/Categories/OSVPhoto+Relm.m"; sourceTree = "<group>"; };
-		CCD2E7191D423410007C2A32 /* ATAppUpdater.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATAppUpdater.h; sourceTree = "<group>"; };
-		CCD2E71A1D423410007C2A32 /* ATAppUpdater.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATAppUpdater.m; sourceTree = "<group>"; };
 		CCD92BBA1BE7709E002F9341 /* OSVUtils+Image.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "OSVUtils+Image.m"; sourceTree = "<group>"; };
 		CCDEFA641C88864700A542BA /* OSVSensorsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVSensorsManager.m; sourceTree = "<group>"; };
 		CCDEFA651C88864700A542BA /* OSVSensorsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVSensorsManager.h; sourceTree = "<group>"; };
@@ -971,8 +955,6 @@
 				CC1E503D1BF20A5100BD4A1A /* OSVSectionItem.m */,
 				CCF58D0B1D74525700F1054C /* OSVSettingsMenuFactory.h */,
 				CCF58D0C1D74525700F1054C /* OSVSettingsMenuFactory.m */,
-				CC1E503F1BF26B1200BD4A1A /* OSVProfileMenuFactory.h */,
-				CC1E50401BF26B1200BD4A1A /* OSVProfileMenuFactory.m */,
 				CC5CC2741D2BC2AC002963D2 /* OSVMainMenuFactory.h */,
 				CC5CC2751D2BC2AC002963D2 /* OSVMainMenuFactory.m */,
 			);
@@ -1139,8 +1121,6 @@
 				CC1E50531BF3A14600BD4A1A /* MapState */,
 				CCC2C6451BA84F4A00A4CDEE /* OSVMapViewController.h */,
 				CCC2C6461BA84F4A00A4CDEE /* OSVMapViewController.m */,
-				CC19F3141BB05A65006C8FCC /* OSVGalleryViewController.h */,
-				CC19F3151BB05A65006C8FCC /* OSVGalleryViewController.m */,
 				CC1E50351BF2048200BD4A1A /* OSVDebugViewController.h */,
 				CC1E50361BF2048200BD4A1A /* OSVDebugViewController.m */,
 				CC15291E1C02618D00BD29DC /* OSVFullScreenImageViewController.h */,
@@ -1156,8 +1136,6 @@
 				CC0168961D3514AF00E8297D /* Settings */,
 				CC4C7B3F1D3D3C1200B902E8 /* OSVLayersViewController.h */,
 				CC4C7B401D3D3C1200B902E8 /* OSVLayersViewController.m */,
-				CCAF7EBF1D59C33600802D1B /* OBDBLEDeviceList.h */,
-				CCAF7EC01D59C33600802D1B /* OBDBLEDeviceList.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -1404,8 +1382,6 @@
 			isa = PBXGroup;
 			children = (
 				CC1FFCD91D58A43800958B8E /* OBDLib */,
-				CCD2E7191D423410007C2A32 /* ATAppUpdater.h */,
-				CCD2E71A1D423410007C2A32 /* ATAppUpdater.m */,
 				CC8960EE1D2B935500501341 /* SideMenu */,
 				CC40F3A01D13FE840028E488 /* Godzippa */,
 				CC65DF5C1CA1601400EC3F70 /* OBD2Kit */,
@@ -1955,7 +1931,6 @@
 				CCA16C301C92F64B001EEB57 /* OSVServerSequence+Convertor.m in Sources */,
 				CCA16C311C92F64B001EEB57 /* OSVButton.m in Sources */,
 				CCA16C321C92F64B001EEB57 /* OSVPolyline.m in Sources */,
-				CCD2E71C1D423415007C2A32 /* ATAppUpdater.m in Sources */,
 				CCA16C331C92F64B001EEB57 /* OSVSettingsSwitchCell.m in Sources */,
 				CC4536551CA59365005C4490 /* ELM327Command.m in Sources */,
 				CCA16C341C92F64B001EEB57 /* OSVUtils+Location.m in Sources */,
@@ -1988,7 +1963,6 @@
 				CCB952E11CE60EB9006D5BBD /* OSVVideo.m in Sources */,
 				CCA16C471C92F64B001EEB57 /* AFJSONRequestOperation.m in Sources */,
 				CCA16C491C92F64B001EEB57 /* OSVUtils+Image.m in Sources */,
-				CCA16C4A1C92F64B001EEB57 /* OSVProfileMenuFactory.m in Sources */,
 				CCA16C4B1C92F64B001EEB57 /* OSVSequenceSectionHeaderView.m in Sources */,
 				CCA16C4D1C92F64B001EEB57 /* OSVCamViewController.m in Sources */,
 				CCA16C4E1C92F64B001EEB57 /* UIColor+OSVColor.m in Sources */,
@@ -2035,7 +2009,6 @@
 				CCA16C651C92F64B001EEB57 /* OSVLocationManager.m in Sources */,
 				CC0168901D35104B00E8297D /* OSVSettingsDetails.m in Sources */,
 				CC8960FB1D2B9ECF00501341 /* OSVLeftMenuViewController.m in Sources */,
-				CCAF7EC21D59C33600802D1B /* OBDBLEDeviceList.m in Sources */,
 				CCA16C671C92F64B001EEB57 /* OSVLogger.m in Sources */,
 				CC4C7B421D3D3C1200B902E8 /* OSVLayersViewController.m in Sources */,
 				CC92B0AE1D37C5D4004F7EF8 /* UIView+Additions.m in Sources */,
@@ -2052,7 +2025,6 @@
 				CC1FFCE61D58A48300958B8E /* OBDService.m in Sources */,
 				CCA16C6F1C92F64B001EEB57 /* OSVFullScreenImageCell.m in Sources */,
 				CC7C6A421CF5E03400C03051 /* CERangeSlider.m in Sources */,
-				CCA16C701C92F64B001EEB57 /* OSVGalleryViewController.m in Sources */,
 				CC0168551D30235D00E8297D /* OSVNavigationController.m in Sources */,
 				CCBBCFE41D1D638700B9104F /* OSVTipPageViewController.m in Sources */,
 				CC16AE381CE4892B001EA02A /* OSVVideoPlayerViewController.m in Sources */,
@@ -2114,7 +2086,6 @@
 				CC1FFCE91D58A48300958B8E /* OBDUtils.m in Sources */,
 				CC65DF801CA1601400EC3F70 /* ELM327Command.m in Sources */,
 				CC7C6A401CF5E01F00C03051 /* CERangeSliderKnobLayer.m in Sources */,
-				CCD2E71B1D423410007C2A32 /* ATAppUpdater.m in Sources */,
 				CCF822E21C0745B900E607D9 /* OSVButton.m in Sources */,
 				CC06B6961C776A1A00E2B0DB /* OSVPolyline.m in Sources */,
 				CC791E5F1BF0A11100E5CBD3 /* OSVSettingsSwitchCell.m in Sources */,
@@ -2154,7 +2125,6 @@
 				CC16AE371CE4892B001EA02A /* OSVVideoPlayerViewController.m in Sources */,
 				CC65DF811CA1601400EC3F70 /* ELM327ResponseParser.m in Sources */,
 				CC0168761D34ED7F00E8297D /* OSVBasicCell.m in Sources */,
-				CC1E50411BF26B1200BD4A1A /* OSVProfileMenuFactory.m in Sources */,
 				CC92B0A21D3665D9004F7EF8 /* KAProgressLabel.m in Sources */,
 				CC91D5D31BFDE88E003A6409 /* OSVSequenceSectionHeaderView.m in Sources */,
 				CCC2C64A1BA84F4A00A4CDEE /* OSVCamViewController.m in Sources */,
@@ -2196,7 +2166,6 @@
 				CC8960FA1D2B9ECF00501341 /* OSVLeftMenuViewController.m in Sources */,
 				CC01688F1D35104B00E8297D /* OSVSettingsDetails.m in Sources */,
 				CC65DF7D1CA1601400EC3F70 /* FLECUSensor.m in Sources */,
-				CCAF7EC11D59C33600802D1B /* OBDBLEDeviceList.m in Sources */,
 				CC5EB4151C46741F006F3FD0 /* OSVLogger.m in Sources */,
 				CC4C7B411D3D3C1200B902E8 /* OSVLayersViewController.m in Sources */,
 				CC92B0AD1D37C5D4004F7EF8 /* UIView+Additions.m in Sources */,
@@ -2214,7 +2183,6 @@
 				CC1FFCE51D58A48300958B8E /* OBDService.m in Sources */,
 				CCE6C4611C106288005DC6FF /* OSVCropedLabel.m in Sources */,
 				CCBE0F171C8F1D9D00A43F37 /* OSVFullScreenImageCell.m in Sources */,
-				CC19F3161BB05A65006C8FCC /* OSVGalleryViewController.m in Sources */,
 				CC0168541D30235D00E8297D /* OSVNavigationController.m in Sources */,
 				CCBBCFE31D1D638700B9104F /* OSVTipPageViewController.m in Sources */,
 				CC97264B1C1634A80034DE96 /* TPPropertyAnimation.m in Sources */,
