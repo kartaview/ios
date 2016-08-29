@@ -122,8 +122,8 @@
     self.mapView.settings.showCompass = NO;
     self.mapView.settings.displayMode = SKMapDisplayMode2D;
     self.mapView.settings.showStreetNamePopUps = YES;
-    self.mapView.settings.osmAttributionPosition = SKAttributionPositionNone;
-    self.mapView.settings.companyAttributionPosition = SKAttributionPositionNone;
+    // self.mapView.settings.osmAttributionPosition = SKAttributionPositionNone;
+    // self.mapView.settings.companyAttributionPosition = SKAttributionPositionNone;
     self.mapView.userInteractionEnabled = NO;
     
     SKCoordinateRegion region;
