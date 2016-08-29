@@ -20,6 +20,7 @@
 #import "OSVUser.h"
 #import "OSVUtils.h"
 #import "OSVUserDefaults.h"
+#import "UIAlertView+Blocks.h"
 
 #import "NSAttributedString+Additions.h"
 
@@ -38,6 +39,8 @@
 @property (strong, nonatomic) id<OSVUser>                                   currentUser;
 @property (assign, nonatomic) NSInteger                                     localRank;
 @property (assign, nonatomic) NSInteger                                     totalNumberOfTracks;
+
+@property (assign, nonatomic) BOOL                                          didShowNoInternet;
 
 @end
 
@@ -252,6 +255,14 @@
 
 - (void)loadCurrentPageShowReset:(BOOL)reset {
     [[OSVSyncController sharedInstance].tracksController getMyServerSequencesAtPage:self.currentPage withCompletion:^(NSArray<OSVServerSequence *> *tracks, OSVMetadata *metadata, NSError *error) {
+        
+        if (error && !self.didShowNoInternet) {
+            self.didShowNoInternet = YES;
+            [UIAlertView showWithTitle:NSLocalizedString(@"No internet connection", @"") message:NSLocalizedString(@"", @"") cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
+                [self.navigationController popViewControllerAnimated:YES];
+            }];
+        }
+        
         if (reset) {
             self.datasource = [NSMutableArray arrayWithArray:tracks];
         } else {

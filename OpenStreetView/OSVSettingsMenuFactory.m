@@ -1,12 +1,12 @@
 //
-//  OSVProfileMenuFactory.m
+//  OSVSettingsMenuFactory.m
 //  OpenStreetView
 //
 //  Created by Bogdan Sala on 10/11/15.
 //  Copyright © 2015 Bogdan Sala. All rights reserved.
 //
 
-#import "OSVProfileMenuFactory.h"
+#import "OSVSettingsMenuFactory.h"
 #import "OSVSettingsViewController.h"
 #import <UIKit/UIKit.h>
 #import "UIAlertView+Blocks.h"
@@ -21,7 +21,9 @@
 
 #import <AVFoundation/AVFoundation.h>
 
-@implementation OSVProfileMenuFactory
+#import "UIDevice+Aditions.h"
+
+@implementation OSVSettingsMenuFactory
 
 #pragma mark - Menu Factory
 
@@ -29,9 +31,16 @@
 
 // Enable debug for all builds for now.
 #ifdef ENABLED_DEBUG
-    NSArray *array = @[[self settingsSection], [self obdSectionWithWiFiStatus:connectionStatus BLEStatus:bleStat], [self feedbackSection], [self aboutSection], [self debugSection]];
+    NSArray *array = @[[self settingsSection],
+                       [self obdSectionWithWiFiStatus:connectionStatus BLEStatus:bleStat],
+                       [self feedbackSection],
+                       [self aboutSection],
+                       [self debugSection]];
 #else
-    NSArray *array = @[[self settingsSection], [self obdSectionWithWiFiStatus:connectionStatus BLEStatus:bleStat], [self feedbackSection], [self aboutSection]];
+    NSArray *array = @[[self settingsSection],
+                       [self obdSectionWithWiFiStatus:connectionStatus BLEStatus:bleStat],
+                       [self feedbackSection],
+                       [self aboutSection]];
 #endif
     return array;
 }
@@ -48,7 +57,12 @@
 
 + (OSVSectionItem *)settingsSection {
     OSVSectionItem *settingsSection = [OSVSectionItem new];
-    settingsSection.rowItems = [@[[self wifiItem], [self autoUploadItem], [self metricItem], [self videoQualityItem], [self signDetection]]mutableCopy];
+    settingsSection.rowItems = [@[[self wifiItem],
+                                  [self autoUploadItem],
+                                  [self metricItem],
+                                  [self videoQualityItem],
+                                  [self showMapItem],
+                                  [self signDetectionItem]] mutableCopy];
     settingsSection.title = NSLocalizedString(@"GENERAL", nil);
     
     return settingsSection;
@@ -56,7 +70,8 @@
 
 + (OSVSectionItem *)feedbackSection {
     OSVSectionItem *feedbackItem = [OSVSectionItem new];
-    feedbackItem.rowItems = [@[[self feedbackItem], [self walkthrough]]mutableCopy];
+    feedbackItem.rowItems = [@[[self feedbackItem],
+                               [self walkthrough]] mutableCopy];
     feedbackItem.title = NSLocalizedString(@"IMPROVE", nil);
     
     return feedbackItem;
@@ -64,7 +79,8 @@
 
 + (OSVSectionItem *)aboutSection {
     OSVSectionItem *aboutItem = [OSVSectionItem new];
-    aboutItem.rowItems = [@[[self appVersion], [self copyRight]] mutableCopy];
+    aboutItem.rowItems = [@[[self appVersion],
+                            [self copyRight]] mutableCopy];
     aboutItem.title = NSLocalizedString(@"ABOUT", nil);
     
     return aboutItem;
@@ -265,28 +281,35 @@
     item.title = NSLocalizedString(@"Resolution", @"");
     item.key = @"videoQuality";
     
-    NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
-    AVCaptureDevice *captureDevice = [devices firstObject];
-    
-    for (AVCaptureDevice *device in devices) {
-        if ([device position] == AVCaptureDevicePositionBack) {
-            captureDevice = device;
-            break;
-        }
-    }
-    
-    AVCaptureDeviceFormat *format = [captureDevice.formats lastObject];
-    CMVideoDimensions dim = CMVideoFormatDescriptionGetDimensions(format.formatDescription);
-    BOOL has12MP = NO;
-    
-    if (dim.width > 3264) {
-        has12MP = YES;
-    }
-    
-    if (has12MP) {
-        item.rowItems = [@[[self smallResolution], [self mediumResolution], [self highResolution]] mutableCopy];
+    if ([UIDevice isLessTheniPhone6]) {
+        item.rowItems = [@[[self smallerResolution]] mutableCopy];
     } else {
-        item.rowItems = [@[[self smallResolution], [self mediumResolution]] mutableCopy];
+        NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+        AVCaptureDevice *captureDevice = [devices firstObject];
+        
+        for (AVCaptureDevice *device in devices) {
+            if ([device position] == AVCaptureDevicePositionBack) {
+                captureDevice = device;
+                break;
+            }
+        }
+        
+        AVCaptureDeviceFormat *format = [captureDevice.formats lastObject];
+        CMVideoDimensions dim = CMVideoFormatDescriptionGetDimensions(format.formatDescription);
+        BOOL has12MP = NO;
+        
+        if (dim.width > 3264) {
+            has12MP = YES;
+        }
+        
+        if (has12MP) {
+            item.rowItems = [@[[self smallResolution],
+                               [self mediumResolution],
+                               [self highResolution]] mutableCopy];
+        } else {
+            item.rowItems = [@[[self smallResolution],
+                               [self mediumResolution]] mutableCopy];
+        }
     }
     
     return item;
@@ -294,16 +317,29 @@
 
 + (NSDictionary *)resolutionDictionaryFormArray:(NSArray *)array {
     NSDictionary *resolutionsDictionary;
-    if ([array count] == 3) {
-        resolutionsDictionary = @{k5MPQuality : array[0],
-                                  k8MPQuality : array[1],
-                                  k12MPQuality: array[2]};
+    if ([UIDevice isLessTheniPhone6]) {
+        resolutionsDictionary = @{k2MPQuality : array[0]};
     } else {
-        resolutionsDictionary = @{k5MPQuality : array[0],
-                                  k8MPQuality : array[1]};
+        if ([array count] == 3) {
+            resolutionsDictionary = @{k5MPQuality : array[0],
+                                      k8MPQuality : array[1],
+                                      k12MPQuality: array[2]};
+        } else {
+            resolutionsDictionary = @{k5MPQuality : array[0],
+                                      k8MPQuality : array[1]};
+        }
     }
     
     return resolutionsDictionary;
+}
+
++ (OSVMenuItem *)smallerResolution {
+    OSVMenuItem *item = [OSVMenuItem new];
+    item.title = NSLocalizedString(@"2 MP", @"");
+    item.type = OSVMenuItemOption;
+    item.key = k2MPQuality;
+    
+    return item;
 }
 
 + (OSVMenuItem *)smallResolution {
@@ -333,10 +369,20 @@
     return item;
 }
 
-+ (OSVMenuItem *)signDetection {
++ (OSVMenuItem *)showMapItem {
+    OSVMenuItem *item = [OSVMenuItem new];
+    item.title = NSLocalizedString(@"Display map while recording", @"");
+    item.subtitle = NSLocalizedString(@"Map display increases battery and data consumption.", @"");
+    item.type = OSVMenuItemSwitch;
+    item.key = @"showMapWhileRecording";
+    
+    return item;
+}
+
++ (OSVMenuItem *)signDetectionItem {
     OSVMenuItem *video = [OSVMenuItem new];
-    video.title = NSLocalizedString(@"Road signs detection", @"");
-    video.subtitle = NSLocalizedString(@"Detect street signs while recording.", @"");
+    video.title = NSLocalizedString(@"BETA: Detect road signs", @"");
+    video.subtitle = NSLocalizedString(@"Only works in landscape mode with home button on the right.", @"");
     video.type = OSVMenuItemSwitch;
     video.key = @"useImageRecognition";
     
@@ -441,8 +487,7 @@
 
 + (OSVMenuItem *)obdBLEDisconnected {
     OSVMenuItem *item = [OSVMenuItem new];
-    item.title = NSLocalizedString(@"BLE Not connected", nil);
-    item.subtitle = [OSVUserDefaults sharedInstance].bleDevice;
+    item.title = NSLocalizedString(@"BluetoothLE Not connected", nil);
     item.type = OSVMenuItemDetails;
     item.action = ^(OSVSettingsViewController *sender, id indexPath) {
         sender.obdBLEConnectionStatus = 1;
@@ -465,7 +510,7 @@
 + (OSVMenuItem *)obdBLEConnected {
     OSVMenuItem *item = [OSVMenuItem new];
     item.title = NSLocalizedString(@"BLE Connected to OBD 2", nil);
-    item.subtitle = NSLocalizedString(@"Disconnect", nil);
+    item.subtitle = [NSString stringWithFormat:NSLocalizedString(@"Disconnect %@", nil), [OSVUserDefaults sharedInstance].bleDevice];
     item.type = OSVMenuItemButton;
     item.action = ^(OSVSettingsViewController *sender, id indexPath) {
         sender.obdBLEConnectionStatus = 2;

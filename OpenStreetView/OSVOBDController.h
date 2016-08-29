@@ -22,7 +22,7 @@ typedef void (^OSVOBDHandler)(OSVOBDData *obdData);
 - (void)startOBDUpdates;
 - (void)stopOBDUpdates;
 
-- (void)scanBLEOBD;
+- (void)scanBLEOBDShowAlert:(BOOL)value;
 
 - (void)reconnect;
 

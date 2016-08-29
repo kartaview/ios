@@ -46,7 +46,7 @@
     [OSMAPI sharedInstance].didFinishLogin = ^(OSMUser *osmUser, BOOL success){
         NSError *error = nil;
         if (!success) {
-            error = [[NSError alloc] init];
+            error = [[NSError alloc] initWithDomain:@"OSVLogginControler" code:11 userInfo:@{}];
             completion(error);
             return;
         }
@@ -107,9 +107,11 @@
     return [self.osvAPI getAppLink];
 }
 
-- (void)getApiVersionWithCompletion:(void (^)(BOOL response))completion {
-    [self.osvAPI getApiVersionWithCompletion:^(NSString *version, NSError *error) {
-        completion([version isEqualToString:@"1.0"]);
+- (void)checkForAppUpdateWithCompletion:(void (^)(BOOL response))completion {
+    [self.osvAPI getApiVersionWithCompletion:^(double version, NSError *error) {
+        if (!error) {
+            completion(version > 0);
+        }
     }];
 }
 

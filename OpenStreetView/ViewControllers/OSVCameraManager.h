@@ -19,6 +19,7 @@
 - (void)didChangeGPSStatus:(UIImage *)gpsStatus;
 - (void)didChangeOBDInfo:(double)speed withError:(NSError *)error;
 - (void)showOBD:(BOOL)value;
+// TODO change naming to something more explicit
 - (void)didAddNewLocation:(CLLocation *)location;
 
 - (void)didReceiveUIUpdate;

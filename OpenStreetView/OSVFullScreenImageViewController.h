@@ -7,16 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "OSVPhoto.h"
+#import "OSVSequence.h"
 
 @protocol OSVFullScreenImageViewControllerDelegate;
 
 @interface OSVFullScreenImageViewController : UIViewController
 
-@property (strong, nonatomic) NSArray<id <OSVPhoto>>    *datasource;
+@property (strong, nonatomic) id<OSVSequence>           sequenceDatasource;
 @property (strong, nonatomic) id<OSVPhoto>              selectedPhoto;
-@property (nonatomic, strong) NSIndexPath               *selectedIndexPath;
-@property (nonatomic, strong) UIImageView               *imageView;
+@property (strong, nonatomic) NSIndexPath               *selectedIndexPath;
+@property (strong, nonatomic) UIImageView               *imageView;
 
 @property (weak, nonatomic) id<OSVFullScreenImageViewControllerDelegate> delegate;
 

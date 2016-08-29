@@ -23,6 +23,8 @@
 @property (nonatomic, strong) UIColor                   *colorPurple;
 @property (nonatomic, strong) NSArray                   *localSeq;
 
+@property (nonatomic, assign) BOOL                      shouldClearMap;
+
 @end
 
 @implementation OSVBasicMapController
@@ -209,17 +211,30 @@ int iii = 0;
 #pragma mark - Private
 
 - (void)requestAndDisplayAllSequencesOnMapInBoundingBox:(id<OSVBoundingBox>)box withZoom:(double)zoom {
-    if ([OSVUtils getAirDistanceBetweenCoordinate:box.topLeftCoordinate andCoordinate:box.bottomRightCoordinate] < 400 * 1000) {
+    if ([OSVUtils getAirDistanceBetweenCoordinate:box.topLeftCoordinate andCoordinate:box.bottomRightCoordinate] < 600 * 1000) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-
             [self.syncController.tracksController getServerTracksInBoundingBox:box withZoom:zoom withPartialCompletion:^(id<OSVSequence> sequence, OSVMetadata *metadata, NSError *error) {
     //TODO: refactor the line below..
                 if (![self.viewController.navigationController.viewControllers.firstObject isKindOfClass:[OSVMapViewController class]]) {
                     [self.viewController.mapView clearAllOverlays];
                 } else {
-                    if (metadata.pageIndex == 0) {
+                    if (metadata.pageIndex == 0 && self.shouldClearMap) {
+                        self.shouldClearMap = NO;
+                        
                         [self.viewController.mapView clearAllOverlays];
                         [self addLocalSequences];
+                    }
+                    
+//                    if (metadata.pageIndex == 0 && self.shouldClearMap) {
+//                        self.shouldClearMap = NO;
+//                        for (int x = (int)MAX(metadata.totalItems * 9/10, self.localSeq.count); x <= iii; x++) {
+//                            [self.viewController.mapView clearOverlayWithID:x];
+//                        }
+//                        iii = (int)self.localSeq.count;
+//                    }
+                    
+                    if (metadata.pageIndex > 0) {
+                        self.shouldClearMap = YES;
                     }
                     
                     [self addSequenceOnMap:sequence];

@@ -21,6 +21,12 @@
     return meta;
 }
 
+- (BOOL)isLastPage {
+    NSInteger totalPages = self.totalItems / self.itemsPerPage + (self.totalItems % self.itemsPerPage != 0 ? 1 : 0);
+
+    return self.pageIndex == (totalPages-1);
+}
+
 - (NSString *)description {
     return [NSString stringWithFormat:@"%p index:%ld, page:%ld, total:%ld, ipp:%ld", self, (long)self.index, (long)self.pageIndex, (long)self.totalItems, (long)self.itemsPerPage];
 }

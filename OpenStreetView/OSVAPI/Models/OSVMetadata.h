@@ -18,4 +18,6 @@
 
 + (OSVMetadata *)metadataError;
 
+- (BOOL)isLastPage;
+
 @end

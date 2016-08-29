@@ -12,5 +12,6 @@
 
 + (NSString *)modelString;
 + (NSString *)osVersion;
++ (BOOL)isLessTheniPhone6;
 
 @end

@@ -13,7 +13,7 @@
 
 #import "OSVUtils.h"
 
-#import "OSVProfileMenuFactory.h"
+#import "OSVSettingsMenuFactory.h"
 
 #import "OSVSettingsSwitchCell.h"
 #import "OSVSectionHeaderCell.h"
@@ -40,7 +40,7 @@
     [super viewDidLoad];
     
     self.syncController = [OSVSyncController sharedInstance];
-    self.datasource = [OSVProfileMenuFactory settingsMenuWithWiFiOBDStatus:self.obdWIFIConnectionStatus BLEStatus:self.obdBLEConnectionStatus];
+    self.datasource = [OSVSettingsMenuFactory settingsMenuWithWiFiOBDStatus:self.obdWIFIConnectionStatus BLEStatus:self.obdBLEConnectionStatus];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -72,7 +72,7 @@
 #pragma mark - Private
 
 - (void)reloadData {
-    self.datasource = [OSVProfileMenuFactory settingsMenuWithWiFiOBDStatus:self.obdWIFIConnectionStatus BLEStatus:self.obdBLEConnectionStatus];
+    self.datasource = [OSVSettingsMenuFactory settingsMenuWithWiFiOBDStatus:self.obdWIFIConnectionStatus BLEStatus:self.obdBLEConnectionStatus];
     [self.tableView reloadData];
 }
 
@@ -202,12 +202,22 @@
 #pragma mark - private
 
 - (void)managerDidConnectToOBD:(NSNotification *)notif {
-    self.obdWIFIConnectionStatus = 2;
+    if ([notif.userInfo[@"OBD"] isEqualToString:@"WIFI"]) {
+        self.obdWIFIConnectionStatus = 2;
+    } else {
+        self.obdBLEConnectionStatus = 2;
+    }
+    
     [self reloadData];
 }
 
 - (void)managerDidDisconnectFromOBD:(NSNotification *)notif {
-    self.obdWIFIConnectionStatus = 0;
+    if ([notif.userInfo[@"OBD"] isEqualToString:@"WIFI"]) {
+        self.obdWIFIConnectionStatus = 0;
+    } else {
+        self.obdBLEConnectionStatus = 0;
+    }
+
     [self reloadData];
 }
 

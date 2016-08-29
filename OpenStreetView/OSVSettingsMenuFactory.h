@@ -1,5 +1,5 @@
 //
-//  OSVProfileMenuFactory.h
+//  OSVSettingsMenuFactory.h
 //  OpenStreetView
 //
 //  Created by Bogdan Sala on 10/11/15.
@@ -11,7 +11,7 @@
 #import "OSVMenuItem.h"
 #import "OSVSectionItem.h"
 
-@interface OSVProfileMenuFactory : NSObject
+@interface OSVSettingsMenuFactory : NSObject
 
 + (NSArray *)settingsMenuWithWiFiOBDStatus:(int)connectionStatus BLEStatus:(int)bleStat;
 

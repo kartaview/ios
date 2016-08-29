@@ -10,7 +10,6 @@
 #import <SKMaps/SKMaps.h>
 #import "AFOAuth1Client.h"
 #import <Realm/Realm.h>
-#import "RLMPhoto.h"
 #import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
 #import "OSVLocationManager.h"
@@ -21,9 +20,8 @@
 
 #import "UIAlertView+Blocks.h"
 #import "OSVReachablityController.h"
-#import "OSVSensorLibManager.h"
 
-#import "ATAppUpdater.h"
+#import "OSVUser.h"
 
 @interface AppDelegate ()
 
@@ -34,7 +32,17 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [Fabric with:@[[Crashlytics class]]];
-
+    NSString *username = [OSVSyncController sharedInstance].tracksController.user.name;
+    if (username) {
+        [CrashlyticsKit setUserName:username];
+    }
+    
+    [[OSVSyncController sharedInstance].tracksController checkForAppUpdateWithCompletion:^(BOOL response) {
+        if (response) {
+            [[UIApplication sharedApplication] openURL:[[OSVSyncController sharedInstance].tracksController getAppLink]];
+        }
+    }];
+    
     SKMapsInitSettings *mapsettings = [SKMapsInitSettings mapsInitSettings];
     
     [[SKMapsService sharedInstance] initializeSKMapsWithAPIKey:@"47c0589b94694c04e757f6c36157f13b21d30d051d662b7c8034bf3988bd9843" settings:mapsettings];
@@ -95,7 +103,11 @@
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
-    [[ATAppUpdater sharedUpdater] showUpdateWithConfirmation];
+    [[OSVSyncController sharedInstance].tracksController checkForAppUpdateWithCompletion:^(BOOL response) {
+        if (response) {
+            [[UIApplication sharedApplication] openURL:[[OSVSyncController sharedInstance].tracksController getAppLink]];
+        }
+    }];
     
     [[OSVLocationManager sharedInstance].sensorsManager startUpdatingOBD];
     if (([OSVReachablityController hasWiFiAccess] || [OSVReachablityController hasCellularAcces]) &&

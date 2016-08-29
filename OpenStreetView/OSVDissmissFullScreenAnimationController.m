@@ -23,14 +23,18 @@
     
     NSTimeInterval transitionDuration = [self transitionDuration:transitionContext];
 
-    [UIView animateKeyframesWithDuration:transitionDuration delay:0.0
-                                 options:UIViewKeyframeAnimationOptionCalculationModeCubic animations:^{
-                                     [UIView addKeyframeWithRelativeStartTime:0.0 relativeDuration:1.0 animations:^{
-                                          source.imageView.frame = self.destinationFrame;
-                                     }];
-                                 } completion:^(BOOL finished) {
+    [UIView animateKeyframesWithDuration:transitionDuration
+                                   delay:0.0
+                                 options:UIViewKeyframeAnimationOptionCalculationModeCubic
+                              animations:^{
+                                
+                                    [UIView addKeyframeWithRelativeStartTime:0.0 relativeDuration:1.0 animations:^{
+                                      source.imageView.frame = self.destinationFrame;
+                                    }];
+                              }
+                              completion:^(BOOL finished) {
                                      [transitionContext completeTransition:YES];
-                                 }];
+                              }];
     
 }
 

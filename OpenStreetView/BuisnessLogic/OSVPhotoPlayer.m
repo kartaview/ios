@@ -65,7 +65,7 @@
         self.currentPlayableItem = playableItem;
         self.currentIndex = index;
         self.slider.maximumValue = self.currentPlayableItem.count;
-        NSInteger index = self.currentIndex;
+        NSInteger index = MAX(MIN(self.currentIndex, self.currentPlayableItem.count - 1), 0);
         [[OSVSyncController sharedInstance].tracksController loadThumbnailForPhoto:self.currentPlayableItem[index] intoImageView:[UIImageView new] withCompletion:^(id<OSVPhoto> completePhoto, NSError *error) {
             self.imageView.image = completePhoto.thumbnail;
             completePhoto.thumbnail = nil;

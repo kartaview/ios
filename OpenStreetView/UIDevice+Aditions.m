@@ -22,6 +22,7 @@
 @implementation UIDevice (Aditions)
 
 static NSString *deviceModel = nil;
+static NSString *result = nil;
 
 + (NSString *)modelString {
     static dispatch_once_t onceToken;
@@ -30,7 +31,7 @@ static NSString *deviceModel = nil;
         sysctlbyname("hw.machine", NULL, &size, NULL, 0);
         char *answer = (char *)malloc(size);
         sysctlbyname("hw.machine", answer, &size, NULL, 0);
-        NSString *result = [NSString stringWithCString:answer encoding:NSUTF8StringEncoding];
+        result = [NSString stringWithCString:answer encoding:NSUTF8StringEncoding];
         free(answer);
         
         NSDictionary *dictionary = @{
@@ -40,8 +41,8 @@ static NSString *deviceModel = nil;
                                      @"iPhone3,1" : @"iPhone4G",
                                      @"iPhone3,3" : @"iPhone4G",
                                      @"iPhone4,1" : @"iPhone4S",
-                                     @"iPhone5,1" : @"iPhone5G",
-                                     @"iPhone5,2" : @"iPhone5G",
+                                     @"iPhone5,1" : @"iPhone5",
+                                     @"iPhone5,2" : @"iPhone5",
                                      @"iPhone5,3" : @"iPhone5C",
                                      @"iPhone5,4" : @"iPhone5C",
                                      @"iPhone5,5" : @"iPhone5C",
@@ -101,5 +102,16 @@ static NSString *deviceModel = nil;
     return [[UIDevice currentDevice] systemVersion];
 }
 
++ (BOOL)isLessTheniPhone6 {
+    [self modelString];
+    if ([result containsString:@"iPhone"]) {
+        NSString *deviceModelNumb = [result stringByReplacingOccurrencesOfString:@"iPhone" withString:@""];
+        deviceModelNumb = [deviceModelNumb stringByReplacingOccurrencesOfString:@"," withString:@"."];
+        double value = [deviceModelNumb doubleValue];
+        return value < 7;
+    }
+    
+    return YES;
+}
 
 @end

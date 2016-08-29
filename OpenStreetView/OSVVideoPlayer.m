@@ -7,9 +7,6 @@
 //
 #import <AVFoundation/AVFoundation.h>
 #import "OSVVideoPlayer.h"
-#import "OSVAPISerialOperation.h"
-
-#import "OSVLogger.h"
 
 @interface OSVVideoPlayer ()
 
@@ -33,19 +30,23 @@
 @property (nonatomic, strong) NSArray<AVPlayerItem *>       *itemsArray;
 
 @property (nonatomic, strong) NSURL                         *currentPlayableItem;
+@property (strong, nonatomic) UIImageView                   *imageView;
 
 @end
 
 @implementation OSVVideoPlayer
 
 @synthesize delegate;
-@synthesize imageView;
+
 
 - (instancetype)initWithView:(UIView *)aview andSlider:(UISlider *)slider {
     self = [super init];
     if (self) {
         self.view = aview;
-        imageView = nil;
+        self.imageView = [[UIImageView alloc] initWithFrame:aview.bounds];
+        self.imageView.userInteractionEnabled = YES;
+        self.imageView.contentMode = UIViewContentModeScaleAspectFit;
+        self.imageView.hidden = YES;
         
         self.slider = slider;
         [self.slider addTarget:self action:@selector(scrub:) forControlEvents:UIControlEventValueChanged];
@@ -60,6 +61,7 @@
         
         self.duration = kCMTimeZero;
         [self.view.layer insertSublayer:self.playerLayer atIndex:0];
+        [self.view addSubview:self.imageView];
     }
     
     return self;
@@ -278,6 +280,39 @@
     }
 }
 
+- (UIImage *)currentItemScreenShot {
+    AVPlayer *abovePlayer = self.player;
+    CMTime time = [[abovePlayer currentItem] currentTime];
+    AVAsset *asset = [[abovePlayer currentItem] asset];
+    AVAssetImageGenerator *imageGenerator = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+    if ([imageGenerator respondsToSelector:@selector(setRequestedTimeToleranceBefore:)] && [imageGenerator respondsToSelector:@selector(setRequestedTimeToleranceAfter:)]) {
+        [imageGenerator setRequestedTimeToleranceBefore:kCMTimeZero];
+        [imageGenerator setRequestedTimeToleranceAfter:kCMTimeZero];
+    }
+    
+    CGImageRef imgRef = [imageGenerator copyCGImageAtTime:time
+                                               actualTime:NULL
+                                                    error:NULL];
+    if (imgRef == nil) {
+        if ([imageGenerator respondsToSelector:@selector(setRequestedTimeToleranceBefore:)] && [imageGenerator respondsToSelector:@selector(setRequestedTimeToleranceAfter:)]) {
+            [imageGenerator setRequestedTimeToleranceBefore:kCMTimePositiveInfinity];
+            [imageGenerator setRequestedTimeToleranceAfter:kCMTimePositiveInfinity];
+        }
+        imgRef = [imageGenerator copyCGImageAtTime:time actualTime:NULL error:NULL];
+    }
+    UIImage *image = [[UIImage alloc] initWithCGImage:imgRef];
+    CGImageRelease(imgRef);
+    
+    return image;
+}
+
+#pragma mark - Override
+
+- (UIImageView *)imageView {
+    _imageView.image = [self currentItemScreenShot];
+    
+    return _imageView;
+}
 
 #pragma mark - Slider
 

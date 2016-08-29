@@ -66,7 +66,7 @@
     self.progressView.startDegree = 0;
     self.progressView.endDegree = 0;
     
-    [self.pauseButton setTitle:NSLocalizedString(@"Paused", @"") forState:UIControlStateNormal];
+    [self.pauseButton setTitle:NSLocalizedString(@"Pause", @"") forState:UIControlStateNormal];
     [self.pauseButton setTitle:NSLocalizedString(@"Resume", @"") forState:UIControlStateSelected];
     [self.stopButton setTitle:NSLocalizedString(@"Stop", @"") forState:UIControlStateNormal];
 }
@@ -235,7 +235,7 @@
 }
 
 - (void)pauseUploadSequences {
-    [self addRightNavigationItemWithText:NSLocalizedString(@"Pause", @"") andCount:@" "];
+    [self addRightNavigationItemWithText:NSLocalizedString(@"Paused", @"") andCount:@" "];
     self.isPaused = YES;
     [[OSVSyncController sharedInstance].tracksController pauseUpload];
 }

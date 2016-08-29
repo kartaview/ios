@@ -12,8 +12,8 @@
 
 @interface OSVSettingsDetails : UIViewController
 
-@property (weak, nonatomic) IBOutlet UIButton   *titleButton;
-@property (nonatomic, strong) OSVSectionItem    *item;
+@property (weak, nonatomic) IBOutlet UIButton                   *titleButton;
+@property (nonatomic, strong) OSVSectionItem                    *item;
 
 - (void)reloadData;
 

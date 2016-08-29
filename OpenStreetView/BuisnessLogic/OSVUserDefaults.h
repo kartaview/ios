@@ -11,6 +11,7 @@
 #import <CoreLocation/CoreLocation.h>
 #import <UIKit/UIKit.h>
 
+#define k2MPQuality             @"k2MPQuality"
 #define k5MPQuality             @"k5MPQuality"
 #define k8MPQuality             @"k8MPQuality"
 #define k12MPQuality            @"k12MPQuality"
@@ -55,6 +56,7 @@
 @property (nonatomic, assign) BOOL      debugHighDesintyOn;
 
 @property (nonatomic, assign) BOOL      useImageRecognition;
+@property (nonatomic, assign) BOOL      showMapWhileRecording;
 
 + (instancetype)sharedInstance;
 - (void)save;

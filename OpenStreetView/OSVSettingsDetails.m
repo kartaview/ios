@@ -14,7 +14,8 @@
 
 @interface OSVSettingsDetails () <UITableViewDataSource>
 
-@property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet UITableView                *tableView;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView    *activityIndicator;
 
 @end
 
@@ -22,7 +23,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [[NSNotificationCenter defaultCenter] addObserver:self.tableView selector:@selector(reloadData) name:@"kReloadDetails" object:nil];
+    self.activityIndicator.hidden = YES;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:@"kReloadDetails" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(waitForData) name:@"kWaitForData" object:nil];
 }
 
 - (void)dealloc {
@@ -80,7 +83,14 @@
 #pragma mark - Public 
 
 - (void)reloadData {
+    [self.activityIndicator stopAnimating];
+    self.activityIndicator.hidden = YES;
     [self.tableView reloadData];
+}
+
+- (void)waitForData {
+    [self.activityIndicator startAnimating];
+    self.activityIndicator.hidden = NO;
 }
 
 @end

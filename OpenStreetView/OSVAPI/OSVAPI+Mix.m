@@ -131,7 +131,7 @@
 
 @implementation OSVAPI(Version)
 
-- (void)getApiVersionWithCompletion:(void (^)(NSString *version, NSError *error))completion {
+- (void)getApiVersionWithCompletion:(void (^)(double version, NSError *error))completion {
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", [self.configurator osvBaseURL],kVersion]];
     
     AFHTTPRequestOperation *requestOperation = [OSVAPIUtils requestWithURL:url parameters:@{} method:@"POST"];
@@ -139,17 +139,17 @@
     [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         if (!operation.isCancelled) {
             if (!responseObject) {
-                completion(nil, [NSError errorWithDomain:@"OSVAPI" code:1 userInfo:@{@"Response":@"NoResponse"}]);
+                completion(0, [NSError errorWithDomain:@"OSVAPI" code:1 userInfo:@{@"Response":@"NoResponse"}]);
                 return;
             }
             
             NSDictionary *response = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
-            NSString *osvVersion = response[@"version"];
+            double osvVersion = [response[@"version"] floatValue];
             
             completion(osvVersion, nil);
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        completion(nil, error);
+        completion(0, error);
     }];
     
     [self.requestsQueue addOperation:requestOperation];

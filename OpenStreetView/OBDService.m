@@ -45,9 +45,9 @@ static NSString * const kCentralManagerRestorationID = @"OBDLibCentralManagerID"
     if (self) {
         self.bluethoothQueue = dispatch_queue_create("OBDServiceBluetoothQueue", DISPATCH_QUEUE_SERIAL);
         if ([self backgroundBluetoothEnabled]) {
-            self.centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:self.bluethoothQueue options:@{CBCentralManagerOptionRestoreIdentifierKey : kCentralManagerRestorationID}];
+            self.centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:self.bluethoothQueue options:@{CBCentralManagerOptionRestoreIdentifierKey : kCentralManagerRestorationID, CBCentralManagerOptionShowPowerAlertKey: @NO}];
         } else {
-            self.centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:self.bluethoothQueue];
+            self.centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:self.bluethoothQueue options:@{CBCentralManagerOptionShowPowerAlertKey: @NO}];
         }
         self.devices = [NSMutableArray array];
     }
@@ -65,7 +65,7 @@ static NSString * const kCentralManagerRestorationID = @"OBDLibCentralManagerID"
     if (connection == OBDConnectionTypeBluetoothLE) {
         if (self.centralManager.state == CBCentralManagerStatePoweredOn) {
             [self.devices removeAllObjects];
-            [self.centralManager scanForPeripheralsWithServices:nil options:nil];
+            [self.centralManager scanForPeripheralsWithServices:nil options:@{CBCentralManagerOptionShowPowerAlertKey: @NO}];
         } else if (self.centralManager.state == CBCentralManagerStatePoweredOff) {
             if ([self.delegate respondsToSelector:@selector(OBDService:unableToSearchForDevicesOnConnection:)]) {
                 [self.delegate OBDService:self unableToSearchForDevicesOnConnection:OBDConnectionTypeBluetoothLE];
@@ -87,6 +87,10 @@ static NSString * const kCentralManagerRestorationID = @"OBDLibCentralManagerID"
         if (self.searchPending) {
             [self.centralManager scanForPeripheralsWithServices:nil options:nil];
             self.searchPending = NO;
+        }
+    } else if (self.centralManager.state == CBCentralManagerStatePoweredOff) {
+        if ([self.delegate respondsToSelector:@selector(OBDService:unableToSearchForDevicesOnConnection:)]) {
+            [self.delegate OBDService:self unableToSearchForDevicesOnConnection:OBDConnectionTypeBluetoothLE];
         }
     }
 }

@@ -14,7 +14,7 @@
 #import "OSVUserDefaults.h"
 #import "OSVSyncController.h"
 
-@interface OSVLocationManager () <CLLocationManagerDelegate,SKPositionerServiceDelegate>
+@interface OSVLocationManager () <CLLocationManagerDelegate, SKPositionerServiceDelegate>
 
 @property (nonatomic, strong) CLLocation *currentLocation;
 
@@ -93,6 +93,7 @@
 #pragma mark - Public 
 
 - (void)startUpdatingLocation {
+    [[SKPositionerService sharedInstance] startLocationUpdate];
     [self refreshSimulationDelegate];
 }
 

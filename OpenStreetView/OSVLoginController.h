@@ -28,6 +28,6 @@
 - (void)osvUserInfoWithCompletion:(void (^)(id<OSVUser> user, NSError *error))completion;
 
 - (NSURL *)getAppLink;
-- (void)getApiVersionWithCompletion:(void (^)(BOOL response))completion;
+- (void)checkForAppUpdateWithCompletion:(void (^)(BOOL response))completion;
 
 @end

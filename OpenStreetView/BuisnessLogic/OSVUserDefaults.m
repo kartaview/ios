@@ -21,6 +21,7 @@
 #define kEnvironmentKey             @"kEnvironmentKey"
 #define kHdrOptionKey               @"kHdrOptionKey"
 #define kSLOptionKey                @"kSLOptionKey"
+#define kMapWhileRecodingKey        @"kMapWhileRecodingKey"
 
 #define kisUploadingKey             @"kisUploadingKey"
 
@@ -108,6 +109,10 @@
             self.debugHighDesintyOn = YES;
         }
         
+        if (![[NSUserDefaults standardUserDefaults] valueForKey:kMapWhileRecodingKey]) {
+            self.showMapWhileRecording = YES;
+        }
+        
         [self save];
     }
     
@@ -173,7 +178,10 @@
 - (CMVideoDimensions)videoQualityDimension {
     CMVideoDimensions dimension;
     
-    if ([self.videoQuality isEqualToString:k5MPQuality]) {
+    if ([self.videoQuality isEqualToString:k2MPQuality]) {
+        dimension.width = 1920;
+        dimension.height = 1080;
+    } else if ([self.videoQuality isEqualToString:k5MPQuality]) {
         dimension.width = 2592;
         dimension.height = 1936;
     } else if ([self.videoQuality isEqualToString:k8MPQuality]) {
@@ -202,6 +210,14 @@
 
 - (BOOL)useImageRecognition {
     return [[NSUserDefaults standardUserDefaults] boolForKey:kSLOptionKey];
+}
+
+- (void)setShowMapWhileRecording:(BOOL)showMapWhileRecording {
+    return [[NSUserDefaults standardUserDefaults] setBool:showMapWhileRecording forKey:kMapWhileRecodingKey];
+}
+
+- (BOOL)showMapWhileRecording {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kMapWhileRecodingKey];
 }
 
 - (void)setUserName:(NSString *)userName {

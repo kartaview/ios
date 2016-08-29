@@ -27,9 +27,16 @@
     NSTimeInterval transitionDuration = [self transitionDuration:transitionContext];
     UIColor *prevColor = self.player.imageView.backgroundColor;
     self.player.imageView.backgroundColor = [UIColor blackColor];
+    self.player.imageView.hidden = NO;
+    
+    CGPoint imageViewPoint = [self.player.imageView convertPoint:self.player.imageView.frame.origin fromView:nil];
+    
+    CGRect imageViewRect = CGRectMake(imageViewPoint.x, imageViewPoint.y, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height);
+    self.fullScreeFrame = imageViewRect;
+    
     [UIView animateKeyframesWithDuration:transitionDuration delay:0.0 options:UIViewKeyframeAnimationOptionCalculationModeCubic animations:^{
         [UIView addKeyframeWithRelativeStartTime:0.0 relativeDuration:1.0 animations:^{
-            self.player.imageView.frame = [[UIScreen mainScreen] bounds];
+            self.player.imageView.frame = imageViewRect;
         }];
     } completion:^(BOOL finished) {
         self.player.imageView.backgroundColor = prevColor;

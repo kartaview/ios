@@ -71,6 +71,7 @@
 
 - (void)cancel {
     [super cancel];
+    NSLog(@"did cancel stuff making here");
     if (self.cancelTaskBlock) {
         __weak typeof(self) welf = self;
         self.cancelTaskBlock(welf);

@@ -11,7 +11,6 @@
 #import "OSVUtils.h"
 #import "OSVImageCollectionViewCell.h"
 
-#import "OSVGalleryViewController.h"
 #import "KAProgressLabel.h"
 #import "OSVReachablityController.h"
 #import "UIColor+OSVColor.h"

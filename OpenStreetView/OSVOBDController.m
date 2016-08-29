@@ -19,31 +19,36 @@
 #import "OSVMenuItem.h"
 #import "OSVUserDefaults.h"
 
+#import <CoreBluetooth/CoreBluetooth.h>
+
+
 @interface OSVOBDController () <FLScanToolDelegate, OBDServiceDelegate, OBDDeviceDelegate>
 
-@property (strong, nonatomic) ELM327 *obdScanner;
+@property (strong, nonatomic) ELM327        *obdScanner;
 
-@property (copy, nonatomic) OSVOBDHandler handler;
+@property (copy, nonatomic) OSVOBDHandler   handler;
 
-@property (strong, nonatomic) NSTimer *timer;
+@property (strong, nonatomic) NSTimer       *timer;
 
-@property (strong, nonatomic) NSTimer *keepAlive;
+@property (strong, nonatomic) NSTimer       *keepAlive;
 
-@property (strong, nonatomic) NSTimer *bleTimer;
-@property (strong, nonatomic) NSTimer *bleConnection;
+@property (strong, nonatomic) NSTimer       *bleTimer;
+@property (strong, nonatomic) NSTimer       *bleConnection;
 
-@property (strong, nonatomic) NSDate  *lastReceivedDataTimestamp;
+@property (strong, nonatomic) NSDate        *lastReceivedDataTimestamp;
 
-@property (assign, nonatomic) BOOL    isConnected;
-@property (assign, nonatomic) BOOL    isConnecting;
+@property (assign, nonatomic) BOOL          isConnected;
+@property (assign, nonatomic) BOOL          isConnecting;
 
-@property (assign, nonatomic) BOOL    isConnectedBLE;
-@property (assign, nonatomic) BOOL    isConnectingBLE;
+@property (assign, nonatomic) BOOL          isConnectedBLE;
+@property (assign, nonatomic) BOOL          isConnectingBLE;
 
-@property (assign, nonatomic) BOOL    manualyDisconnected;
-@property (assign, nonatomic) BOOL    hasWiFiConnection;
+@property (assign, nonatomic) BOOL          manualyDisconnected;
+@property (assign, nonatomic) BOOL          hasWiFiConnection;
 
-@property (nonatomic, strong) Reachability *r;
+@property (assign, nonatomic) BOOL          shouldDisplayBluetooth;
+
+@property (nonatomic, strong) Reachability  *r;
 
 @property (assign, nonatomic) NSInteger     retryCheckStatus;
 
@@ -94,31 +99,30 @@ const int connectionTimeOut = 7;
         return;
     }
     
-    if (!self.hasWiFiConnection) {
-        return;
-    }
-    
-    self.isConnecting = YES;
-    self.manualyDisconnected = NO;
-    
-    //reset OBD
-    [self.obdScanner cancelScan];
-    [self.obdScanner setSensorScanTargets:nil];
-    [self.obdScanner setDelegate:nil];
-    self.obdScanner = [ELM327 scanToolWithHost:@"192.168.0.10" andPort:35000];
-    
-    [self.obdScanner setUseLocation:NO];
-    [self.obdScanner setDelegate:self];
-    [self.obdScanner startScanWithSensors:^NSArray *{
-        NSArray *sensors = @[@(OBD2SensorVehicleSpeed)];
-        [[OSVLogger sharedInstance] logMessage:@"is connected" withLevel:LogLevelDEBUG];
-        self.isConnected = YES;
-        self.isConnecting = NO;
+//detect if there is a bluethooth device connection
+    if (self.hasWiFiConnection) {
+        self.isConnecting = YES;
+        self.manualyDisconnected = NO;
         
-        return sensors;
-    }];
-    
-    [self scanBLEOBD];
+        //reset OBD
+        [self.obdScanner cancelScan];
+        [self.obdScanner setSensorScanTargets:nil];
+        [self.obdScanner setDelegate:nil];
+        self.obdScanner = [ELM327 scanToolWithHost:@"192.168.0.10" andPort:35000];
+        
+        [self.obdScanner setUseLocation:NO];
+        [self.obdScanner setDelegate:self];
+        [self.obdScanner startScanWithSensors:^NSArray *{
+            NSArray *sensors = @[@(OBD2SensorVehicleSpeed)];
+            [[OSVLogger sharedInstance] logMessage:@"is connected" withLevel:LogLevelDEBUG];
+            self.isConnected = YES;
+            self.isConnecting = NO;
+            
+            return sensors;
+        }];
+    }
+
+    [self scanBLEOBDShowAlert:NO];
 }
 
 - (void)checkForOBDScannerStatus {
@@ -181,9 +185,17 @@ const int connectionTimeOut = 7;
     self.isConnected = NO;
     self.isConnecting = NO;
     self.manualyDisconnected = YES;
+    
+    if (self.bleDevice) {
+        [self.bleDevice disconnect];
+        self.bleDevice = nil;
+        [OSVUserDefaults sharedInstance].bleDevice = nil;
+        [[OSVUserDefaults sharedInstance] save];
+    }
 }
 
-- (void)scanBLEOBD {
+- (void)scanBLEOBDShowAlert:(BOOL)value {
+    self.shouldDisplayBluetooth = value;
     [[OBDService sharedInstance] stopDeviceSearch];
     [[OBDService sharedInstance] searchForDevicesOnConnection:OBDConnectionTypeBluetoothLE];
 }
@@ -232,6 +244,8 @@ const int connectionTimeOut = 7;
     [[OBDService sharedInstance] stopDeviceSearch];
     if (self.isConnected) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidConnect" object:nil userInfo:@{@"OBD" : @"WIFI"}];
+    } else if (self.isConnectedBLE) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidConnect" object:nil userInfo:@{@"OBD" : @"BLE"}];
     } else {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidDisconnect" object:nil userInfo:@{@"OBD" : @"WIFI"}];
     }
@@ -379,6 +393,12 @@ const int connectionTimeOut = 7;
         [service stopDeviceSearch];
         dispatch_async(dispatch_get_main_queue(), ^{
             [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidDisconnect" object:nil userInfo:@{@"OBD" : @"BLE"}];
+            if (self.shouldDisplayBluetooth) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"kWaitForData" object:nil userInfo:@{}];
+                CBCentralManager *cb = [[CBCentralManager alloc] initWithDelegate:nil queue:nil];
+                [cb scanForPeripheralsWithServices:nil options:nil];
+                [cb stopScan];
+            }
         });
     }
 }
@@ -389,9 +409,13 @@ const int connectionTimeOut = 7;
     self.isConnectedBLE = YES;
     self.isConnectingBLE = NO;
 
-    self.bleTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self
-                                                   selector:@selector(requestNewBLEData:) userInfo:@{@"bleSensor":device}
-                                                    repeats:YES];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSLog(@"request data");
+        [device getValueForSensor:OBDSensorVehicleSpeed];
+    });
+    
+    self.bleDevice = device;
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidConnect" object:nil userInfo:@{@"OBD" : @"BLE"}];
     });
@@ -441,14 +465,13 @@ const int connectionTimeOut = 7;
             
             break;
     }
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.bleDevice getValueForSensor:sensor];
+    });
 }
 
 #pragma mark - OBD BluethoothLE
-
-- (void)requestNewBLEData:(NSTimer *)timer {
-    OBDDevice *device = timer.userInfo[@"bleSensor"];
-    [device getValueForSensor:OBDSensorVehicleSpeed];
-}
 
 - (void)stopAutomaticSearch {
     self.bleConnection = nil;

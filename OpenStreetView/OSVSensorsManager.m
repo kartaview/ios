@@ -130,7 +130,7 @@
 }
 
 - (void)startBLEOBDScan {
-    [self.OBD scanBLEOBD];
+    [self.OBD scanBLEOBDShowAlert:YES];
 }
 
 - (void)stopUpdatingAccelerometer {

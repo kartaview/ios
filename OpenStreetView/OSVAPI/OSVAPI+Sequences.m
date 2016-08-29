@@ -228,14 +228,14 @@
                     completionBlock(sequenceArray, nil, meta);
                 });
             } else {
-                NSLog(@"canceled operations");
+                completionBlock(nil, nil, nil);
             }
         });
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         if (!operation.isCancelled) {
             completionBlock(nil, error, [OSVMetadata metadataError]);
         } else {
-            NSLog(@"canceled operations");
+            completionBlock(nil, nil, nil);
         }
     }];
     

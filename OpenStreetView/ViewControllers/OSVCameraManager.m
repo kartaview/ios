@@ -94,8 +94,9 @@ int const MaxStillImageRequests = 8;
 
 //      TODO Change the sensor manager to have a location manager
         [[OSVLocationManager sharedInstance] startUpdatingLocation];
-        
         [OSVLocationManager sharedInstance].sensorsManager.delegate = self;
+        [OSVLocationManager sharedInstance].delegate = self;
+        
         [[OSVLocationManager sharedInstance].sensorsManager startUpdatingDeviceMotion];
         //high res video
         CMVideoDimensions dim = CMVideoFormatDescriptionGetDimensions(self.deviceFormat.formatDescription);
@@ -114,9 +115,10 @@ int const MaxStillImageRequests = 8;
         double ratio = frameMaxSize/MAX(dim.width, dim.height);
         dimSmall.height = dim.height * ratio;
         dimSmall.width = dim.width * ratio;
-
-        self.smallVideoRecorder = [[OSVVideoRecorder alloc] initWithVideoSize:dimSmall encoding:encoding bitrate:bitRate];
         
+#ifdef ENABLED_DEBUG
+//        self.smallVideoRecorder = [[OSVVideoRecorder alloc] initWithVideoSize:dimSmall encoding:encoding bitrate:bitRate];
+#endif
         [self addObservers];
         [self initSensorLib];
     }
@@ -148,7 +150,6 @@ int const MaxStillImageRequests = 8;
     AVCaptureVideoOrientation orientation = [[self.previewLayer connection] videoOrientation];
     
     [self.videoRecorder createRecordingWithURL:[self fileNameForTrackID:self.currentSequence videoID:self.videoIndex] orientation:orientation];
-    [OSVLocationManager sharedInstance].delegate = self;
 }
 
 - (void)stopLowResolutionCapture {
@@ -178,7 +179,6 @@ int const MaxStillImageRequests = 8;
         [OSVSyncUtils removeTrackWithID:self.currentSequence atPath:[OSVSyncController sharedInstance].tracksController.basePathToPhotos];
     }
     
-    [OSVLocationManager sharedInstance].delegate = nil;
     self.backgroundRenderingID = UIBackgroundTaskInvalid;
     self.isSnapping = NO;
 }
@@ -294,98 +294,101 @@ int const MaxStillImageRequests = 8;
 }
 
 - (void)lowResolutionCapure {
-    float interval = 0.1;
+    float interval = 0.2;
 #ifdef ENABLED_DEBUG
     interval = 1.0/[OSVUserDefaults sharedInstance].debugFrameRate;
 #endif
     
     self.stillImageRequests = 0;
     
-    dispatch_queue_t timerQueue = dispatch_queue_create("timer queue",DISPATCH_QUEUE_SERIAL);
-    // Create dispatch source that submits the event handler block based on a timer.
-    self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER,
-                                        0, // unused
-                                        DISPATCH_TIMER_STRICT,
-                                        timerQueue);
-    // Set the event handler block for the timer dispatch source.
-    dispatch_source_set_event_handler(self.timer, ^{
-        // This block will attempt to capture a new still image each time it is called.
-        // Captured requested number of images?
-        if (self.stillImageRequests >= MaxStillImageRequests) {
-            // Don't capture another image if the maximum
-            // number of outstanding still image requests has
-            // been exceeded.
-        } else {
-            self.stillImageRequests++;
-            AVCaptureConnection *connection = [self.stillOutput connectionWithMediaType:AVMediaTypeVideo];
-            
-            [self.stillOutput captureStillImageAsynchronouslyFromConnection:connection
-                                                               completionHandler:^(CMSampleBufferRef sampleBuffer, NSError *error) {
-                 self.stillImageRequests--;
+    if ([OSVUserDefaults sharedInstance].useImageRecognition) {
+        dispatch_queue_t timerQueue = dispatch_queue_create("timer queue",DISPATCH_QUEUE_SERIAL);
+        // Create dispatch source that submits the event handler block based on a timer.
+        self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER,
+                                            0, // unused
+                                            DISPATCH_TIMER_STRICT,
+                                            timerQueue);
+        // Set the event handler block for the timer dispatch source.
+        dispatch_source_set_event_handler(self.timer, ^{
+            // This block will attempt to capture a new still image each time it is called.
+            // Captured requested number of images?
+            if (self.stillImageRequests >= MaxStillImageRequests) {
+                // Don't capture another image if the maximum
+                // number of outstanding still image requests has
+                // been exceeded.
+            } else {
+                self.stillImageRequests++;
+                AVCaptureConnection *connection = [self.stillOutput connectionWithMediaType:AVMediaTypeVideo];
+                
+                [self.stillOutput captureStillImageAsynchronouslyFromConnection:connection
+                                                                   completionHandler:^(CMSampleBufferRef sampleBuffer, NSError *error) {
+                     self.stillImageRequests--;
 
-                 if (error) {
-                     NSLog(@"erorare");
-                 } else if (sampleBuffer) {
-                     NSLog(@"working");
-                     
-                     NSTimeInterval curretTimeFrame = [[NSDate new] timeIntervalSince1970];
-                     if (self.previousTimeFrame == 0) {
+                     if (error) {
+                         NSLog(@"erorare");
+                     } else if (sampleBuffer) {
+                         NSLog(@"working");
+                         
+                         NSTimeInterval curretTimeFrame = [[NSDate new] timeIntervalSince1970];
+                         if (self.previousTimeFrame == 0) {
+                             self.previousTimeFrame = curretTimeFrame;
+                         }
+                         
+                         NSTimeInterval dif = curretTimeFrame - self.previousTimeFrame;
                          self.previousTimeFrame = curretTimeFrame;
-                     }
-                     
-                     NSTimeInterval dif = curretTimeFrame - self.previousTimeFrame;
-                     self.previousTimeFrame = curretTimeFrame;
-                     
-                     AVCaptureVideoOrientation orientation = [[self.previewLayer connection] videoOrientation];
-                     NSInteger rotation = kRotate0DegreesClockwise;
-                     if (orientation == AVCaptureVideoOrientationPortrait) {
-                         rotation = kRotate90DegreesClockwise;
-                     } if (orientation == AVCaptureVideoOrientationLandscapeLeft) {
-                         rotation = kRotate180DegreesClockwise;
-                     } else if (orientation == AVCaptureVideoOrientationLandscapeRight) {
-                         rotation = kRotate0DegreesClockwise;
-                     }
-                     
-                     if (![OSVUserDefaults sharedInstance].useImageRecognition) {
-                         CVPixelBufferRef pixelsBuffer = CVPixelBufferRetain(CMSampleBufferGetImageBuffer(sampleBuffer));
+                         
+                         AVCaptureVideoOrientation orientation = [[self.previewLayer connection] videoOrientation];
+                         NSInteger rotation = kRotate0DegreesClockwise;
+                         if (orientation == AVCaptureVideoOrientationPortrait) {
+                             rotation = kRotate90DegreesClockwise;
+                         } if (orientation == AVCaptureVideoOrientationLandscapeLeft) {
+                             rotation = kRotate180DegreesClockwise;
+                         } else if (orientation == AVCaptureVideoOrientationLandscapeRight) {
+                             rotation = kRotate0DegreesClockwise;
+                         }
+                         
+                         if (![OSVUserDefaults sharedInstance].useImageRecognition) {
+                             CVPixelBufferRef pixelsBuffer = CVPixelBufferRetain(CMSampleBufferGetImageBuffer(sampleBuffer));
 
-                         [self.smallVideoRecorder addPixelBuffer:pixelsBuffer
-                                                    withRotation:rotation
-                                                    withDuration:CMTimeMake(dif*1000, 1000)
-                                                      completion:^(BOOL success) {
-                             NSLog(@"adding  stuff %d", success);
-                         }];
-                         CVPixelBufferRelease(pixelsBuffer);
-                     } else {
-                         [self.sensorLib speedLimitsFromSampleBuffer:sampleBuffer
-                                                      withCompletion:^(NSArray *detections, CVImageBufferRef pixelsBuffer) {
-                                                          
-                              [self.smallVideoRecorder addPixelBuffer:pixelsBuffer
-                                                         withRotation:rotation
-                                                         withDuration:CMTimeMake(dif*1000, 1000)
-                                                           completion:^(BOOL success) {
-                                  NSLog(@"adding  stuff %d", success);
-                              }];
-                              
-                              UIImage *image = [self.sensorLib imageForSpeedLimit:detections.firstObject];
-                              if (image) {
-                                  dispatch_async(dispatch_get_main_queue(), ^{
-                                      [self.delegate shouldDisplayTraficSign:image];
-                                  });
-                              }
-                        }];
+                             [self.smallVideoRecorder addPixelBuffer:pixelsBuffer
+                                                        withRotation:rotation
+                                                        withDuration:CMTimeMake(dif*1000, 1000)
+                                                          completion:^(BOOL success) {
+                                 NSLog(@"adding  stuff %d", success);
+                             }];
+                             CVPixelBufferRelease(pixelsBuffer);
+                         } else {
+                             [self.sensorLib speedLimitsFromSampleBuffer:sampleBuffer
+                                                          withCompletion:^(NSArray *detections, CVImageBufferRef pixelsBuffer) {
+                                                              
+                                  [self.smallVideoRecorder addPixelBuffer:pixelsBuffer
+                                                             withRotation:rotation
+                                                             withDuration:CMTimeMake(dif*1000, 1000)
+                                                               completion:^(BOOL success) {
+                                      NSLog(@"adding  stuff %d", success);
+                                  }];
+                                  
+                                  UIImage *image = [self.sensorLib imageForSpeedLimit:detections.firstObject];
+                                  if (image) {
+                                      dispatch_async(dispatch_get_main_queue(), ^{
+                                          [self startDecayForSign];
+                                          [self.delegate shouldDisplayTraficSign:image];
+                                      });
+                                  }
+                            }];
+                         }
                      }
-                 }
-                }];
-            }
-    });
+                    }];
+                }
+        });
     
-    // Set timer start time and interval.
-    dispatch_source_set_timer(self.timer,
+        // Set timer start time and interval.
+        dispatch_source_set_timer(self.timer,
                               dispatch_time(DISPATCH_TIME_NOW, 0), // start time
                               interval * NSEC_PER_SEC, // interval
                               0.001 * NSEC_PER_SEC); // leeway
-    dispatch_resume(self.timer);
+        dispatch_resume(self.timer);
+    }
 }
 
 - (void)initSensorLib {
@@ -421,15 +424,6 @@ int const MaxStillImageRequests = 8;
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)newLocation {
     self.currentLocation = [newLocation firstObject];
-    SKPosition matchedPosition = [SKPositionerService sharedInstance].currentMatchedPosition;
-    CLLocation *matchedLocation = [[CLLocation alloc] initWithLatitude:matchedPosition.latY longitude:matchedPosition.lonX];
-    
-    [self.delegate didAddNewLocation:matchedLocation];
-
-    
-    OSVLogItem *item = [OSVLogItem new];
-    item.location = self.currentLocation;
-    [[OSVSyncController sharedInstance].logger logItems:@[item] inFileForSequenceID:0];
     
     if (self.currentLocation.horizontalAccuracy < 0) {
         [self badGPSHandling];
@@ -448,6 +442,19 @@ int const MaxStillImageRequests = 8;
             [self badGPSHandling];
         }
     }
+    
+    if (!self.isSnapping) {
+        return;
+    }
+    
+    SKPosition matchedPosition = [SKPositionerService sharedInstance].currentMatchedPosition;
+    CLLocation *matchedLocation = [[CLLocation alloc] initWithLatitude:matchedPosition.latY longitude:matchedPosition.lonX];
+    
+    [self.delegate didAddNewLocation:matchedLocation];
+
+    OSVLogItem *item = [OSVLogItem new];
+    item.location = self.currentLocation;
+    [[OSVSyncController sharedInstance].logger logItems:@[item] inFileForSequenceID:0];
     
     if (!self.lastPhotoLocation || (self.lastPhotoLocation.coordinate.latitude == 0 && self.lastPhotoLocation.coordinate.longitude == 0)) {
         self.lastPhotoLocation = self.currentLocation;

@@ -78,12 +78,16 @@ UIBackgroundTaskIdentifier taskIndentifier;
     __weak typeof(self) welf = self;
     NSMutableArray *allIDs = [NSMutableArray array];
     [self.listTracksOpetations addObject:[welf.osvAPI listTracksForUser:self.user atPage:0 inBoundingBox:box withZoom:zoom withCompletionBlock:^(NSArray *sequences, NSError *error, OSVMetadata *metadata) {
+        if (!sequences.count) {
+            partComp(nil, metadata, error);
+        }
+        
         for (id<OSVSequence> sequence in sequences) {
             [allIDs addObject:@(sequence.uid)];
             partComp(sequence, metadata, error);
         }
         NSInteger totalPages = metadata.totalItems / metadata.itemsPerPage + (metadata.totalItems % metadata.itemsPerPage != 0 ? 1 : 0);
-        
+
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
             for (int i = 1; i < totalPages; i++) {
                 [welf.listTracksOpetations addObject:[welf.osvAPI listTracksForUser:self.user atPage:i inBoundingBox:box withZoom:zoom withCompletionBlock:^(NSArray *sequences, NSError *error, OSVMetadata *metadata) {
@@ -624,10 +628,6 @@ UIBackgroundTaskIdentifier taskIndentifier;
     [self.videoUploadQueue addOperation:finishedRequest];
 }
 
-
-- (void)finishUploadingSequence:(OSVSequence *)seq {
-
-}
 
 - (NSString *)fileNameForVideoWithTrackID:(NSInteger)trackUID index:(NSInteger)videoIndex {
     NSString *folderPathString = [NSString stringWithFormat:@"%@%ld/%ld.mp4", self.basePathToPhotos, (long)trackUID, (long)videoIndex];

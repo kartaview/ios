@@ -31,6 +31,7 @@
 #import "OSVDotedPolyline.h"
 
 #import "OSVCameraManager.h"
+#import "OSVCameraMapManager.h"
 
 #import "OSVPersistentManager.h"
 
@@ -85,6 +86,7 @@
 @property (assign, nonatomic) BOOL                      hadOBD;
 //controllers/managers
 @property (nonatomic, strong) OSVCameraManager          *cameraManager;
+@property (nonatomic, strong) OSVCameraMapManager       *mapManager;
 
 @end
 
@@ -97,6 +99,15 @@
     self.startCapture.clipsToBounds = YES;
     self.gpsQuality.hidden = YES;
     self.infoView.alpha = 0;
+    
+    if (![OSVUserDefaults sharedInstance].showMapWhileRecording) {
+        [self.mapContainer removeFromSuperview];
+        [self.mapView removeFromSuperview];
+        self.mapContainer = nil;
+        self.mapView = nil;
+    } else {
+        self.mapManager = [[OSVCameraMapManager alloc] initWithMap:self.mapView];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -111,15 +122,15 @@
     self.mapView.settings.showCompass = NO;
     self.mapView.settings.displayMode = SKMapDisplayMode2D;
     self.mapView.settings.showStreetNamePopUps = YES;
-//    self.mapView.settings.osmAttributionPosition = SKAttributionPositionNone;
-//    self.mapView.settings.companyAttributionPosition = SKAttributionPositionNone;
+    self.mapView.settings.osmAttributionPosition = SKAttributionPositionNone;
+    self.mapView.settings.companyAttributionPosition = SKAttributionPositionNone;
+    self.mapView.userInteractionEnabled = NO;
     
     SKCoordinateRegion region;
     region.zoomLevel = 12;
     region.center = [SKPositionerService sharedInstance].currentCoordinate;
     self.mapView.visibleRegion = region;
-    
-    }
+}
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
     return UIStatusBarStyleLightContent;
@@ -213,7 +224,7 @@
     
     self.topMap.constant = -self.mapContainer.frame.origin.y;
     self.leadingMap.constant = -10;
-    self.trailingMap.constant = self.view.frame.size.width - CGRectGetMaxX(self.mapContainer.frame);
+    self.trailingMap.constant = self.topContainer.frame.size.width - CGRectGetMaxX(self.mapContainer.frame);
     if (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
         self.bottomMap.constant = 10;
         
@@ -285,7 +296,9 @@
         [[SKPositionerService sharedInstance] startLocationUpdate];
         [[NSNotificationCenter defaultCenter ] addObserver:self selector:@selector(didChangeAuthorizationStatus:) name:@"didChangeAuthorizationStatus" object:nil];
     } else {
-        [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Location Services access", nil) message:NSLocalizedString(@"Please allow access to Location Services from Settings before starting a recording", @"") delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
+        [UIAlertView showWithTitle:NSLocalizedString(@"No Location Services access", nil) message:NSLocalizedString(@"Please allow access to Location Services from Settings before starting a recording", @"") cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
+            [self.navigationController popViewControllerAnimated:YES];
+        }];
     }
 }
 
@@ -362,6 +375,19 @@
 
 - (BOOL)prefersStatusBarHidden {
     return NO;
+}
+
+#pragma mark - Override
+
+- (void)setDeviceAuthorized:(BOOL)deviceAuthorized {
+    super.deviceAuthorized = deviceAuthorized;
+
+    if (deviceAuthorized) {
+        SKCoordinateRegion region;
+        region.zoomLevel = 12;
+        region.center = [SKPositionerService sharedInstance].currentCoordinate;
+        self.mapView.visibleRegion = region;
+    }
 }
 
 #pragma mark - Private
@@ -481,7 +507,8 @@
         self.obdSpeed.attributedText = [NSAttributedString combineString:[@(value) stringValue] withSize:16.f color:[UIColor whiteColor] fontName:@"HelveticaNeue"
                                                               withString:@"\nkm/h" withSize:10.f color:[UIColor whiteColor] fontName:@"HelveticaNeue"];
     } else {
-        self.obdSpeed.attributedText = [NSAttributedString combineString:[@([OSVUtils milesPerHourFromKmPerHour:value]) stringValue] withSize:16.f color:[UIColor whiteColor] fontName:@"HelveticaNeue"
+        NSString *firstString = [NSString stringWithFormat:@"%.0f", [OSVUtils milesPerHourFromKmPerHour:value]];
+        self.obdSpeed.attributedText = [NSAttributedString combineString:firstString withSize:16.f color:[UIColor whiteColor] fontName:@"HelveticaNeue"
                                                               withString:@"\nmph" withSize:10.f color:[UIColor whiteColor] fontName:@"HelveticaNeue"];
     }
 }

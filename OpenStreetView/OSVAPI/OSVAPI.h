@@ -53,7 +53,7 @@
 
 @interface OSVAPI (Version)
 
-- (void)getApiVersionWithCompletion:(nullable void (^)(NSString *_Nullable version, NSError *_Nullable error))completion;
+- (void)getApiVersionWithCompletion:(nullable void (^)(double version, NSError *_Nullable error))completion;
 - (nonnull NSURL *)getAppLink;
 
 @end

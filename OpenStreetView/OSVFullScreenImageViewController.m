@@ -11,6 +11,8 @@
 #import "OSVSyncController.h"
 #import "OSVFullScreenImageCell.h"
 #import <SDWebImage/UIImageView+WebCache.h>
+#import <AVFoundation/AVFoundation.h>
+#import "OSVServerPhoto.h"
 
 #define kSpacing 2
 
@@ -18,6 +20,7 @@
 
 @property (nonatomic, strong) OSVSyncController         *syncController;
 @property (weak, nonatomic) IBOutlet UICollectionView   *collectionViewFullscreen;
+@property (strong, nonatomic) AVAssetImageGenerator     *imageGenerator;
 
 @end
 
@@ -26,19 +29,25 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.syncController = [OSVSyncController sharedInstance];
-    UINib *cellNib = [UINib nibWithNibName:@"OSVFullScreenImageCell" bundle:nil];
     
-    [self.collectionViewFullscreen registerNib:cellNib forCellWithReuseIdentifier:@"fullScreenID"];
+    UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
+    [flowLayout setScrollDirection:UICollectionViewScrollDirectionHorizontal];
+    [flowLayout setMinimumInteritemSpacing:0.0f];
+    [flowLayout setMinimumLineSpacing:0.0f];
     [self.collectionViewFullscreen setPagingEnabled:YES];
+    [self.collectionViewFullscreen setCollectionViewLayout:flowLayout];
+    
+    UINib *cellNib = [UINib nibWithNibName:@"OSVFullScreenImageCell" bundle:nil];
+    [self.collectionViewFullscreen registerNib:cellNib forCellWithReuseIdentifier:@"fullScreenID"];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-//    NSInteger index = [self.datasource indexOfObject:self.selectedPhoto];
-//    if (index != NSNotFound) {
-//        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:0];
-//        [self displayItemAtIndex:indexPath];
-//    }
+    
+    if (self.selectedIndexPath) {
+        NSIndexPath *indexPath = self.selectedIndexPath;
+        [self displayItemAtIndex:indexPath];
+    }
 }
 
 - (BOOL)prefersStatusBarHidden {
@@ -70,11 +79,11 @@
 #pragma mark - UICollectionViewDatasource
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.datasource.count;
+    return self.sequenceDatasource.photos.count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)cv cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    id<OSVPhoto> photo = self.datasource[indexPath.row];
+    id<OSVPhoto> photo = self.sequenceDatasource.photos[indexPath.row];
 
     OSVFullScreenImageCell *cell = [cv dequeueReusableCellWithReuseIdentifier:@"fullScreenID" forIndexPath:indexPath];
     [cell prepareForReuse];
@@ -83,41 +92,35 @@
     [self.collectionViewFullscreen addGestureRecognizer:cell.scrollView.panGestureRecognizer];
     
     self.imageView = cell.image;
-    
-    [self.syncController.tracksController loadThumbnailForPhoto:photo intoImageView:cell.image withCompletion:^(id<OSVPhoto> completePhoto, NSError *error) {
-        photo.imageData = nil;
-    }];
-    [self.syncController.tracksController loadImageDataForPhoto:photo intoImageView:cell.image withCompletion:^(id<OSVPhoto> completePhoto, NSError *error) {
-        photo.thumbnail = nil;
-        photo.imageData = nil;
-        photo.image = nil;
-    }];
+    if ([photo isKindOfClass:[OSVServerPhoto class]]) {
+        [self.syncController.tracksController loadThumbnailForPhoto:photo intoImageView:cell.image withCompletion:^(id<OSVPhoto> completePhoto, NSError *error) {
+            photo.imageData = nil;
+        }];
+        [self.syncController.tracksController loadImageDataForPhoto:photo intoImageView:cell.image withCompletion:^(id<OSVPhoto> completePhoto, NSError *error) {
+            photo.thumbnail = nil;
+            photo.imageData = nil;
+            photo.image = nil;
+        }];
+    } else {
+        if (self.imageGenerator) {
+            CMTime time = CMTimeMake(1 * indexPath.item, 5);
+            CGImageRef imageRef = [self.imageGenerator copyCGImageAtTime:time actualTime:nil error:nil];
+            cell.image.image = [UIImage imageWithCGImage:imageRef];
+            CGImageRelease(imageRef);
+        }
+    }
     
     return cell;
 }
-
-
 
 #pragma mark - UICollectionViewDelegate
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     [self setSelectedCellUsingCollectionView:self.collectionViewFullscreen overindingIndex:YES];
-
 }
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     return self.collectionViewFullscreen.frame.size;
-}
-
-- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section {
-    return 0;
-}
-
-- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
-    return 0;
-}
-
-- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    return UIEdgeInsetsMake(0, 0, 0, 0);
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(OSVFullScreenImageCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -129,6 +132,8 @@
 
 - (void)displayItemAtIndex:(NSIndexPath *)indexPath {
     self.selectedIndexPath = indexPath;
+    
+    [self.view layoutIfNeeded];
     [self.collectionViewFullscreen scrollToItemAtIndexPath:self.selectedIndexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:NO];
 }
 
@@ -148,8 +153,9 @@
             indexpath = [collectionView indexPathForCell:cell];
         }
     }
-    
-    self.selectedIndexPath = indexpath;
+    if (found) {
+        self.selectedIndexPath = indexpath;
+    }
 }
 
 
@@ -157,9 +163,74 @@
 
 - (void)setSelectedIndexPath:(NSIndexPath *)selectedIndexPath {
     _selectedIndexPath = selectedIndexPath;
-    if (self.datasource.count > selectedIndexPath.item) {
-        _selectedPhoto = self.datasource[selectedIndexPath.item];
+    if (self.sequenceDatasource.photos.count > selectedIndexPath.item) {
+        _selectedPhoto = self.sequenceDatasource.photos[selectedIndexPath.item];
     }
+}
+
+- (void)setSequenceDatasource:(id<OSVSequence>)sequenceDatasource {
+    _sequenceDatasource = sequenceDatasource;
+    if (sequenceDatasource.photos.count && ![sequenceDatasource.photos[0] isKindOfClass:[OSVServerPhoto class]]) {
+        
+        NSArray<NSURL *> *videoPaths = [self videoPathsFromFolder:[self fileNameForTrackID:self.sequenceDatasource.uid]];
+        AVMutableComposition *mixComposition = [[AVMutableComposition alloc] init];
+
+        AVMutableCompositionTrack *videoTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo
+                                                                            preferredTrackID:kCMPersistentTrackID_Invalid];
+        CMTime insertTime = kCMTimeZero;
+
+        for (NSURL *object in videoPaths) {
+
+            AVAsset *asset = [AVAsset assetWithURL:object];
+            NSArray *videos = [asset tracksWithMediaType:AVMediaTypeVideo];
+            AVAssetTrack *track = [videos firstObject];
+            if (track) {
+                CMTimeRange timeRange = CMTimeRangeMake(kCMTimeZero, asset.duration);
+
+                [videoTrack insertTimeRange:timeRange
+                                    ofTrack:track
+                                     atTime:insertTime
+                                      error:nil];
+
+                insertTime = CMTimeAdd(insertTime, asset.duration);
+            } else {
+                NSLog(@"bad asset");
+            }
+        }
+
+        self.imageGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:mixComposition];
+    } else {
+        self.imageGenerator = nil;
+    }
+}
+
+- (NSURL *)fileNameForTrackID:(NSInteger)trackUID {
+    NSString *folderPathString = [NSString stringWithFormat:@"%@%ld", [OSVSyncController sharedInstance].tracksController.basePathToPhotos, (long)trackUID];
+    
+    return [[NSURL alloc] initWithString:folderPathString];
+}
+
+- (NSArray<NSURL *> *)videoPathsFromFolder:(NSURL *)basePath {
+    NSMutableArray *videoFiles = [NSMutableArray array];
+    
+    NSArray *properties = [NSArray arrayWithObjects: NSURLLocalizedNameKey, NSURLCreationDateKey, NSURLLocalizedTypeDescriptionKey, nil];
+    
+    NSArray *array = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:basePath includingPropertiesForKeys:properties options:(NSDirectoryEnumerationSkipsHiddenFiles) error:nil];
+    
+    for (NSURL *fileSystemItem in array) {
+        BOOL directory = NO;
+        [[NSFileManager defaultManager] fileExistsAtPath:[fileSystemItem path] isDirectory:&directory];
+        if (!directory && [fileSystemItem pathExtension] && [[fileSystemItem pathExtension] isEqualToString:@"mp4"]) {
+            [videoFiles addObject:fileSystemItem];
+        }
+    }
+    
+    [videoFiles sortUsingComparator:^NSComparisonResult(NSURL *obj1, NSURL *obj2) {
+
+        return [[[obj1 lastPathComponent] stringByDeletingPathExtension] integerValue] > [[[obj2 lastPathComponent] stringByDeletingPathExtension] integerValue];
+    }];
+    
+    return videoFiles;
 }
 
 @end

@@ -23,11 +23,11 @@
 
 @interface OSVVideoPlayerViewController () <OSVPlayerDelegate, UIViewControllerTransitioningDelegate, OSVFullScreenImageViewControllerDelegate, UIGestureRecognizerDelegate>
 
-
 @property (weak, nonatomic) IBOutlet UIButton       *playButton;
 @property (weak, nonatomic) IBOutlet SKMapView      *mapView;
 @property (weak, nonatomic) IBOutlet UILabel        *dateLabel;
 @property (weak, nonatomic) IBOutlet UILabel        *frameIndexLabel;
+@property (weak, nonatomic) IBOutlet UIImageView    *frameIndexImage;
 @property (weak, nonatomic) IBOutlet UISlider       *basicSlider;
 @property (weak, nonatomic) IBOutlet UIButton       *fullScreenButton;
 @property (weak, nonatomic) IBOutlet UIButton       *deletePhotoButton;
@@ -39,6 +39,7 @@
 @property (assign, nonatomic) CGRect                prevFrame;
 
 @property (assign, nonatomic) NSInteger             startingFrameIndex;
+@property (assign, nonatomic) BOOL                  willShowFullScreen;
 
 @property (strong, nonatomic) OSVFullScreenAnimationController          *presentFullScreenAnimationController;
 @property (strong, nonatomic) OSVDissmissFullScreenAnimationController  *dissmissFullScreenAnimationController;
@@ -82,7 +83,6 @@
                     }
                 }];
             }
-            self.fullScreenButton.hidden = YES;
         } else {
             self.player = [[OSVVideoPlayer alloc] initWithView:self.videoPlayerPreview andSlider:self.basicSlider];
             self.deletePhotoButton.hidden = YES;
@@ -129,8 +129,20 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    self.navigationController.navigationBar.hidden = NO;
-    self.navigationController.interactivePopGestureRecognizer.delegate = self.savedGestureRecognizerDelegate;
+    if (!self.willShowFullScreen) {
+        self.navigationController.navigationBar.hidden = NO;
+        self.navigationController.interactivePopGestureRecognizer.delegate = self.savedGestureRecognizerDelegate;
+    }
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"presentFullScreen"]) {
+        OSVFullScreenImageViewController *vc = segue.destinationViewController;
+        vc.delegate = self;
+        vc.sequenceDatasource = self.selectedSequence;
+        vc.selectedIndexPath = [NSIndexPath indexPathForItem:self.frameIndex-1 inSection:0];
+        vc.transitioningDelegate = self;
+    }
 }
 
 #pragma mark - Orientation
@@ -154,16 +166,6 @@
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         
     }];
-}
-
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqualToString:@"presentFullScreen"]) {
-        OSVFullScreenImageViewController *vc = segue.destinationViewController;
-        vc.delegate = self;
-        vc.datasource = self.selectedSequence.photos;
-        vc.selectedPhoto = self.selectedSequence.photos[self.frameIndex];
-        vc.transitioningDelegate = self;
-    }
 }
 
 #pragma mark - Actions
@@ -220,7 +222,7 @@
 }
 
 - (IBAction)didTapDelete:(id)sender {
-    if (self.frameIndex > 0) {
+    if (self.frameIndex > 0 && self.selectedSequence.photos.count >= self.frameIndex) {
         [[OSVSyncController sharedInstance].tracksController deletePhoto:self.selectedSequence.photos[self.frameIndex - 1] withCompletionBlock:^(NSError *error) {
             [self.selectedSequence.photos removeObjectAtIndex:self.frameIndex-1];
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -393,15 +395,43 @@
 #pragma mark - Transition delegate
 
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source {
-    self.presentFullScreenAnimationController.originFrame = self.player.imageView.frame;
-    self.presentFullScreenAnimationController.player = self.player;
-   
-    return self.presentFullScreenAnimationController;
+    if ([presented isKindOfClass:[OSVFullScreenImageViewController class]]) {
+        self.presentFullScreenAnimationController.originFrame = self.player.imageView.frame;
+        self.presentFullScreenAnimationController.player = self.player;
+        self.willShowFullScreen = YES;
+        self.fullScreenButton.hidden = YES;
+        self.frameIndexLabel.hidden = YES;
+        self.frameIndexImage.hidden = YES;
+        self.dateLabel.hidden = YES;
+        self.videoPlayerPreview.layer.borderWidth = 0;
+
+        return self.presentFullScreenAnimationController;
+    }
+    
+    return nil;
 }
 
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
     if ([dismissed isKindOfClass:[OSVFullScreenImageViewController class]]) {
-        self.dissmissFullScreenAnimationController.destinationFrame = self.presentFullScreenAnimationController.originFrame;
+        self.willShowFullScreen = NO;
+        self.fullScreenButton.hidden = NO;
+        self.frameIndexLabel.hidden = NO;
+        self.frameIndexImage.hidden = NO;
+        self.dateLabel.hidden = NO;
+        self.videoPlayerPreview.layer.borderWidth = 1;
+
+        CGPoint imageViewPoint = self.presentFullScreenAnimationController.fullScreeFrame.origin;
+        
+        CGRect imageViewRect;
+        
+        if ([self.selectedSequence isKindOfClass:[OSVServerSequence class]]) {
+            imageViewRect = CGRectMake(-imageViewPoint.x, -imageViewPoint.y, self.presentFullScreenAnimationController.originFrame.size.width, self.presentFullScreenAnimationController.originFrame.size.height);
+        } else {
+            imageViewRect = CGRectMake(0, -imageViewPoint.y, self.presentFullScreenAnimationController.originFrame.size.width, self.presentFullScreenAnimationController.originFrame.size.height);
+            self.player.imageView.hidden = YES;
+        }
+        
+        self.dissmissFullScreenAnimationController.destinationFrame = imageViewRect;
         
         return self.dissmissFullScreenAnimationController;
     }
@@ -420,9 +450,9 @@
 #pragma mark - OSVFullScreenImageViewControllerDelegate
 
 - (void)willDissmissViewController:(OSVFullScreenImageViewController *)vc {
-    NSInteger index = [self.selectedSequence.photos indexOfObject:vc.selectedPhoto];
+    NSInteger index = vc.selectedIndexPath.item;
     if (index != NSNotFound) {
-        [self.player displayFrameAtIndex:index+1];
+        [self.player displayFrameAtIndex:index];
     }
 }
 
