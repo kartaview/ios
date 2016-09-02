@@ -8,6 +8,8 @@
 
 #import "OSVUserDefaults.h"
 #import <AVFoundation/AVFoundation.h>
+#import <Crashlytics/Crashlytics.h>
+#import "UIDevice+Aditions.h"
 
 #define kUserNameKey                @"kUserNameKey"
 #define kRealPositionsKey           @"kRealPositionsKey"
@@ -82,6 +84,11 @@
         if (!self.videoQuality || [self.videoQuality isEqualToString:@""]) {
             self.videoQuality = k5MPQuality;
         }
+        
+        if ([UIDevice isLessTheniPhone6]) {
+            self.videoQuality = k2MPQuality;
+        }
+        
         if (!self.distanceUnitSystem || [self.distanceUnitSystem isEqualToString:@""]) {
             self.distanceUnitSystem = kImperialSystem;
         }
@@ -168,6 +175,8 @@
 }
 
 - (void)setVideoQuality:(NSString *)videoQuality {
+    [CrashlyticsKit setObjectValue:videoQuality forKey:kVideoQuality];
+    
     return [[NSUserDefaults standardUserDefaults] setValue:videoQuality forKey:kVideoQuality];
 }
 
@@ -205,6 +214,8 @@
 }
 
 - (void)setUseImageRecognition:(BOOL)useImg {
+    [CrashlyticsKit setBoolValue:useImg forKey:kSLOptionKey];
+    
     return [[NSUserDefaults standardUserDefaults] setBool:useImg forKey:kSLOptionKey];
 }
 
