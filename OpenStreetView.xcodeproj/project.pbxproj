@@ -15,8 +15,6 @@
 		CC01677F1D2E4CB000E8297D /* OSVInfoCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0167301D2D665500E8297D /* OSVInfoCell.m */; };
 		CC0167DE1D2E856100E8297D /* OSVSensorLibManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC0167DD1D2E856100E8297D /* OSVSensorLibManager.mm */; };
 		CC0167DF1D2E856100E8297D /* OSVSensorLibManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC0167DD1D2E856100E8297D /* OSVSensorLibManager.mm */; };
-		CC0167E21D2EB0CF00E8297D /* OSVWaitingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0167E11D2EB0CF00E8297D /* OSVWaitingViewController.m */; };
-		CC0167E31D2EB0CF00E8297D /* OSVWaitingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0167E11D2EB0CF00E8297D /* OSVWaitingViewController.m */; };
 		CC0167E71D2EBA8100E8297D /* OSVLocalTrackCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0167E61D2EBA8100E8297D /* OSVLocalTrackCell.m */; };
 		CC0167E81D2EBA8100E8297D /* OSVLocalTrackCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0167E61D2EBA8100E8297D /* OSVLocalTrackCell.m */; };
 		CC0167EA1D2F9A8200E8297D /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC0167E91D2F9A8200E8297D /* CoreMedia.framework */; };
@@ -320,6 +318,8 @@
 		CCA16CA81C92F64B001EEB57 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CCFD49A11BA02455005B5E9A /* Images.xcassets */; };
 		CCB56F551C28072D00FFFC39 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CCB56F541C28072D00FFFC39 /* Localizable.strings */; };
 		CCB69D551C3E856D00832788 /* OSVAPIConfigurator.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB69D541C3E856D00832788 /* OSVAPIConfigurator.m */; };
+		CCB88C781D830C15000CADD6 /* OSVLocalTracksViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB88C771D830C15000CADD6 /* OSVLocalTracksViewController.m */; };
+		CCB88C791D830E52000CADD6 /* OSVLocalTracksViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB88C771D830C15000CADD6 /* OSVLocalTracksViewController.m */; };
 		CCB952D01CE5EAD3006D5BBD /* OSVAPI+Video.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB952CF1CE5EAD3006D5BBD /* OSVAPI+Video.m */; };
 		CCB952D11CE5EAD3006D5BBD /* OSVAPI+Video.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB952CF1CE5EAD3006D5BBD /* OSVAPI+Video.m */; };
 		CCB952E01CE60EB9006D5BBD /* OSVVideo.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB952DF1CE60EB9006D5BBD /* OSVVideo.m */; };
@@ -419,8 +419,6 @@
 		CC0167301D2D665500E8297D /* OSVInfoCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVInfoCell.m; sourceTree = "<group>"; };
 		CC0167DC1D2E856100E8297D /* OSVSensorLibManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVSensorLibManager.h; sourceTree = "<group>"; };
 		CC0167DD1D2E856100E8297D /* OSVSensorLibManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OSVSensorLibManager.mm; sourceTree = "<group>"; };
-		CC0167E01D2EB0CF00E8297D /* OSVWaitingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVWaitingViewController.h; sourceTree = "<group>"; };
-		CC0167E11D2EB0CF00E8297D /* OSVWaitingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVWaitingViewController.m; sourceTree = "<group>"; };
 		CC0167E51D2EBA8100E8297D /* OSVLocalTrackCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVLocalTrackCell.h; sourceTree = "<group>"; };
 		CC0167E61D2EBA8100E8297D /* OSVLocalTrackCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVLocalTrackCell.m; sourceTree = "<group>"; };
 		CC0167E91D2F9A8200E8297D /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
@@ -689,6 +687,8 @@
 		CCB56F581C285E8800FFFC39 /* RLMBoundingBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMBoundingBox.h; path = Models/Persistent/RLMBoundingBox.h; sourceTree = "<group>"; };
 		CCB69D531C3E856D00832788 /* OSVAPIConfigurator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVAPIConfigurator.h; sourceTree = "<group>"; };
 		CCB69D541C3E856D00832788 /* OSVAPIConfigurator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVAPIConfigurator.m; sourceTree = "<group>"; };
+		CCB88C761D830C15000CADD6 /* OSVLocalTracksViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVLocalTracksViewController.h; sourceTree = "<group>"; };
+		CCB88C771D830C15000CADD6 /* OSVLocalTracksViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVLocalTracksViewController.m; sourceTree = "<group>"; };
 		CCB952CF1CE5EAD3006D5BBD /* OSVAPI+Video.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "OSVAPI+Video.m"; sourceTree = "<group>"; };
 		CCB952DE1CE60EB9006D5BBD /* OSVVideo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSVVideo.h; sourceTree = "<group>"; };
 		CCB952DF1CE60EB9006D5BBD /* OSVVideo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSVVideo.m; sourceTree = "<group>"; };
@@ -1141,8 +1141,8 @@
 				CC16AE361CE4892B001EA02A /* OSVVideoPlayerViewController.m */,
 				CC39374D1D2D2CC700669EFC /* OSVMyProfileViewController.h */,
 				CC39374E1D2D2CC700669EFC /* OSVMyProfileViewController.m */,
-				CC0167E01D2EB0CF00E8297D /* OSVWaitingViewController.h */,
-				CC0167E11D2EB0CF00E8297D /* OSVWaitingViewController.m */,
+				CCB88C761D830C15000CADD6 /* OSVLocalTracksViewController.h */,
+				CCB88C771D830C15000CADD6 /* OSVLocalTracksViewController.m */,
 				CC0168961D3514AF00E8297D /* Settings */,
 				CC4C7B3F1D3D3C1200B902E8 /* OSVLayersViewController.h */,
 				CC4C7B401D3D3C1200B902E8 /* OSVLayersViewController.m */,
@@ -2031,7 +2031,6 @@
 				CCA16C6C1C92F64B001EEB57 /* OSVBaseUser.m in Sources */,
 				CC01677F1D2E4CB000E8297D /* OSVInfoCell.m in Sources */,
 				CCA16C6D1C92F64B001EEB57 /* OSVAPI+Sequences.m in Sources */,
-				CC0167E31D2EB0CF00E8297D /* OSVWaitingViewController.m in Sources */,
 				CC40F3A81D14028A0028E488 /* NSData+Godzippa.m in Sources */,
 				CCA16C6E1C92F64B001EEB57 /* OSVCropedLabel.m in Sources */,
 				CC1FFCE61D58A48300958B8E /* OBDService.m in Sources */,
@@ -2049,6 +2048,7 @@
 				CCA16C781C92F64B001EEB57 /* OSVSliderCell.m in Sources */,
 				CC7A64061CA2FE85007C9F3B /* OSVOBDData.m in Sources */,
 				CCA16C791C92F64B001EEB57 /* OSVReachablityController.m in Sources */,
+				CCB88C791D830E52000CADD6 /* OSVLocalTracksViewController.m in Sources */,
 				CCA16C7A1C92F64B001EEB57 /* OSMAPI.m in Sources */,
 				CC01672A1D2D647D00E8297D /* OSVMyTracksCell.m in Sources */,
 				CC40CEB71D1BF8250006D619 /* OSVLoginController.m in Sources */,
@@ -2188,7 +2188,6 @@
 				CC7A64051CA2FE85007C9F3B /* OSVOBDData.m in Sources */,
 				CC01677E1D2E4CB000E8297D /* OSVInfoCell.m in Sources */,
 				CCC2C68C1BA8506400A4CDEE /* OSVPersistentManager.m in Sources */,
-				CC0167E21D2EB0CF00E8297D /* OSVWaitingViewController.m in Sources */,
 				CC1529771C039DC500BD29DC /* OSVBaseUser.m in Sources */,
 				CC1B3D551D74885C00F07098 /* OSVSettingsMenuFactory.m in Sources */,
 				CC881E431C2025440089CA0B /* OSVAPI+Sequences.m in Sources */,
@@ -2205,6 +2204,7 @@
 				CCC2C63F1BA84F2C00A4CDEE /* RLMPhoto.m in Sources */,
 				CC3937311D2BDBEB00669EFC /* OSVMainMenuCell.m in Sources */,
 				CCFD49971BA02455005B5E9A /* main.m in Sources */,
+				CCB88C781D830C15000CADD6 /* OSVLocalTracksViewController.m in Sources */,
 				CCDEFA661C88864700A542BA /* OSVSensorsManager.m in Sources */,
 				CC160EA71C5A335A000185D3 /* OSVSliderCell.m in Sources */,
 				CC31DB241C1F0D9D00A0E83D /* OSVReachablityController.m in Sources */,
