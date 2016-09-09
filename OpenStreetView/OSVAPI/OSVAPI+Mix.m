@@ -51,9 +51,9 @@
 - (void)getUserInfo:(id<OSVUser>)user withCompletion:( void (^)(id<OSVUser> user, NSError *error))completion {
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", [self.configurator osvBaseURL], [self.configurator osvAPIVerion], kUserDetails]];
     
-    NSString *externalUserId = [@(user.userID) stringValue];
+    NSString *username = user.name;
     
-    AFHTTPRequestOperation *requestOperation = [OSVAPIUtils requestWithURL:url parameters:NSDictionaryOfVariableBindings(externalUserId) method:@"POST"];
+    AFHTTPRequestOperation *requestOperation = [OSVAPIUtils requestWithURL:url parameters:NSDictionaryOfVariableBindings(username) method:@"POST"];
     
     [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         if (!operation.isCancelled) {
@@ -67,7 +67,7 @@
             OSVUser *user = [OSVUser new];
             user.name = userDict[@"username"];
             user.totalKM = [userDict[@"totalDistance"] doubleValue];
-            user.obdDistance = [userDict[@"obdDistance"] doubleValue];
+            user.obdDistance = [userDict[@"obdDistance"] respondsToSelector:@selector(doubleValue)] ? [userDict[@"obdDistance"] doubleValue] : 0;
             user.rank = [userDict[@"overallRank"] integerValue];
             user.weekRank = [userDict[@"weeklyRank"] integerValue];
             user.totalTracks = [userDict[@"totalTracks"] integerValue];

@@ -33,14 +33,9 @@
                withPartialCompletion:(void (^)(id<OSVSequence> sequence, OSVMetadata *metadata, NSError *error))partComp;
 
 //server
-- (void)getServerSequencesInBoundingBox:(id<OSVBoundingBox>)box
-                  withPartialCompletion:(void (^)(id<OSVSequence> sequence, OSVMetadata *metadata, NSError *error))patialCompletion;
 - (void)cancelGetServerSequences;
 
-- (void)getServerSequencesAtPage:(NSInteger)integer
-           withPartialCompletion:(void (^)(id<OSVSequence> sequnence, OSVMetadata *metadata, NSError *error))partialCompletion;
-- (void)getMyServerSequencesAtPage:(NSInteger)index
-             withPartialCompletion:(void (^)(id<OSVSequence> sequnence, OSVMetadata *metadata, NSError *error))partialCompletion;
+
 - (void)getMyServerSequencesAtPage:(NSInteger)index
                     withCompletion:(void (^)(NSArray *, OSVMetadata *, NSError *))completion;
 

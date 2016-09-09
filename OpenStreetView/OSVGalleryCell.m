@@ -11,6 +11,7 @@
 @implementation OSVGalleryCell
 
 - (void)awakeFromNib {
+    [super awakeFromNib];
     self.transparentOverlay.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.6];
 }
 

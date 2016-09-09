@@ -19,7 +19,7 @@
     if (status == ReachableViaWiFi || status == ReachableViaWWAN) {
         return YES;
     } else {
-        [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No internet Connection", nil) message:NSLocalizedString(@"Please connect to the internet" , nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
+        [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No internet Connection", nil) message:NSLocalizedString(@"Please connect to the internet" , nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"Ok", nil) otherButtonTitles:nil] show];
         
         return NO;
     }

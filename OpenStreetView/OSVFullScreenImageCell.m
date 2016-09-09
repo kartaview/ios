@@ -26,6 +26,7 @@
 }
 
 - (void)awakeFromNib{
+    [super awakeFromNib];
     self.scrollView.minimumZoomScale=1;
     self.scrollView.maximumZoomScale=6.0;
     

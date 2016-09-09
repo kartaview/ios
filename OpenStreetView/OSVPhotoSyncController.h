@@ -22,8 +22,7 @@
 //Save photo
 //localy
 - (void)savePhoto:(OSVPhoto *)photo withImageData:(NSData *)data;
-//server
-- (void)uploadPhoto:(OSVPhoto *)photo withCompletion:(void (^)(NSError *error))completion;
+
 //delete photo localy/server
 - (void)deletePhoto:(id<OSVPhoto>)photo withCompletionBlock:(void (^)(NSError *error))completionBlock;
 

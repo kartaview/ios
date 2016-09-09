@@ -17,7 +17,7 @@
 @implementation OSVSequenceSectionHeaderView
 
 - (void)awakeFromNib {
-    
+    [super awakeFromNib];
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                                  action:@selector(toggleOpen:)];
     [self addGestureRecognizer:tapGesture];

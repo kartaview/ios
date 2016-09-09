@@ -27,6 +27,8 @@
 }
 
 - (void)awakeFromNib {
+    [super awakeFromNib];
+    
     self.backgroundPaternView.layer.borderColor = [UIColor colorWithHex:0x31333b].CGColor;
     self.backgroundPaternView.layer.borderWidth = 1;
     self.backgroundPaternView.layer.cornerRadius = 2;

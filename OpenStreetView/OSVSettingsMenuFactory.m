@@ -381,7 +381,7 @@
 
 + (OSVMenuItem *)signDetectionItem {
     OSVMenuItem *video = [OSVMenuItem new];
-    video.title = NSLocalizedString(@"BETA: Detect road signs", @"");
+    video.title = NSLocalizedString(@"Detect road signs", @"");
     video.subtitle = NSLocalizedString(@"Only works in landscape mode with home button on the right.", @"");
     video.type = OSVMenuItemSwitch;
     video.key = @"useImageRecognition";

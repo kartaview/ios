@@ -111,6 +111,18 @@ static void *CapturingStillImageContext = &CapturingStillImageContext;
 	});
 }
 
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    
+    // Note that the app delegate controls the device orientation notifications required to use the device orientation.
+    UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
+    if ( UIDeviceOrientationIsPortrait( deviceOrientation ) || UIDeviceOrientationIsLandscape( deviceOrientation ) ) {
+        AVCaptureVideoPreviewLayer *previewLayer = (AVCaptureVideoPreviewLayer *)self.previewView.layer;
+        previewLayer.connection.videoOrientation = (AVCaptureVideoOrientation)deviceOrientation;
+    }
+}
+
 - (BOOL)shouldAutorotate {
 	// Disable autorotation of the interface when recording is in progress.
 	return ![self lockInterfaceRotation];
@@ -118,10 +130,6 @@ static void *CapturingStillImageContext = &CapturingStillImageContext;
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
 	return UIInterfaceOrientationMaskAll;
-}
-
-- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
@@ -235,8 +243,14 @@ static void *CapturingStillImageContext = &CapturingStillImageContext;
                 // Because AVCaptureVideoPreviewLayer is the backing layer for AVCamPreviewView and UIView can only be manipulated on main thread.
                 // Note: As an exception to the above rule, it is not necessary to serialize video orientation changes on the AVCaptureVideoPreviewLayer’s connection with other session manipulation.
                 
-                [[(AVCaptureVideoPreviewLayer *)[[welf previewView] layer] connection] setVideoOrientation:(AVCaptureVideoOrientation)[welf interfaceOrientation]];
-                ((AVCaptureVideoPreviewLayer *)[[welf previewView] layer]).videoGravity = AVLayerVideoGravityResizeAspectFill;
+                UIInterfaceOrientation statusBarOrientation = [UIApplication sharedApplication].statusBarOrientation;
+                AVCaptureVideoOrientation initialVideoOrientation = AVCaptureVideoOrientationPortrait;
+                if ( statusBarOrientation != UIInterfaceOrientationUnknown ) {
+                    initialVideoOrientation = (AVCaptureVideoOrientation)statusBarOrientation;
+                }
+                
+                AVCaptureVideoPreviewLayer *previewLayer = (AVCaptureVideoPreviewLayer *)welf.previewView.layer;
+                previewLayer.connection.videoOrientation = initialVideoOrientation;
             });
         }
         self.videoDeviceInput = videoDeviceInput;
@@ -324,7 +338,7 @@ static void *CapturingStillImageContext = &CapturingStillImageContext;
 				[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Camera!", @"")
 											message:NSLocalizedString(@"OSV doesn't have permission to use Camera, please change privacy settings", @"")
 										   delegate:welf
-                                  cancelButtonTitle:NSLocalizedString(@"OK", @"")
+                                  cancelButtonTitle:NSLocalizedString(@"Ok", @"")
 								  otherButtonTitles:nil] show];
 				[welf setDeviceAuthorized:NO];
 			});

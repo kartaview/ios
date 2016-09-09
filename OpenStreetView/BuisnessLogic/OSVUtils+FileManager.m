@@ -27,7 +27,7 @@
 + (NSArray *)arrayFormatedFromByteCount:(long long)bytes {
     if (bytes / kGB > 0) {
         NSArray *array = [[self memoryFormatter:bytes] componentsSeparatedByString:@" "];
-        NSString *unit = [NSString stringWithFormat:@" %@", array[0]];
+        NSString *unit = [NSString stringWithFormat:@" %@", array[1]];
         return @[array[0], unit];
     } else if (bytes / kMB > 0){
         return @[[NSString stringWithFormat:@"%lld", (long long)bytes/kMB], @" MB"];

@@ -108,57 +108,6 @@ UIBackgroundTaskIdentifier taskIndentifier;
     }];
 }
 
-- (void)getServerSequencesInBoundingBox:(id<OSVBoundingBox>)box withPartialCompletion:(void (^)(id<OSVSequence> sequence, OSVMetadata *metadata, NSError *error))patialCompletion {
-    [self cancelGetServerSequences];
-    
-    __weak typeof(self) welf = self;
-    
-    [welf.osvAPI listSequencesForUser:self.user inBoundingBox:box withPartialCompletionBlock:^(NSArray *sequences, NSError *error, OSVMetadata *metadata) {
-        for (OSVServerSequence *seq in sequences) {
-            OSVAPISerialOperation *operation = [OSVAPISerialOperation new];
-            
-            operation.asyncTask = ^(OSVAPISerialOperation *wOperation) {
-                if (wOperation.cancelled) {
-                    return;
-                }
-                                
-                [welf.osvAPI listPhotosForUser:self.user withSequence:seq completionBlock:^(NSMutableArray *photos, NSError *error) {
-                    if (wOperation.cancelled) {
-                        return;
-                    }
-                    seq.photos = photos;
-                    patialCompletion(seq, metadata, error);
-                    metadata.index++;
-                    [wOperation asyncTaskDone];
-                }];
-            };
-            [welf.listSequencesQueue addOperation:operation];
-        }
-    }];
-}
-
-- (void)getServerSequencesAtPage:(NSInteger)integer withPartialCompletion:(void (^)(id<OSVSequence>, OSVMetadata *, NSError *))patialCompletion {
-    if (![self userIsLoggedIn]) {
-        patialCompletion(nil, [OSVMetadata metadataError], [NSError errorWithDomain:@"OSMAPI" code:1 userInfo:@{@"Authentication":@"UserAutenticationRequired"}]);
-        return;
-    }
-    
-    [self.osvAPI listSequencesForUser:self.user atPage:integer inBoundingBox:nil withCompletionBlock:^(NSArray *sequences, NSError *error, OSVMetadata *metadata) {
-        if (error) {
-            patialCompletion(nil, nil, error);
-            return;
-        }
-        
-        for (OSVServerSequence *seq in sequences) {
-            [self.osvAPI listPhotosForUser:self.user withSequence:seq completionBlock:^(NSMutableArray *photos, NSError *error) {
-                seq.photos = photos;
-                patialCompletion(seq, metadata, error);
-                metadata.index++;
-            }];
-        }
-    }];
-}
-
 - (void)getMyServerSequencesAtPage:(NSInteger)index withCompletion:(void (^)(NSArray *, OSVMetadata *, NSError *))completion {
     if (![self userIsLoggedIn]) {
         completion(nil, [OSVMetadata metadataError], [NSError errorWithDomain:@"OSMAPI" code:1 userInfo:@{@"Authentication":@"UserAutenticationRequired"}]);
@@ -173,32 +122,6 @@ UIBackgroundTaskIdentifier taskIndentifier;
         completion(sequences, metadata, error);
     }];
 
-}
-
-- (void)getMyServerSequencesAtPage:(NSInteger)index withPartialCompletion:(void (^)(id<OSVSequence>, OSVMetadata *, NSError *))partialCompletion {
-    if (![self userIsLoggedIn]) {
-        partialCompletion(nil, [OSVMetadata metadataError], [NSError errorWithDomain:@"OSMAPI" code:1 userInfo:@{@"Authentication":@"UserAutenticationRequired"}]);
-        return;
-    }
-    
-    [self.osvAPI listMySequncesForUser:self.user atPage:index withCompletionBlock:^(NSArray *sequences, NSError *error, OSVMetadata *metadata) {
-        if (error) {
-            partialCompletion(nil, nil, error);
-            return;
-        }
-        
-        if (!sequences.count) {
-            partialCompletion(nil, metadata, error);
-        }
-        
-        for (OSVServerSequence *seq in sequences) {
-            [self.osvAPI listPhotosForUser:self.user withSequence:seq completionBlock:^(NSMutableArray *photos, NSError *error) {
-                seq.photos = photos;
-                metadata.index++;
-                partialCompletion(seq, metadata, error);
-            }];
-        }
-    }];
 }
 
 - (void)getPhotosForTrack:(id<OSVSequence>)seq withCompletionBlock:(void (^)(id<OSVSequence>seq , NSError *error))completion {
@@ -521,7 +444,7 @@ UIBackgroundTaskIdentifier taskIndentifier;
                 video.uid = sequence.uploadID;
             }
             //upload video
-            wOperation.taskObject = [self.osvAPI uploadVideo:video withProgressBlock:^(long long totalBytesSent, long long totalBytesExpected) {
+            wOperation.taskObject = [self.osvAPI uploadVideo:video forUser:self.user withProgressBlock:^(long long totalBytesSent, long long totalBytesExpected) {
                 tbsCache = totalBytesSent;
                 uploadProgressBlock(totalBytesSentInVideos + tbsCache, totalBytesExpected);
                 

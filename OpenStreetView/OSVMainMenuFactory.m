@@ -17,7 +17,7 @@
 @implementation OSVMainMenuFactory
 
 + (NSArray *)mainMenu {
-    NSArray *array = @[[self myProfileItem],  [self waitingItem], [self settingsItem]];
+    NSArray *array = @[[self myProfileItem],  [self localTracksItem], [self settingsItem]];
     
     return array;
 }
@@ -49,7 +49,7 @@
     return item;
 }
 
-+ (OSVMenuItem *)waitingItem {
++ (OSVMenuItem *)localTracksItem {
     OSVMenuItem *item = [OSVMenuItem new];
     item.title = NSLocalizedString(@"Upload", @"");
     item.additional = @{@"icon":[UIImage imageNamed:@"tracks"]};
@@ -57,9 +57,24 @@
     item.action = ^(UIViewController * sender, id info) {
         if ([OSVSyncController hasSequencesToUpload]) {
             if ([OSVUserDefaults sharedInstance].isUploading) {
-                [sender performSegueWithIdentifier:@"showUploading" sender:info];
+                if (![[OSVSyncController sharedInstance].tracksController userIsLoggedIn]) {
+                    [[OSVSyncController sharedInstance].tracksController loginWithCompletion:^(NSError *error) {
+                        if (error) {
+                            [UIAlertView showWithTitle:@"" message:@"Failed to login. Please retry." cancelButtonTitle:@"Ok" otherButtonTitles:nil tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
+                                
+                            }];
+                        } else {
+                            
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                [sender performSegueWithIdentifier:@"showUploading" sender:info];
+                            });
+                        }
+                    }];
+                } else {
+                    [sender performSegueWithIdentifier:@"showUploading" sender:info];
+                }
             } else {
-                [sender performSegueWithIdentifier:@"showWaiting" sender:info];
+                [sender performSegueWithIdentifier:@"showLocalTracks" sender:info];
             }
         } else {
             [UIAlertView showWithTitle:@"" message:NSLocalizedString(@"Looks like you don't have any recordings.",@"") cancelButtonTitle:NSLocalizedString(@"Ok", @"") otherButtonTitles:nil tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {

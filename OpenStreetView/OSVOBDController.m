@@ -20,7 +20,7 @@
 #import "OSVUserDefaults.h"
 
 #import <CoreBluetooth/CoreBluetooth.h>
-
+#import <Crashlytics/Crashlytics.h>
 
 @interface OSVOBDController () <FLScanToolDelegate, OBDServiceDelegate, OBDDeviceDelegate>
 
@@ -146,6 +146,7 @@ const int connectionTimeOut = 7;
         
         [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDFailedToConnectInTime" object:nil userInfo:@{}];
         [[OSVLogger sharedInstance] logMessage:@"failed to connect" withLevel:LogLevelDEBUG];
+        [CrashlyticsKit setObjectValue:@"faildToConnectInTime" forKey:@"OBD"];
         if (self.isRecordingMode) {
             [self reconnect];
         }
@@ -166,6 +167,7 @@ const int connectionTimeOut = 7;
     } else if (self.retryCheckStatus == (connectionTimeOut / delay)) {
         self.retryCheckStatus = 0;
         [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDFailedToConnectInTime" object:nil userInfo:@{}];
+        [CrashlyticsKit setObjectValue:@"faildToConnectInTime" forKey:@"OBD"];
         [[OSVLogger sharedInstance] logMessage:@"failed to connect will reconnect" withLevel:LogLevelDEBUG];
         self.isConnected = NO;
         self.isConnecting = NO;
@@ -180,6 +182,8 @@ const int connectionTimeOut = 7;
     
     [[OSVLogger sharedInstance] logMessage:@"did stop obd upldates" withLevel:LogLevelDEBUG];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidDisconnect" object:nil userInfo:@{@"OBD" : @"WIFI"}];
+    [CrashlyticsKit setObjectValue:@"kOBDDidDisconnect - WIFI" forKey:@"OBD"];
+
     [self.timer invalidate];
     self.timer = nil;
     self.isConnected = NO;
@@ -244,10 +248,18 @@ const int connectionTimeOut = 7;
     [[OBDService sharedInstance] stopDeviceSearch];
     if (self.isConnected) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidConnect" object:nil userInfo:@{@"OBD" : @"WIFI"}];
+        [CrashlyticsKit setObjectValue:@"kOBDDidConnect - WIFI" forKey:@"OBD"];
+
     } else if (self.isConnectedBLE) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidConnect" object:nil userInfo:@{@"OBD" : @"BLE"}];
+        
+        [CrashlyticsKit setObjectValue:@"kOBDDidConnect - BLE" forKey:@"OBD"];
+
     } else {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidDisconnect" object:nil userInfo:@{@"OBD" : @"WIFI"}];
+        
+        [CrashlyticsKit setObjectValue:@"kOBDDidDisconnect - WIFI" forKey:@"OBD"];
+
     }
 }
 
@@ -265,6 +277,7 @@ const int connectionTimeOut = 7;
     self.isConnecting = NO;
     [[OSVLogger sharedInstance] logMessage:@"has connection" withLevel:LogLevelDEBUG];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidConnect" object:nil userInfo:@{@"OBD" : @"WIFI"}];
+    [CrashlyticsKit setObjectValue:@"kOBDDidConnect-WIFI" forKey:@"OBD"];
 }
 
 - (void)scanTool:(FLScanTool *)scanTool didUpdateSensor:(FLECUSensor *)sensor {
@@ -327,7 +340,7 @@ const int connectionTimeOut = 7;
         self.isConnecting = NO;
         
         [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidDisconnect" object:nil userInfo:@{@"OBD" : @"WIFI"}];
-        
+        [CrashlyticsKit setObjectValue:@"kOBDDidDisconnect-WIFI" forKey:@"OBD"];
         [[OSVLogger sharedInstance] logMessage:@"did lost wifi connection" withLevel:LogLevelDEBUG];
         [self.obdScanner cancelScan];
         [self.obdScanner setSensorScanTargets:nil];
@@ -393,6 +406,8 @@ const int connectionTimeOut = 7;
         [service stopDeviceSearch];
         dispatch_async(dispatch_get_main_queue(), ^{
             [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidDisconnect" object:nil userInfo:@{@"OBD" : @"BLE"}];
+            [CrashlyticsKit setObjectValue:@"kOBDDidDisconnect-BLE" forKey:@"OBD"];
+
             if (self.shouldDisplayBluetooth) {
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"kWaitForData" object:nil userInfo:@{}];
                 CBCentralManager *cb = [[CBCentralManager alloc] initWithDelegate:nil queue:nil];
@@ -418,6 +433,7 @@ const int connectionTimeOut = 7;
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidConnect" object:nil userInfo:@{@"OBD" : @"BLE"}];
+        [CrashlyticsKit setObjectValue:@"kOBDDidConnect-BLE" forKey:@"OBD"];
     });
 }
 
@@ -429,6 +445,7 @@ const int connectionTimeOut = 7;
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidDisconnect" object:nil userInfo:@{@"OBD" : @"BLE"}];
+        [CrashlyticsKit setObjectValue:@"kOBDDidDisconnect-BLE" forKey:@"OBD"];
     });
 }
 
@@ -441,6 +458,7 @@ const int connectionTimeOut = 7;
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:@"kOBDDidDisconnect" object:nil userInfo:@{@"OBD" : @"BLE"}];
+        [CrashlyticsKit setObjectValue:@"kOBDDidDisconnect-BLE" forKey:@"OBD"];
     });
 }
 

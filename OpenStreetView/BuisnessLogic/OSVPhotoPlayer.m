@@ -101,6 +101,10 @@
         return;
     }
     
+    if (self.currentIndex + 1 < 0) {
+        self.currentIndex = 0;
+    }
+    
     NSInteger index = ++self.currentIndex;
         
     [[OSVSyncController sharedInstance].tracksController loadThumbnailForPhoto:self.currentPlayableItem[index] intoImageView:[UIImageView new] withCompletion:^(id<OSVPhoto> completePhoto, NSError *error) {
@@ -113,6 +117,10 @@
 - (void)displayPreviousFrame {
     if (self.currentIndex - 1 < 0) {
         return;
+    }
+
+    if (self.currentIndex - 1 >= self.currentPlayableItem.count) {
+        self.currentIndex = self.currentPlayableItem.count - 1;
     }
     
     NSInteger index = --self.currentIndex;

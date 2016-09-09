@@ -65,6 +65,11 @@
             self.videoQuality = k5MPQuality;
         }
         
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"defaultOverriden1.4.2"]) {
+            self.showMapWhileRecording = NO;
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"defaultOverriden1.4.2"];
+        }
+        
         if (!self.environment) {
 #ifdef ENABLED_DEBUG
             self.environment = @"http://openstreetview.com";
@@ -117,7 +122,7 @@
         }
         
         if (![[NSUserDefaults standardUserDefaults] valueForKey:kMapWhileRecodingKey]) {
-            self.showMapWhileRecording = YES;
+            self.showMapWhileRecording = NO;
         }
         
         [self save];

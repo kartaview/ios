@@ -50,4 +50,6 @@
 
 - (void)resetValues;
 
+- (void)badGPSHandling;
+
 @end

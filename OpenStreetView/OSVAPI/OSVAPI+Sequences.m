@@ -17,7 +17,6 @@
 #import "OSVAPISpeedometer.h"
 
 #define kNewSequneceMethod      @"sequence"
-#define kListSequnceMethod      @"list"
 #define kLayersMethod           @"nearby-tracks"
 #define kMyListSequnceMethod    @"list/my-list"
 #define kFinishedUploading      @"sequence/finished-uploading"
@@ -48,18 +47,15 @@
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@/", [self.configurator osvBaseURL], [self.configurator osvAPIVerion], kNewSequneceMethod]];
     NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url];
     
-    NSString *externalUserId    = [NSString stringWithFormat:@"%ld", (long)user.userID];
-    NSString *userName          = user.name;
-    NSString *userType          = user.type;
     NSString *access_token      = user.accessToken;
     
-    NSString *clientToken       = [OSVAPIUtils deviceUUID];
     NSData   *metaData          = metaDataDict[@"data"];
     NSNumber *obdInfo           = @(seq.hasOBD?1:0);
     NSString *appVersion        = [self.configurator appVersion];
     NSString *platformVersion   = [self.configurator platformVersion];
     NSString *platformName      = [self.configurator platformName];
     NSString *currentCoordinate = [NSString stringWithFormat:@"%f,%f", photo.photoData.location.coordinate.latitude, photo.photoData.location.coordinate.longitude];
+    NSString *uploadSource      = [self.configurator platformName];
     
     NSStringEncoding stringEncoding = NSUTF8StringEncoding;
     NSString *boundaryString    = [OSVAPIUtils generateRandomBoundaryString];
@@ -67,7 +63,7 @@
     [urlRequest setValue:value forHTTPHeaderField:@"Content-Type"];
     
     @autoreleasepool {
-        [urlRequest setHTTPBody:[OSVAPIUtils multipartFormDataQueryStringFromParameters:NSDictionaryOfVariableBindings(externalUserId, userName, userType, access_token, clientToken, metaData, obdInfo, platformName, platformVersion, appVersion, currentCoordinate) withEncoding:stringEncoding boundary:boundaryString parametersInfo:@{@"metaData" : metaDataDict[@"metadataMime"]}]];
+        [urlRequest setHTTPBody:[OSVAPIUtils multipartFormDataQueryStringFromParameters:NSDictionaryOfVariableBindings(access_token, metaData, obdInfo, platformName, platformVersion, uploadSource, appVersion, currentCoordinate) withEncoding:stringEncoding boundary:boundaryString parametersInfo:@{@"metaData" : metaDataDict[@"metadataMime"]}]];
     }
     [urlRequest setHTTPMethod:@"POST"];
     
@@ -90,31 +86,13 @@
     [self.speedometer startSpeedCalculationTimer];
 };
 
-- (void)uploadSequence:(OSVSequence *)sequence forUser:(id<OSVUser>)user withCompletionBlock:(void (^)(NSError *error))completionBlock partialCompletion:(void (^)(id<OSVPhoto>photo, NSError *error))patialCompletion {
-    NSAssert(sequence.photos.count, @"There are no photos to upload");
-    __block NSInteger index = 0;
-    for (OSVPhoto *photo in sequence.photos) {
-        [self uploadPhoto:photo withProgressBlock:^(long long totalBytes, long long totalBytesExpected) {
-            
-        } andCompletionBlock:^(NSInteger photoId, NSError *error) {
-            patialCompletion(photo, error);
-            index++;
-            
-            if (index == sequence.photos.count) {
-                completionBlock(error);
-            }
-        }];
-    }
-}
-
 - (void)finishUploadingSequenceWithID:(NSInteger)uid forUser:(id<OSVUser>)user withCompletionBlock:(void (^)(NSError *error))completionBlock {
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@/", [self.configurator osvBaseURL], [self.configurator osvAPIVerion], kFinishedUploading]];
+
     NSNumber *sequenceId        = @(uid);
-    NSString *externalUserId    = [NSString stringWithFormat:@"%ld", (long)user.userID];
-    NSString *userType          = user.type;
     NSString *access_token      = user.accessToken;
     
-    AFHTTPRequestOperation *requestOperation = [OSVAPIUtils requestWithURL:url parameters:NSDictionaryOfVariableBindings(sequenceId, externalUserId, userType, access_token) method:@"POST"];
+    AFHTTPRequestOperation *requestOperation = [OSVAPIUtils requestWithURL:url parameters:NSDictionaryOfVariableBindings(sequenceId, access_token) method:@"POST"];
     [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         if (!operation.isCancelled) {
             completionBlock(nil);
@@ -134,11 +112,10 @@
     
     NSNumber *ipp               = @50;
     NSNumber *page              = @(pageIndex + 1);
-    NSString *externalUserId    = [NSString stringWithFormat:@"%ld", (long)user.userID];
-    NSString *userType          = user.type;
+
     NSString *access_token      = user.accessToken;
     
-    AFHTTPRequestOperation *requestOperation = [OSVAPIUtils requestWithURL:url parameters:NSDictionaryOfVariableBindings(page, ipp, externalUserId, userType, access_token) method:@"POST"];
+    AFHTTPRequestOperation *requestOperation = [OSVAPIUtils requestWithURL:url parameters:NSDictionaryOfVariableBindings(page, ipp, access_token) method:@"POST"];
     
     [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         if (!operation.isCancelled) {
@@ -287,85 +264,16 @@
 
 }
 
-
-- (void)listSequencesForUser:(id<OSVUser>)user atPage:(NSInteger)pageIndex inBoundingBox:(id<OSVBoundingBox>)box withCompletionBlock:(void (^)(NSArray *, NSError *, OSVMetadata *))completionBlock {
-    
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@/", [self.configurator osvBaseURL], [self.configurator osvAPIVerion], kListSequnceMethod]];
-    
-    NSNumber *ipp               = @10;
-    NSNumber *page              = @(pageIndex+1);
-    NSString *externalUserId    = [NSString stringWithFormat:@"%ld", (long)user.userID];
-    NSString *userType          = user.type;
-    NSString *access_token      = user.accessToken;
-    
-    AFHTTPRequestOperation *requestOperation;
-    //adding optional bounding box parameter
-    if (box) {
-        NSString *bbTopLeft = [NSString stringWithFormat:@"%f,%f", box.topLeftCoordinate.latitude, box.topLeftCoordinate.longitude];
-        NSString *bbBottomRight = [NSString stringWithFormat:@"%f,%f", box.bottomRightCoordinate.latitude, box.bottomRightCoordinate.longitude];
-
-        requestOperation = [OSVAPIUtils requestWithURL:url parameters:NSDictionaryOfVariableBindings(page, ipp, externalUserId, userType, access_token, bbTopLeft, bbBottomRight) method:@"POST"];
-    } else {
-        requestOperation = [OSVAPIUtils requestWithURL:url parameters:NSDictionaryOfVariableBindings(page, ipp, externalUserId, userType, access_token) method:@"POST"];
-    }
-    
-    [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
-        if (!operation.isCancelled) {
-            if (!responseObject) {
-                completionBlock(nil, [NSError errorWithDomain:@"OSVAPI" code:1 userInfo:@{@"Response":@"NoResponse"}], [OSVMetadata metadataError]);
-                return;
-            }
-            NSDictionary *response = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
-            NSArray *array = response[@"currentPageItems"];
-            NSMutableArray *sequenceArray = [NSMutableArray array];
-            for (NSDictionary *dictionary in array) {
-                OSVServerSequence *sequence = [OSVServerSequence sequenceFromDictionary:dictionary];
-                [sequenceArray addObject:sequence];
-            }
-            
-            OSVMetadata *meta = [OSVMetadata new];
-            NSArray *totalItems = response[@"totalFilteredItems"];
-            NSInteger numberOfItems = ((NSNumber *)totalItems.firstObject).integerValue;
-            meta.totalItems = numberOfItems;
-            meta.pageIndex = pageIndex;
-            meta.itemsPerPage = [ipp integerValue];
-            meta.index = pageIndex * meta.itemsPerPage;
-            
-            completionBlock(sequenceArray, nil, meta);
-        }
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        if (!operation.isCancelled) {
-            completionBlock(nil, error, [OSVMetadata metadataError]);
-        }
-    }];
-    
-    [_requestsQueue addOperation:requestOperation];
-}
-
-- (void)listSequencesForUser:(id<OSVUser>)user inBoundingBox:(id<OSVBoundingBox>)box withPartialCompletionBlock:(void (^)(NSArray *sequences, NSError *error, OSVMetadata *))partialBlock {
-    
-    [self listSequencesForUser:user atPage:0 inBoundingBox:box withCompletionBlock:^(NSArray *sequences, NSError *error, OSVMetadata *metadata) {
-        partialBlock(sequences, error, metadata);
-        NSInteger totalPages = metadata.totalItems / metadata.itemsPerPage + (metadata.totalItems % metadata.itemsPerPage != 0 ? 1 : 0);
-        for (NSInteger i = metadata.pageIndex; i < totalPages; i++) {
-            [self listSequencesForUser:user atPage:i inBoundingBox:box withCompletionBlock:^(NSArray *sequences, NSError *error, OSVMetadata *metadata) {
-                partialBlock(sequences, error, metadata);
-            }];
-        }
-    }];
-}
-
 #pragma mark - Delete requests
 
 - (void)deleteSequence:(OSVServerSequence *)sequence forUser:(id<OSVUser>)user withCompletionBlock:(void (^)(NSError *error))completionBlock {
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@/", [self.configurator osvBaseURL], [self.configurator osvAPIVerion], kSequncesRemoveMethod]];
     
     NSNumber *sequenceId        = @(sequence.uid);
-    NSNumber *externalUserId    = @(user.userID);
-    NSString *userType          = user.type;
+
     NSString *access_token      = user.accessToken;
     
-    AFHTTPRequestOperation *requestOperation = [OSVAPIUtils requestWithURL:url parameters:NSDictionaryOfVariableBindings(sequenceId, externalUserId, userType, access_token) method:@"POST"];
+    AFHTTPRequestOperation *requestOperation = [OSVAPIUtils requestWithURL:url parameters:NSDictionaryOfVariableBindings(sequenceId, access_token) method:@"POST"];
     
     [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         if (!operation.isCancelled) {

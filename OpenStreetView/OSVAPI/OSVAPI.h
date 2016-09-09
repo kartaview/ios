@@ -60,11 +60,6 @@
 
 @interface OSVAPI (Photos)
 
-//upload photos
-- (void)uploadPhoto:(nonnull OSVPhoto *)photo
-  withProgressBlock:(nullable void (^)(long long totalBytes, long long totalBytesExpected))uploadProgress
- andCompletionBlock:(nullable void (^)(NSInteger photoId,  NSError *_Nullable error))completionBlock;
-
 //list photos
 - (void)listPhotosForUser:(nonnull id<OSVUser>)user
              withSequence:(nonnull OSVServerSequence *)sequence
@@ -83,9 +78,10 @@ withCompletionBlock:(nullable void (^)(NSError *_Nullable error))completionBlock
 
 @interface OSVAPI (Video)
 //upload video
-- (nonnull NSURLSessionUploadTask *)uploadVideo:(nonnull OSVVideo *)video
-  withProgressBlock:(nullable void (^)(long long totalBytesSent, long long totalBytesExpected))uploadProgressBlock
- andCompletionBlock:(nullable void (^)(NSInteger videoId,  NSError * _Nullable error))completionBlock;
+- (nullable NSURLSessionUploadTask *)uploadVideo:(nonnull OSVVideo *)video
+                                        forUser:(nonnull id<OSVUser>)user
+                              withProgressBlock:(nullable void (^)(long long totalBytesSent, long long totalBytesExpected))uploadProgressBlock
+                             andCompletionBlock:(nullable void (^)(NSInteger videoId,  NSError * _Nullable error))completionBlock;
 
 @end
 
@@ -97,17 +93,13 @@ withCompletionBlock:(nullable void (^)(NSError *_Nullable error))completionBlock
                            metadata:(nonnull NSDictionary *)metaDataDict
                   withProgressBlock:(nullable void (^)(long long totalBytes, long long totalBytesExpected))uploadProgressBlock
                     completionBlock:(nullable void (^)(NSInteger sequenceId, NSError * _Nullable error))completionBlock;
-//upload sequence
-- (void)uploadSequence:(nonnull OSVSequence *)sequence
-               forUser:(nonnull id<OSVUser>)user
-   withCompletionBlock:(nullable void (^)(NSError *_Nullable error))completionBlock
-     partialCompletion:(nullable void (^)(id<OSVPhoto> _Nullable photo, NSError *_Nullable error))patialCompletion;
+
 //finish upload
 - (void)finishUploadingSequenceWithID:(NSInteger)uid
                               forUser:(nonnull id<OSVUser>)user
                   withCompletionBlock:(nullable void (^)(NSError *_Nullable error))completionBlock;
 //list track
-- (nonnull NSOperation *)listTracksForUser:(nonnull id<OSVUser>)user
+- (nullable NSOperation *)listTracksForUser:(nonnull id<OSVUser>)user
                                     atPage:(NSInteger)pageIndex
                              inBoundingBox:(nullable id<OSVBoundingBox>)box
                                   withZoom:(double)zoom
@@ -117,17 +109,6 @@ withCompletionBlock:(nullable void (^)(NSError *_Nullable error))completionBlock
                        radius:(double)distance
                withCompletion:(nullable void (^)(NSArray *_Nullable, NSError *_Nullable))completion;
 
-
-
-//list sequences
-- (void)listSequencesForUser:(nonnull id<OSVUser>)user
-               inBoundingBox:(nullable id<OSVBoundingBox>)box
-  withPartialCompletionBlock:(nonnull void (^)(NSArray *_Nullable sequences, NSError *_Nullable error, OSVMetadata *_Nullable))partialBlock;
-//paged list sequences and bounding box
-- (void)listSequencesForUser:(nonnull id<OSVUser>)user
-                      atPage:(NSInteger)pageIndex
-               inBoundingBox:(nullable id<OSVBoundingBox>)box
-         withCompletionBlock:(nullable void (^)(NSArray *_Nullable sequences, NSError *_Nullable error, OSVMetadata *_Nonnull metadata))completionBlock;
 //paged list sequences
 - (void)listMySequncesForUser:(nonnull id<OSVUser>)user
                        atPage:(NSInteger)pageIndex

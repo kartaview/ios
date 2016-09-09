@@ -258,7 +258,7 @@
         
         if (error && !self.didShowNoInternet) {
             self.didShowNoInternet = YES;
-            [UIAlertView showWithTitle:NSLocalizedString(@"No internet connection", @"") message:NSLocalizedString(@"", @"") cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
+            [UIAlertView showWithTitle:NSLocalizedString(@"No internet connection", @"") message:NSLocalizedString(@"", @"") cancelButtonTitle:NSLocalizedString(@"Ok", @"") otherButtonTitles:nil tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
                 [self.navigationController popViewControllerAnimated:YES];
             }];
         }

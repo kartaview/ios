@@ -62,12 +62,12 @@
 @property (assign, nonatomic) NSInteger                 realDistance;
 @property (assign, nonatomic) BOOL                      hadOBD;
 @property (strong, nonatomic) dispatch_source_t         timer;
-@property (assign, nonatomic) NSInteger                 stillImageRequests;
+@property (assign, atomic)    NSInteger                 stillImageRequests;
 @property (assign, nonatomic) NSTimeInterval            previousTimeFrame;
 
 @end
 
-int const MaxStillImageRequests = 8;
+int const MaxStillImageRequests = 5;
 
 @implementation OSVCameraManager
 
@@ -104,12 +104,12 @@ int const MaxStillImageRequests = 8;
         
         //low res video
         double frameMaxSize = 1024;
-        double bitRate = 1500000;
-        NSString *encoding = AVVideoProfileLevelH264HighAutoLevel;
+//        double bitRate = 1500000;
+//        NSString *encoding = AVVideoProfileLevelH264HighAutoLevel;
 #ifdef ENABLED_DEBUG
         frameMaxSize = [OSVUserDefaults sharedInstance].debugFrameSize;
-        bitRate = [OSVUserDefaults sharedInstance].debugBitRate*1000000;
-        encoding = [OSVUserDefaults sharedInstance].debugEncoding;
+//        bitRate = [OSVUserDefaults sharedInstance].debugBitRate*1000000;
+//        encoding = [OSVUserDefaults sharedInstance].debugEncoding;
 #endif
         CMVideoDimensions dimSmall;
         double ratio = frameMaxSize/MAX(dim.width, dim.height);
@@ -144,7 +144,8 @@ int const MaxStillImageRequests = 8;
 - (void)startHighResolutionCapure {
     self.isSnapping = YES;
     self.backgroundRenderingID = UIBackgroundTaskInvalid;
-    
+    [[OSVLogger sharedInstance] logMessage:@"Start new seq." withLevel:LogLevelDEBUG];
+
     [[OSVSyncController sharedInstance].logger createNewLogFileForSequenceID:self.currentSequence];
     
     AVCaptureVideoOrientation orientation = [[self.previewLayer connection] videoOrientation];
@@ -160,7 +161,6 @@ int const MaxStillImageRequests = 8;
         NSLog(@"%@", error);
     }];
 }
-
 
 - (void)stopHighResolutionCapture {
     [self.badGPSTimer invalidate];
@@ -227,12 +227,18 @@ int const MaxStillImageRequests = 8;
         
         AVCaptureConnection *connection = [welf.stillOutput connectionWithMediaType:AVMediaTypeVideo];
         
+        welf.stillImageRequests++;
         // Capture a still image.
         [welf.stillOutput captureStillImageAsynchronouslyFromConnection:connection
                                                       completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
             
+            if (error) {
+                welf.stillImageRequests--;
+                return;
+            }
+                                                          
             CVPixelBufferRef pixelsBuffer = CVPixelBufferRetain(CMSampleBufferGetImageBuffer(imageDataSampleBuffer));
-            NSLog(@"test works");
+            
             NSInteger rotation = kRotate0DegreesClockwise;
             if (orientation == AVCaptureVideoOrientationPortrait) {
                 rotation = kRotate90DegreesClockwise;
@@ -246,9 +252,9 @@ int const MaxStillImageRequests = 8;
                 [welf.videoRecorder addPixelBuffer:pixelsBuffer withRotation:rotation completion:^(BOOL success) {
                     welf.isValidVideo = YES;
                     OSVPhoto *photo = [OSVPhoto new];
-                    NSLog(@"is dooing stuf");
+                    welf.stillImageRequests--;
+                    
                     if (success) {
-                        NSLog(@"with success");
                         photo.photoData = [OSVPhotoData new];
                         photo.photoData.location = photoLocation;
                         photo.photoData.timestamp = dateLocation;
@@ -276,16 +282,16 @@ int const MaxStillImageRequests = 8;
                                 [[OSVLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Failed to Write Video error:%@", error] withLevel:LogLevelDEBUG];
                             }
 
-                            NSLog(@"before complete %ld", (long)welf.usedMemory);
                             AVCaptureVideoOrientation orientation = [[welf.previewLayer connection] videoOrientation];
                             welf.usedMemory += [welf.videoRecorder currentVideoSize];
-                            NSLog(@"after complete %ld", (long)welf.usedMemory);
                             
                             [welf.videoRecorder createRecordingWithURL:[welf fileNameForTrackID:welf.currentSequence videoID:welf.videoIndex] orientation:orientation];
                             welf.isValidVideo = NO;
                         }];
                     }
                 }];
+            } else {
+                welf.stillImageRequests--;
             }
             
             CVPixelBufferRelease(pixelsBuffer);
@@ -294,7 +300,7 @@ int const MaxStillImageRequests = 8;
 }
 
 - (void)lowResolutionCapure {
-    float interval = 0.2;
+    float interval = 0.25;
 #ifdef ENABLED_DEBUG
     interval = 1.0/[OSVUserDefaults sharedInstance].debugFrameRate;
 #endif
@@ -321,11 +327,10 @@ int const MaxStillImageRequests = 8;
                 AVCaptureConnection *connection = [self.stillOutput connectionWithMediaType:AVMediaTypeVideo];
                 
                 [self.stillOutput captureStillImageAsynchronouslyFromConnection:connection
-                                                                   completionHandler:^(CMSampleBufferRef sampleBuffer, NSError *error) {
-                     self.stillImageRequests--;
-
+                                                              completionHandler:^(CMSampleBufferRef sampleBuffer, NSError *error) {
                      if (error) {
                          NSLog(@"erorare");
+                         self.stillImageRequests--;
                      } else if (sampleBuffer) {
                          NSLog(@"working");
                          
@@ -357,6 +362,7 @@ int const MaxStillImageRequests = 8;
                                  NSLog(@"adding  stuff %d", success);
                              }];
                              CVPixelBufferRelease(pixelsBuffer);
+                             self.stillImageRequests--;
                          } else {
                              [self.sensorLib speedLimitsFromSampleBuffer:sampleBuffer
                                                           withCompletion:^(NSArray *detections, CVImageBufferRef pixelsBuffer) {
@@ -375,11 +381,14 @@ int const MaxStillImageRequests = 8;
                                           [self.delegate shouldDisplayTraficSign:image];
                                       });
                                   }
+                                self.stillImageRequests--;
                             }];
                          }
+                     } else {
+                         self.stillImageRequests--;
                      }
-                    }];
-                }
+                                                                }];
+            }
         });
     
         // Set timer start time and interval.
@@ -401,7 +410,13 @@ int const MaxStillImageRequests = 8;
 - (NSURL *)fileNameForTrackID:(NSInteger)trackUID videoID:(NSInteger)videoUID {
     NSString *folderPathString = [NSString stringWithFormat:@"%@%ld", [OSVSyncController sharedInstance].tracksController.basePathToPhotos, (long)trackUID];
     if (![[NSFileManager defaultManager] fileExistsAtPath:folderPathString]) {
-        [[NSFileManager defaultManager] createDirectoryAtPath:folderPathString withIntermediateDirectories:NO attributes:NULL error:NULL];
+        NSError *error;
+        BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:folderPathString withIntermediateDirectories:NO attributes:NULL error:&error];
+        if (!success) {
+            [[OSVLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Failed to create folder for trackID:%ld error:%@", trackUID, error] withLevel:LogLevelDEBUG];
+            success = [[NSFileManager defaultManager] createDirectoryAtPath:folderPathString withIntermediateDirectories:NO attributes:NULL error:&error];
+            [[OSVLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Retry to create folder with result:%d error:%@", success, error] withLevel:LogLevelDEBUG];
+        }
     }
     
     return [NSURL fileURLWithPath:[folderPathString stringByAppendingString:[NSString stringWithFormat:@"/%ld.mp4", (long)videoUID]]];
@@ -410,7 +425,13 @@ int const MaxStillImageRequests = 8;
 - (NSURL *)fileNameForLowResTrackID:(NSInteger)trackUID videoID:(NSInteger)videoUID {
     NSString *folderPathString = [NSString stringWithFormat:@"%@%ld", [OSVSyncController sharedInstance].tracksController.basePathToPhotos, (long)trackUID];
     if (![[NSFileManager defaultManager] fileExistsAtPath:folderPathString]) {
-        [[NSFileManager defaultManager] createDirectoryAtPath:folderPathString withIntermediateDirectories:NO attributes:NULL error:NULL];
+        NSError *error;
+        BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:folderPathString withIntermediateDirectories:NO attributes:NULL error:&error];
+        if (!success) {
+            [[OSVLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Fail create folder trackID:%ld error:%@", trackUID, error] withLevel:LogLevelDEBUG];
+            success = [[NSFileManager defaultManager] createDirectoryAtPath:folderPathString withIntermediateDirectories:NO attributes:NULL error:&error];
+            [[OSVLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Retry create folder error:%@ withResult:%d", error, success] withLevel:LogLevelDEBUG];
+        }
     }
     
     return [NSURL fileURLWithPath:[folderPathString stringByAppendingString:[NSString stringWithFormat:@"/%ld_low.mp4", (long)videoUID]]];
@@ -488,14 +509,11 @@ int const MaxStillImageRequests = 8;
     }
 }
 
-
-
 - (void)shouldRemoveCurrentSign {
     [self.timerSign invalidate];
     self.timerSign = nil;
     [self.delegate shouldDisplayTraficSign:nil];
 }
-
 
 - (void)badGPSShapshot {
     NSLog(@"made snap with bad");
@@ -506,7 +524,6 @@ int const MaxStillImageRequests = 8;
         [self makeStillCaptureWithLocation:[[CLLocation alloc] initWithCoordinate:self.lastPhotoLocation.coordinate altitude:0 horizontalAccuracy:1000 verticalAccuracy:0 timestamp:[NSDate new]]];
     }
 }
-
 
 - (void)startDecayForSign {
     [self.timerSign invalidate];

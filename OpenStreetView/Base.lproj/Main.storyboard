@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="tMD-4s-nBA">
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
         <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
@@ -851,7 +850,7 @@
         <!--Waiting View Controller-->
         <scene sceneID="ldv-J0-3DV">
             <objects>
-                <viewController storyboardIdentifier="OSVWaitingViewController" title="My OpenStreetView" automaticallyAdjustsScrollViewInsets="NO" id="E30-yn-dpb" userLabel="Waiting View Controller" customClass="OSVWaitingViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="OSVLocalTracksViewController" title="My OpenStreetView" automaticallyAdjustsScrollViewInsets="NO" id="E30-yn-dpb" userLabel="Waiting View Controller" customClass="OSVLocalTracksViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="vHN-Gx-t8y"/>
                         <viewControllerLayoutGuide type="bottom" id="fHF-8M-zFO"/>
@@ -3408,7 +3407,7 @@
                         <outlet property="bottomRightButton" destination="8DA-qK-ckh" id="i9D-4Z-BQb"/>
                         <outlet property="mapView" destination="PCP-as-Vuw" id="Gd2-fX-z4p"/>
                         <segue destination="BC0-gN-tTe" kind="presentation" identifier="presentReview" id="6sZ-d3-ewx"/>
-                        <segue destination="E30-yn-dpb" kind="show" identifier="showWaiting" id="Y8B-Fl-bMk"/>
+                        <segue destination="E30-yn-dpb" kind="show" identifier="showLocalTracks" id="Y8B-Fl-bMk"/>
                         <segue destination="nI9-oN-fOQ" kind="show" identifier="showSettings" id="ZxV-U2-7U1"/>
                         <segue destination="28h-sQ-dza" kind="show" identifier="showMyProfile" id="eji-Fg-I0j"/>
                         <segue destination="Oev-7q-XFP" kind="show" identifier="showUploading" id="2Pg-y6-rlY"/>

@@ -28,35 +28,6 @@
     });
 }
 
-- (void)uploadPhoto:(OSVPhoto *)photo withCompletion:(void (^)(NSError *))completion {
-    
-    if (![OSVSyncUtils hasInternetPermissions]) {
-        completion([NSError errorWithDomain:@"OSVConnectivity" code:1 userInfo:@{@"Request":@"NotAllowed"}]);
-        return;
-    }
-    
-    if (![self userIsLoggedIn]) {
-        completion([NSError errorWithDomain:@"OSMAPI" code:1 userInfo:@{@"Authentication":@"UserAutenticationRequired"}]);
-        return;
-    }
-    
-    [OSVSyncUtils correctImageDataForPhoto:photo];
-    [self.osvAPI uploadPhoto:photo withProgressBlock:^(long long totalBytes, long long totalBytesExpected) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:kDidReceiveProgress object:nil userInfo:@{@"progress":@(totalBytes),
-                                                                                                             @"totalSize":@(totalBytesExpected)}];
-        
-    } andCompletionBlock:^(NSInteger photoId, NSError * _Nullable error) {
-        completion(error);
-        
-        if (error) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:kDidFinishUploadingPhoto object:nil userInfo:@{@"error": error}];
-        } else {
-            [[NSNotificationCenter defaultCenter] postNotificationName:kDidFinishUploadingPhoto object:nil userInfo:@{}];
-        }
-    }];
-}
-
-
 #pragma mark - load image data method
 
 - (void)loadImageDataForPhoto:(id<OSVPhoto>)photo intoImageView:(UIImageView *)imageView withCompletion:(void (^)(id<OSVPhoto>photo, NSError *error))completion {

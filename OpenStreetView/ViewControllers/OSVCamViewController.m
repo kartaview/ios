@@ -8,6 +8,8 @@
 
 #import "OSVCamViewController.h"
 
+#import <Crashlytics/Crashlytics.h>
+
 #import <AVFoundation/AVFoundation.h>
 #import "AVCamPreviewView.h"
 
@@ -130,6 +132,7 @@
     region.zoomLevel = 12;
     region.center = [SKPositionerService sharedInstance].currentCoordinate;
     self.mapView.visibleRegion = region;
+    [[OSVLogger sharedInstance] createNewLogFile];
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
@@ -163,6 +166,15 @@
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    [[OSVLogger sharedInstance] logMessage:@"DidReceiveMemoryWarning" withLevel:LogLevelDEBUG];
+    [Answers logCustomEventWithName:@"didReceiveMemoryWarning" customAttributes:@{@"Show Map"       :   [OSVUserDefaults sharedInstance].showMapWhileRecording? @"YES":@"NO",
+                                                                                  @"Resolution"     :   [OSVUserDefaults sharedInstance].videoQuality,
+                                                                                  @"PhotoCount"     :   @(self.cameraManager.frameCount),
+                                                                                  @"Detect Signs"   :   [OSVUserDefaults sharedInstance].useImageRecognition? @"YES":@"NO"}];
 }
 
 #pragma mark - Actions
@@ -268,7 +280,6 @@
     self.sugestionLabel.hidden = YES;
     self.arrow.hidden = YES;
     self.arrow1.hidden = YES;
-    [[OSVLogger sharedInstance] createNewLogFile];
     [self.cancelButton setTitle:NSLocalizedString(@"Done", @"") forState:UIControlStateNormal];
     
     [UIView animateWithDuration:0.3 animations:^{
@@ -296,7 +307,7 @@
         [[SKPositionerService sharedInstance] startLocationUpdate];
         [[NSNotificationCenter defaultCenter ] addObserver:self selector:@selector(didChangeAuthorizationStatus:) name:@"didChangeAuthorizationStatus" object:nil];
     } else {
-        [UIAlertView showWithTitle:NSLocalizedString(@"No Location Services access", nil) message:NSLocalizedString(@"Please allow access to Location Services from Settings before starting a recording", @"") cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
+        [UIAlertView showWithTitle:NSLocalizedString(@"No Location Services access", nil) message:NSLocalizedString(@"Please allow access to Location Services from Settings before starting a recording", @"") cancelButtonTitle:NSLocalizedString(@"Ok", nil) otherButtonTitles:nil tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
             [self.navigationController popViewControllerAnimated:YES];
         }];
     }
@@ -357,7 +368,9 @@
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
-    [[(AVCaptureVideoPreviewLayer *)[[self previewView] layer] connection] setVideoOrientation:(AVCaptureVideoOrientation)[[UIDevice currentDevice] orientation]];
+    
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    [[OSVLogger sharedInstance] logMessage:[NSString stringWithFormat:@"will change to Orient:%ld", orientation] withLevel:LogLevelDEBUG];
 
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {        
         if (self.mapFullScreen) {
@@ -424,7 +437,7 @@
     CLAuthorizationStatus stat = (CLAuthorizationStatus)[status integerValue];
     if (stat != kCLAuthorizationStatusNotDetermined) {
         if (stat != kCLAuthorizationStatusAuthorizedWhenInUse) {
-            [[[UIAlertView alloc] initWithTitle:@"" message:NSLocalizedString(@"Please allow access to Location Services before starting a recording", @"") delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil] show];
+            [[[UIAlertView alloc] initWithTitle:@"" message:NSLocalizedString(@"Please allow access to Location Services before starting a recording", @"") delegate:nil cancelButtonTitle:NSLocalizedString(@"Ok", @"") otherButtonTitles:nil] show];
         } else {
             [self startNewSequence];
         }
@@ -477,7 +490,7 @@
 #pragma mark - OSVCameraManagerDelegate
 
 - (void)willStopCapturing {
-    [UIAlertView showWithTitle:@"" message:NSLocalizedString(@"Minimum reserved disk space reached. The recording will stop now.", @"") style:UIAlertViewStyleDefault cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
+    [UIAlertView showWithTitle:@"" message:NSLocalizedString(@"Minimum reserved disk space reached. The recording will stop now.", @"") style:UIAlertViewStyleDefault cancelButtonTitle:NSLocalizedString(@"Ok", @"") otherButtonTitles:nil tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
         [self stopSequence];
     }];
 }

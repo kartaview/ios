@@ -11,6 +11,7 @@
 #import "OSVUserDefaults.h"
 #import "OSVVideo.h"
 #import "OSVAPISpeedometer.h"
+#import "OSVUser.h"
 
 #define kUploadVideoMethod      @"video"
 
@@ -24,24 +25,31 @@
 
 @implementation OSVAPI (Video)
 
-- (NSURLSessionUploadTask *)uploadVideo:(OSVVideo *)videoObj withProgressBlock:(void (^)(long long totalBytesSent, long long totalBytesExpected))uploadProgressBlock andCompletionBlock:(void (^)(NSInteger videoId, NSError *error))completionBlock {
+- (NSURLSessionUploadTask *)uploadVideo:(OSVVideo *)videoObj
+                                forUser:(id<OSVUser>)user
+                      withProgressBlock:(void (^)(long long totalBytesSent, long long totalBytesExpected))uploadProgressBlock
+                     andCompletionBlock:(void (^)(NSInteger videoId, NSError *error))completionBlock {
     @autoreleasepool {
         NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@/", [self.configurator osvBaseURL], [self.configurator osvAPIVerion], kUploadVideoMethod]];
         NSMutableURLRequest *urlrequest = [[NSMutableURLRequest alloc] initWithURL:url];
         
-        NSNumber *sequenceId = @(videoObj.uid);
+        NSNumber *sequenceId    = @(videoObj.uid);
         NSNumber *sequenceIndex = @(videoObj.videoIndex);
+        NSString *access_token  = user.accessToken;
+        
         NSStringEncoding stringEncoding = NSUTF8StringEncoding;
-        NSString *boundaryString = [OSVAPIUtils generateRandomBoundaryString];
-        NSString *value = [NSString stringWithFormat:@"multipart/form-data; boundary=%@", boundaryString];
+        NSString *boundaryString        = [OSVAPIUtils generateRandomBoundaryString];
+        NSString *value                 = [NSString stringWithFormat:@"multipart/form-data; boundary=%@", boundaryString];
+        
         [urlrequest setValue:value forHTTPHeaderField:@"Content-Type"];
         
         NSData *video = [NSData dataWithContentsOfFile:videoObj.videoPath];
         if (!video) {
             return nil;
         }
+        
         @autoreleasepool {
-            [urlrequest setHTTPBody:[OSVAPIUtils multipartFormDataQueryStringFromParameters:NSDictionaryOfVariableBindings(sequenceId, sequenceIndex, video) withEncoding:stringEncoding boundary:boundaryString parametersInfo:@{@"video":@{@"contentType":@"video/mp4", @"format":@"mp4"}}]];
+            [urlrequest setHTTPBody:[OSVAPIUtils multipartFormDataQueryStringFromParameters:NSDictionaryOfVariableBindings(sequenceId, sequenceIndex, video, access_token) withEncoding:stringEncoding boundary:boundaryString parametersInfo:@{@"video":@{@"contentType":@"video/mp4", @"format":@"mp4"}}]];
         }
         [urlrequest setHTTPMethod:@"POST"];
         
