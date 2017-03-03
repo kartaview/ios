@@ -16,7 +16,7 @@
 - (instancetype)initWithBasePath:(NSString *)string;
 
 - (void)createNewLogFileForSequenceID:(NSInteger)uid;
-- (void)logItems:(NSArray<OSVLogItem *> *)trackLogItems inFileForSequenceID:(NSInteger)uid;
+- (void)logItem:(OSVLogItem *)trackLogItem;
 - (void)closeLoggFileForSequenceID:(NSInteger)uid;
 
 @end

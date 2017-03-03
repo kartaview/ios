@@ -28,6 +28,10 @@
 
 #define kSignUpURL              @"http://openstreetmap.org/user/new"
 
+#define kCredentialsID          @"osmLoginCredentials"
+#define kOSMUsernameKey         @"OSMUsernameKey"
+#define kOSMUserIdKey           @"OSMUserIdKey"
+
 @protocol OSMAPIDelegate;
 
 @interface OSMAPI()
@@ -57,7 +61,8 @@
         NSString *secret = credentials[kOSMSecret];
         
         self.osmClient = [[AFOAuth1Client alloc] initWithBaseURL:[NSURL URLWithString:kOSMAPIBaseURL] key:key secret:secret];
-        self.osmClient.accessToken = [AFOAuth1Token retrieveCredentialWithIdentifier:kCredentialsID];
+		self.osmClient.accessToken = [AFOAuth1Token retrieveCredentialWithIdentifier:kCredentialsID];
+		
         [self.osmClient registerHTTPOperationClass:[AFHTTPRequestOperation class]];
         [AFXMLRequestOperation addAcceptableContentTypes:[NSSet setWithObjects:@"text/xml", @"application/xml", nil]];
     }
@@ -65,51 +70,46 @@
     return self;
 }
 
-#pragma mark - Public properties
+#pragma mark - Public methods
 
-- (BOOL)loggedIn {
-    return (self.osmClient.accessToken && !self.osmClient.accessToken.isExpired);
+- (BOOL)isAuthorized {
+	return ([self userName] &&
+			[self userID] &&
+			[self userKey] &&
+			[self userSecret]);
 }
 
 - (OSMUser *)osmUser {
-    OSMUser *user = [OSMUser new];
-    user.userID = [self userID];
-    user.name = [self userName];
-    user.key = [self userKey];
-    user.secret = [self userSecret];
-    
-    return user;
-}
 
-- (NSString *)userName {
-    return self.osmClient.accessToken.userInfo[kOSMUsernameKey];
+	if ([self isAuthorized]) {
+		OSMUser *user = [OSMUser new];
+		user.userID = [self userID];
+		user.name = [self userName];
+		user.providerKey = [self userKey];
+		user.providerSecret = [self userSecret];
+		user.provider = @"osm";
+		
+		return user;
+	}
+	
+	return nil;
 }
-
-- (NSInteger)userID {
-    return ((NSNumber *)self.osmClient.accessToken.userInfo[kOSMUserIdKey]).integerValue;
-}
-
-- (NSString *)userKey {
-    return self.osmClient.accessToken.key;
-}
-
-- (NSString *)userSecret {
-    return self.osmClient.accessToken.secret;
-}
-
-#pragma mark - Public methods
 
 - (void)logIn {
     [self authorize];
 }
 
 - (BOOL)logout {
-    BOOL couldDelete = [AFOAuth1Token deleteCredentialWithIdentifier:kCredentialsID];
-    if (couldDelete) {
-        self.osmClient.accessToken = nil;
-    }
-    
-    return couldDelete;
+	BOOL couldDelete = [AFOAuth1Token deleteCredentialWithIdentifier:kCredentialsID];
+	if (couldDelete) {
+		NSDictionary *infoDict = [[NSBundle mainBundle] infoDictionary];
+		NSDictionary *credentials = infoDict[kOSMCredentials];
+		NSString *key = credentials[kOSMKey];
+		NSString *secret = credentials[kOSMSecret];
+		self.osmClient = [[AFOAuth1Client alloc] initWithBaseURL:[NSURL URLWithString:kOSMAPIBaseURL] key:key secret:secret];
+	}
+	
+	return couldDelete;
 }
 
 - (void)signUp {
@@ -119,14 +119,10 @@
     }
 }
 
-- (BOOL)isAuthorized {
-    return (self.osmClient.accessToken && !self.osmClient.accessToken.isExpired);
-}
-
 - (AFOAuth1Token *)osmAccessToken {
     return self.osmClient.accessToken;
 }
-
+	
 #pragma mark - Private methods
 
 - (void)authorize {
@@ -152,8 +148,8 @@
     [self.osmClient getPath:kOSMAPIUserInfoPath parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
         OSMParser *parser = [[OSMParser alloc] init];
         [parser parseWithData:responseObject andCompletionHandler:^(OSMUser *user) {
-            user.key = self.osmClient.accessToken.key;
-            user.secret = self.osmClient.accessToken.secret;
+            user.providerKey = self.osmClient.accessToken.key;
+            user.providerSecret = self.osmClient.accessToken.secret;
             
             if (self.didFinishLogin) {
                 self.didFinishLogin(user, YES);
@@ -168,4 +164,20 @@
     }];
 }
 
+- (NSString *)userName {
+	return self.osmClient.accessToken.userInfo[kOSMUsernameKey];
+}
+
+- (NSInteger)userID {
+	return ((NSNumber *)self.osmClient.accessToken.userInfo[kOSMUserIdKey]).integerValue;
+}
+
+- (NSString *)userKey {
+	return self.osmClient.accessToken.key;
+}
+
+- (NSString *)userSecret {
+	return self.osmClient.accessToken.secret;
+}
+	
 @end

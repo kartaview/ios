@@ -15,6 +15,11 @@
 
 @property (weak, nonatomic) id<OSVSensorsManagerDelegate>   delegate;
 
++ (instancetype)sharedInstance;
+
+- (void)startAllSensors;
+- (void)stopAllSensors;
+
 - (void)startLoggingSensors;
 - (void)stopLoggingSensors;
 

@@ -9,6 +9,9 @@
 #import "OSVFullScreenImageViewController.h"
 #import "OSVImageCollectionViewCell.h"
 #import "OSVSyncController.h"
+
+#import "OSVUtils.h"
+
 #import "OSVFullScreenImageCell.h"
 #import <SDWebImage/UIImageView+WebCache.h>
 #import <AVFoundation/AVFoundation.h>
@@ -54,12 +57,21 @@
     return YES;
 }
 
+#pragma mark - Rotation
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        [self.collectionViewFullscreen reloadData];
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+    }];
+}
+
 - (BOOL)shouldAutorotate {
-    return NO;
+    return YES;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskPortrait;
+    return UIInterfaceOrientationMaskAll;
 }
 
 #pragma mark - Actions
@@ -158,7 +170,6 @@
     }
 }
 
-
 #pragma mark - Overide 
 
 - (void)setSelectedIndexPath:(NSIndexPath *)selectedIndexPath {
@@ -172,7 +183,7 @@
     _sequenceDatasource = sequenceDatasource;
     if (sequenceDatasource.photos.count && ![sequenceDatasource.photos[0] isKindOfClass:[OSVServerPhoto class]]) {
         
-        NSArray<NSURL *> *videoPaths = [self videoPathsFromFolder:[self fileNameForTrackID:self.sequenceDatasource.uid]];
+        NSArray<NSURL *> *videoPaths = [self videoPathsFromFolder:[OSVUtils fileNameForTrackID:self.sequenceDatasource.uid]];
         AVMutableComposition *mixComposition = [[AVMutableComposition alloc] init];
 
         AVMutableCompositionTrack *videoTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo
@@ -202,12 +213,6 @@
     } else {
         self.imageGenerator = nil;
     }
-}
-
-- (NSURL *)fileNameForTrackID:(NSInteger)trackUID {
-    NSString *folderPathString = [NSString stringWithFormat:@"%@%ld", [OSVSyncController sharedInstance].tracksController.basePathToPhotos, (long)trackUID];
-    
-    return [[NSURL alloc] initWithString:folderPathString];
 }
 
 - (NSArray<NSURL *> *)videoPathsFromFolder:(NSURL *)basePath {

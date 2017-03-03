@@ -20,7 +20,8 @@
 @property (nonatomic, assign) CLLocationCoordinate2D    homeCoordinate;
 @property (nonatomic, strong) NSString                  *descriptions;
 
-@property (nonatomic, strong) NSString                  *key;
-@property (nonatomic, strong) NSString                  *secret;
+@property (nonatomic, strong) NSString                  *providerKey;
+@property (nonatomic, strong) NSString                  *providerSecret;
+@property (nonatomic, strong) NSString                  *provider;
 
 @end

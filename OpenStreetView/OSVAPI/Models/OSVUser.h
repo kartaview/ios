@@ -7,24 +7,30 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "OSVGamificationInfo.h"
 
 @protocol OSVUser <NSObject>
-
-@property (nonatomic, assign) NSInteger userID;
+//user info
+@property (nonatomic, strong) NSString  *userID;
 @property (nonatomic, strong) NSString  *name;
-@property (nonatomic, strong) NSString  *type;
-
+@property (nonatomic, strong) NSString  *fullName;
+//
 @property (nonatomic, assign) double    totalKM;
 @property (nonatomic, assign) double    obdDistance;
+//
 @property (nonatomic, assign) NSInteger totalPhotos;
 @property (nonatomic, assign) NSInteger totalTracks;
+//rankings
 @property (nonatomic, assign) NSInteger weekRank;
 @property (nonatomic, assign) NSInteger rank;
-
-@property (nonatomic, strong) NSString  *key;
-@property (nonatomic, strong) NSString  *secret;
+//login credentials
+@property (nonatomic, strong) NSString  *providerKey;
+@property (nonatomic, strong) NSString  *providerSecret;
+@property (nonatomic, strong) NSString  *provider;
 
 @property (nonatomic, strong) NSString  *accessToken;
+
+@property (nonatomic, strong) OSVGamificationInfo *gameInfo;
 
 @end
 

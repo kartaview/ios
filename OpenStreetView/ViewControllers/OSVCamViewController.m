@@ -17,10 +17,13 @@
 #import "OSVUserDefaults.h"
 #import "OSVLocationManager.h"
 #import "OSVUtils.h"
+#import "UIDevice+Aditions.h"
+#import "UIViewController+Additions.h"
 
 #import "OSVSequence.h"
 
 #import "OSVSyncController.h"
+#import "OSVUser.h"
 
 #import "UIAlertView+Blocks.h"
 
@@ -42,15 +45,24 @@
 #import "NSMutableAttributedString+Additions.h"
 #import "NSAttributedString+Additions.h"
 
+#import "OSVTrackMatcher.h"
+
+#import "OSVCameraGamificationManager.h"
+
+#import "OSC-Swift.h"
+
 @interface OSVCamViewController () <UIGestureRecognizerDelegate, OSVCameraManagerDelegate>
 
 // Communicate with the session and other session objects on this queue.
 @property (nonatomic) dispatch_queue_t                  sessionQueue;
 @property (nonatomic) AVCaptureSession                  *session;
 @property (nonatomic) AVCaptureStillImageOutput         *stillImageOutput;
+@property (nonatomic, strong) AVCaptureVideoDataOutput  *videoOutput;
+
 //interface builder elements
 @property (weak, nonatomic) IBOutlet UIButton           *startCapture;
 @property (weak, nonatomic) IBOutlet UIButton           *cancelButton;
+@property (weak, nonatomic) IBOutlet UIButton           *infoButton;
 //OBD
 @property (weak, nonatomic) IBOutlet UILabel            *obdSpeed;
 @property (weak, nonatomic) IBOutlet UIView             *obdStatus;
@@ -61,7 +73,6 @@
 @property (weak, nonatomic) IBOutlet UILabel            *distanceLabel;
 @property (weak, nonatomic) IBOutlet UILabel            *photosCountLabel;
 @property (weak, nonatomic) IBOutlet UILabel            *storageUsedLabel;
-@property (weak, nonatomic) IBOutlet UILabel            *sugestionLabel;
 //containers/other helper views
 @property (weak, nonatomic) IBOutlet UIView             *mapContainer;
 @property (weak, nonatomic) IBOutlet UIView             *topContainer;
@@ -78,7 +89,9 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *topPreview;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomPreview;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *trailingPreview;
-@property (weak, nonatomic) IBOutlet SKMapView          *mapView;
+
+@property (strong, nonatomic) SKMapView                 *mapView;
+@property (weak, nonatomic) IBOutlet UIView             *mapViewPlaceholder;
 //info
 @property (strong, nonatomic) OSVTipView                *tipView;
 // state values
@@ -89,6 +102,8 @@
 //controllers/managers
 @property (nonatomic, strong) OSVCameraManager          *cameraManager;
 @property (nonatomic, strong) OSVCameraMapManager       *mapManager;
+//gamification UI responseble
+@property (strong, nonatomic) IBOutlet OSVCameraGamificationManager *gamificationManager;
 
 @end
 
@@ -97,19 +112,26 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [UIViewController attemptRotationToDeviceOrientation];
-    
+
     self.startCapture.clipsToBounds = YES;
     self.gpsQuality.hidden = YES;
     self.infoView.alpha = 0;
     
-    if (![OSVUserDefaults sharedInstance].showMapWhileRecording) {
+    if (![OSVUserDefaults sharedInstance].showMapWhileRecording ||
+        ![OSVUserDefaults sharedInstance].enableMap) {
         [self.mapContainer removeFromSuperview];
         [self.mapView removeFromSuperview];
         self.mapContainer = nil;
         self.mapView = nil;
     } else {
+        self.mapView = [[SKMapView alloc] initWithFrame:self.mapViewPlaceholder.bounds];
         self.mapManager = [[OSVCameraMapManager alloc] initWithMap:self.mapView];
+        [UIViewController addMapView:self.mapView toView:self.mapViewPlaceholder];
     }
+    
+    self.gamificationManager.delegate = self;
+    
+    [self.gamificationManager prepareFirstTimeUse];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -118,21 +140,13 @@
     self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
     [self.navigationController setNavigationBarHidden:YES animated:NO];
     [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
-    
-    self.mapView.mapScaleView.hidden = YES;
-    self.mapView.clipsToBounds = YES;
-    self.mapView.settings.showCompass = NO;
-    self.mapView.settings.displayMode = SKMapDisplayMode2D;
-    self.mapView.settings.showStreetNamePopUps = YES;
-    // self.mapView.settings.osmAttributionPosition = SKAttributionPositionNone;
-    // self.mapView.settings.companyAttributionPosition = SKAttributionPositionNone;
-    self.mapView.userInteractionEnabled = NO;
-    
-    SKCoordinateRegion region;
-    region.zoomLevel = 12;
-    region.center = [SKPositionerService sharedInstance].currentCoordinate;
-    self.mapView.visibleRegion = region;
+
     [[OSVLogger sharedInstance] createNewLogFile];
+    
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    [self.gamificationManager configureUIForInterfaceOrientation:orientation];
+    
+	[self animateInfoButton];
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
@@ -145,10 +159,24 @@
     self.mapView.settings.followUserPosition = YES;
     
     [self.mapView centerOnCurrentPosition];
-    [self.mapView animateToZoomLevel:17];
+    [self.mapView animateToZoomLevel:[OSVUserDefaults sharedInstance].zoomLevel];
+
+    self.cameraManager = [[OSVCameraManager alloc] initWithOutput:self.videoOutput
+                                                          preview:(AVCaptureVideoPreviewLayer *)self.previewView.layer
+                                                     deviceFromat:self.deviceFormat
+                                                            queue:self.sessionQueue];
     
-    self.cameraManager = [[OSVCameraManager alloc] initWithOutput:self.stillImageOutput preview:(AVCaptureVideoPreviewLayer *)self.previewView.layer deviceFromat:self.deviceFormat queue:self.sessionQueue];
+    if ((![OSVUserDefaults sharedInstance].showMapWhileRecording ||
+        ![OSVUserDefaults sharedInstance].enableMap) &&
+        [OSVUserDefaults sharedInstance].useGamification) {
+        self.cameraManager.matcher = [OSVTrackMatcher new];
+    }
+    
     self.cameraManager.delegate = self;
+    self.cameraManager.cameraMapManager = self.mapManager;
+    self.gamificationManager.cameraManager = self.cameraManager;
+
+    [self.videoOutput setSampleBufferDelegate:self.cameraManager queue:[self sessionQueue]];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -161,7 +189,6 @@
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
-    [[OSVLocationManager sharedInstance].sensorsManager stopUpdatingDeviceMotion];
 }
 
 - (void)dealloc {
@@ -171,10 +198,43 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     [[OSVLogger sharedInstance] logMessage:@"DidReceiveMemoryWarning" withLevel:LogLevelDEBUG];
+    
+    NSString *username = [OSVSyncController sharedInstance].tracksController.oscUser.name;
     [Answers logCustomEventWithName:@"didReceiveMemoryWarning" customAttributes:@{@"Show Map"       :   [OSVUserDefaults sharedInstance].showMapWhileRecording? @"YES":@"NO",
                                                                                   @"Resolution"     :   [OSVUserDefaults sharedInstance].videoQuality,
                                                                                   @"PhotoCount"     :   @(self.cameraManager.frameCount),
-                                                                                  @"Detect Signs"   :   [OSVUserDefaults sharedInstance].useImageRecognition? @"YES":@"NO"}];
+                                                                                  @"Detect Signs"   :   [OSVUserDefaults sharedInstance].useImageRecognition? @"YES":@"NO",
+                                                                                  @"Model"          :   [UIDevice modelString],
+                                                                                  @"UserName"       :   username ? username : @"unknown"}];
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([sender isKindOfClass:[NSArray class]] && [sender count]) {
+		NSArray *array = sender;
+		NSNumber *seqID = array[0];
+		NSNumber *shouldDissmissAll = @(NO);
+		if (array.count > 1) {
+			shouldDissmissAll = array[1];
+		}
+        [[OSVSyncController sharedInstance].tracksController getLocalSequenceWithID:[seqID integerValue] completion:^(OSVSequence *sequence) {
+            [[OSVSyncController sharedInstance].tracksController getScoreHistoryForSequenceWithID:sequence.uid completion:^(NSArray *history) {
+                sequence.scoreHistory = [history mutableCopy];
+                sequence.points = 0;
+                for (OSVScoreHistory *sch in history) {
+                    sequence.points += sch.points;
+                }
+                SummaryViewController *vc = segue.destinationViewController;
+                vc.sequence = sequence;
+                if ([shouldDissmissAll boolValue]) {
+                    vc.willDissmiss = ^{
+                        [self dismissViewControllerAnimated:YES completion:^{
+                            
+                        }];
+                    };
+                }
+            }];
+        }];
+    }
 }
 
 #pragma mark - Actions
@@ -201,14 +261,26 @@
 }
 
 - (IBAction)didTapOnInfoView:(id)sender {
-    CLLocation *localtion = [[CLLocation alloc] initWithCoordinate:[[SKPositionerService sharedInstance] currentCoordinate] altitude:0 horizontalAccuracy:0 verticalAccuracy:0 timestamp:[NSDate new]];
+    CLLocation *localtion = [[CLLocation alloc] initWithCoordinate:[[OSVLocationManager sharedInstance] currentLocation].coordinate
+                                                          altitude:0
+                                                horizontalAccuracy:1000
+                                                  verticalAccuracy:1000
+                                                         timestamp:[NSDate new]];
     [self.cameraManager makeStillCaptureWithLocation:localtion];
 }
 
-- (IBAction)didTapStartCapture:(id)sender {
-    if (!self.cameraManager.isSnapping) {
+- (IBAction)didTapStartCapture:(UIButton *)sender {
+    if (!self.cameraManager.isRecording) {
         [self startNewSequence];
     } else {
+        if (self.cameraManager.score > 10) {
+            sender.userInteractionEnabled = NO;
+            NSInteger sequenceID = self.cameraManager.currentSequence;
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+				[self performSegueWithIdentifier:@"showSummary" sender:@[@(sequenceID), @(NO)]];
+                sender.userInteractionEnabled = YES;
+            });
+        }
         [self stopSequence];
     }
 }
@@ -223,9 +295,9 @@
         }
     } completion:^(BOOL finished) {
         if (self.mapFullScreen) {
-            [self.topContainer insertSubview:self.mapView aboveSubview:self.previewView];
+            [self.topContainer insertSubview:self.mapViewPlaceholder aboveSubview:self.previewView];
         } else {
-            [self.topContainer insertSubview:self.previewView aboveSubview:self.mapView];
+            [self.topContainer insertSubview:self.previewView aboveSubview:self.mapViewPlaceholder];
         }
         self.mapFullScreen = !self.mapFullScreen;
         sender.enabled = YES;
@@ -237,9 +309,10 @@
     self.topMap.constant = -self.mapContainer.frame.origin.y;
     self.leadingMap.constant = -10;
     self.trailingMap.constant = self.topContainer.frame.size.width - CGRectGetMaxX(self.mapContainer.frame);
+	
     if (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
         self.bottomMap.constant = 10;
-        
+
         self.bottomPreview.constant = 10;
         self.topPreview.constant = self.mapContainer.frame.origin.y;
         self.leadingPreview.constant = 10;
@@ -253,8 +326,12 @@
         self.trailingPreview.constant = self.topContainer.frame.size.width - CGRectGetMaxX(self.mapContainer.frame);
     }
     
-    self.mapView.frame = self.topContainer.frame;
+    self.mapViewPlaceholder.frame = self.topContainer.frame;
+    self.mapView.frame = self.topContainer.bounds;
+    
     self.previewView.frame = self.mapContainer.frame;
+    self.previewView.layer.cornerRadius = 3;
+    self.previewView.clipsToBounds = YES;
 }
 
 - (void)animateNormalSize {
@@ -262,13 +339,16 @@
     self.bottomMap.constant = 0;
     self.topMap.constant = 0;
     self.trailingMap.constant = 0;
-    self.mapView.frame = self.mapContainer.frame;
+    self.mapViewPlaceholder.frame = self.mapContainer.frame;
+    self.mapView.frame = self.mapContainer.bounds;
 
     self.topPreview.constant = 0;
     self.leadingPreview.constant = 0;
     self.trailingPreview.constant = 0;
     self.bottomPreview.constant = 0;
     self.previewView.frame = self.topContainer.frame;
+    self.previewView.layer.cornerRadius = 0;
+    self.previewView.clipsToBounds = NO;
 }
 
 - (void)startNewSequence {
@@ -288,29 +368,50 @@
         self.infoView.alpha = 1;
     }];
     
-    [self startNavigation];
+   self.mapView.settings.followUserPosition = YES;
 
     if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse) {
         [self.cameraManager startHighResolutionCapure];
-        [self.cameraManager startLowResolutionCapture];
         
         [self updateUIInfo];
 
-        [[OSVLocationManager sharedInstance].sensorsManager startLoggingSensors];
-        [[OSVLocationManager sharedInstance].sensorsManager startUpdatingAccelerometer];
-        [[OSVLocationManager sharedInstance].sensorsManager startUpdatingGyro];
-        [[OSVLocationManager sharedInstance].sensorsManager startUpdatingMagnetometer];
-        [[OSVLocationManager sharedInstance].sensorsManager startUpdatingAltitude];
+        [[OSVSensorsManager sharedInstance] startAllSensors];
+                
+        self.startCapture.selected = YES;
+
+        [self.gamificationManager expandMultiplier];
         
-        [self updateUIwithState:YES];
     } else if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined) {
-        [[SKPositionerService sharedInstance] startLocationUpdate];
+        [[OSVLocationManager sharedInstance] startLocationUpdate];
         [[NSNotificationCenter defaultCenter ] addObserver:self selector:@selector(didChangeAuthorizationStatus:) name:@"didChangeAuthorizationStatus" object:nil];
     } else {
         [UIAlertView showWithTitle:NSLocalizedString(@"No Location Services access", nil) message:NSLocalizedString(@"Please allow access to Location Services from Settings before starting a recording", @"") cancelButtonTitle:NSLocalizedString(@"Ok", nil) otherButtonTitles:nil tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
-            [self.navigationController popViewControllerAnimated:YES];
+            [self dismissViewControllerAnimated:YES completion:^{
+                
+            }];
         }];
     }
+}
+
+- (void)stopSequence {
+    self.hadGPS = NO;
+    self.hadOBD = NO;
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        self.infoView.alpha = 0;
+    } completion:^(BOOL finished) {
+        self.infoView.alpha = 0;
+    }];
+    
+    [self.cameraManager stopHighResolutionCapture];
+    
+    [[OSVSensorsManager sharedInstance] stopAllSensors];
+    
+    self.startCapture.selected = NO;
+    
+    [self resetValues];
+
+    [self.gamificationManager stopRecording];
 }
 
 - (void)resetValues {
@@ -319,59 +420,14 @@
     [self updateUIInfo];
 }
 
-- (void)startNavigation {
-    self.mapView.settings.followUserPosition = YES;
-
-    [SKPositionerService sharedInstance].positionerMode = SKPositionerModeRealPositions;
-    SKNavigationSettings *navSettings = [SKNavigationSettings new];
-    navSettings.showStreetNamePopUpsOnRoute = YES;
-    navSettings.navigationType = SKNavigationTypeReal;
-    navSettings.transportMode = SKTransportCar;
-    
-    [[SKRoutingService sharedInstance] startNavigationWithSettings:navSettings];
-}
-
-- (void)stopSequence {
-    self.hadGPS = NO;
-    self.hadOBD = NO;
-    [UIView animateWithDuration:0.3 animations:^{
-        self.infoView.alpha = 0;
-    } completion:^(BOOL finished) {
-        self.infoView.alpha = 0;
-    }];
-
-    [[SKRoutingService sharedInstance] stopNavigation];
-    NSLog(@"did finish navigation");
-    [self.cameraManager stopHighResolutionCapture];
-    [self.cameraManager stopLowResolutionCapture];
-    
-    [[OSVLocationManager sharedInstance].sensorsManager stopLoggingSensors];
-    [[OSVLocationManager sharedInstance].sensorsManager stopUpdatingAccelerometer];
-    [[OSVLocationManager sharedInstance].sensorsManager stopUpdatingGyro];
-    [[OSVLocationManager sharedInstance].sensorsManager stopUpdatingMagnetometer];
-    [[OSVLocationManager sharedInstance].sensorsManager stopUpdatingAltitude];
-    
-    
-    [self updateUIwithState:NO];
-//    [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishCreatingSequence" object:nil userInfo:@{@"sequenceID":@(self.currentSequence)}];
-    
-    if ([OSVUserDefaults sharedInstance].automaticUpload && ([OSVReachablityController hasWiFiAccess] || ([OSVReachablityController hasCellularAcces] && [OSVUserDefaults sharedInstance].useCellularData))) {
-//        //TODO upload current sequence to server.
-    }
-    
-    [self resetValues];
-}
-
-- (void)updateUIwithState:(BOOL)value {
-    self.startCapture.selected = value;
-}
-
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
     [[OSVLogger sharedInstance] logMessage:[NSString stringWithFormat:@"will change to Orient:%ld", orientation] withLevel:LogLevelDEBUG];
 
+    [self.gamificationManager configureUIForDeviceOrientation:orientation];
+       
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {        
         if (self.mapFullScreen) {
             [self animateFullScreen];
@@ -382,8 +438,19 @@
 }
 
 - (IBAction)didTapBackButton:(id)sender {
-    [self stopSequence];
-    [self.navigationController popViewControllerAnimated:NO];
+    [self.gamificationManager willDissmiss];
+    
+    if (self.cameraManager.score > 10) {
+        NSInteger sequenceID = self.cameraManager.currentSequence;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+			[self performSegueWithIdentifier:@"showSummary" sender:@[@(sequenceID),@(YES)]];
+        });
+        [self stopSequence];
+    } else {
+        [self stopSequence];
+        [self dismissViewControllerAnimated:YES
+                                 completion:^{}];
+    }
 }
 
 - (BOOL)prefersStatusBarHidden {
@@ -397,8 +464,8 @@
 
     if (deviceAuthorized) {
         SKCoordinateRegion region;
-        region.zoomLevel = 12;
-        region.center = [SKPositionerService sharedInstance].currentCoordinate;
+        region.zoomLevel = [OSVUserDefaults sharedInstance].zoomLevel;
+        region.center = [OSVLocationManager sharedInstance].currentLocation.coordinate;
         self.mapView.visibleRegion = region;
     }
 }
@@ -408,28 +475,32 @@
 - (OSVTipView *)tipView {
     if (!_tipView) {
         _tipView = [[[NSBundle mainBundle] loadNibNamed:@"OSVTipView" owner:self options:nil] objectAtIndex:0];
+        [_tipView configureViews];
     }
     
     return _tipView;
 }
 
 - (void)updateUIInfo {
-    if ([[OSVUserDefaults sharedInstance].distanceUnitSystem isEqualToString:kMetricSystem]) {
-        NSArray *metricArray = [OSVUtils metricDistanceArray:self.cameraManager.distanceCoverd];
-        self.distanceLabel.attributedText = [NSAttributedString combineString:metricArray[0] withSize:16.f color:[UIColor whiteColor] fontName:@"HelveticaNeue"
-                                                                   withString:metricArray[1] withSize:12.f color:[UIColor colorWithHex:0x6e707b] fontName:@"HelveticaNeue"];
-    } else {
-        NSArray *imperialArray = [OSVUtils imperialDistanceArray:self.cameraManager.distanceCoverd];
-        self.distanceLabel.attributedText = [NSAttributedString combineString:imperialArray[0] withSize:16.f color:[UIColor whiteColor] fontName:@"HelveticaNeue"
-                                                                   withString:imperialArray[1] withSize:12.f color:[UIColor colorWithHex:0x6e707b] fontName:@"HelveticaNeue"];
-    }
-
-    self.photosCountLabel.attributedText = [NSAttributedString combineString:[@(self.cameraManager.frameCount) stringValue] withSize:16.f color:[UIColor whiteColor] fontName:@"HelveticaNeue"
-                                                                  withString:@" IMG" withSize:12.f color:[UIColor colorWithHex:0x6e707b] fontName:@"HelveticaNeue"];
-    
-    NSArray *memoryArray = [OSVUtils arrayFormatedFromByteCount:self.cameraManager.usedMemory];
-    self.storageUsedLabel.attributedText = [NSAttributedString combineString:memoryArray[0] withSize:16.f color:[UIColor whiteColor] fontName:@"HelveticaNeue"
-                                                        withString:memoryArray[1] withSize:12.f color:[UIColor colorWithHex:0x6e707b] fontName:@"HelveticaNeue"];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([[OSVUserDefaults sharedInstance].distanceUnitSystem isEqualToString:kMetricSystem]) {
+            NSArray *metricArray = [OSVUtils metricDistanceArray:self.cameraManager.distanceCoverd];
+            self.distanceLabel.attributedText = [NSAttributedString combineString:metricArray[0] withSize:16.f color:[UIColor whiteColor] fontName:@"HelveticaNeue"
+                                                                       withString:metricArray[1] withSize:12.f color:[UIColor colorWithHex:0x6e707b] fontName:@"HelveticaNeue"];
+        } else {
+            NSArray *imperialArray = [OSVUtils imperialDistanceArray:self.cameraManager.distanceCoverd];
+            self.distanceLabel.attributedText = [NSAttributedString combineString:imperialArray[0] withSize:16.f color:[UIColor whiteColor] fontName:@"HelveticaNeue"
+                                                                       withString:imperialArray[1] withSize:12.f color:[UIColor colorWithHex:0x6e707b] fontName:@"HelveticaNeue"];
+        }
+        
+        self.photosCountLabel.attributedText = [NSAttributedString combineString:[@(self.cameraManager.frameCount) stringValue] withSize:16.f color:[UIColor whiteColor] fontName:@"HelveticaNeue"
+                                                                      withString:@" IMG" withSize:12.f color:[UIColor colorWithHex:0x6e707b] fontName:@"HelveticaNeue"];
+        
+        NSArray *memoryArray = [OSVUtils arrayFormatedFromByteCount:self.cameraManager.usedMemory];
+        self.storageUsedLabel.attributedText = [NSAttributedString combineString:memoryArray[0] withSize:16.f color:[UIColor whiteColor] fontName:@"HelveticaNeue"
+                                                                      withString:memoryArray[1] withSize:12.f color:[UIColor colorWithHex:0x6e707b] fontName:@"HelveticaNeue"];
+        [self.gamificationManager updateUIInfo];
+    });
 }
 
 - (void)didChangeAuthorizationStatus:(NSNotification *)notification {
@@ -444,47 +515,26 @@
     }
 }
 
-- (void)animateFocusAtPoint:(CGPoint)point withGesture:(UIGestureRecognizer *)sender {
-    UIView *previousView = self.previewView.focusView;
-    if (previousView) {
-        [UIView animateWithDuration:0 animations:^{
-            previousView.alpha = 0;
-        } completion:^(BOOL finished) {
-            [previousView removeFromSuperview];
-        }];
-        previousView = nil;
-    }
-    
-    self.previewView.focusView = nil;
-    
-    UIView *aview = nil;
-    if (!self.previewView.focusView) {
-        aview = [[UIView alloc] initWithFrame:CGRectMake(point.x - 35, point.y - 35, 70, 70)];
-        aview.center = point;
-        aview.layer.borderWidth = 3;
-        aview.layer.borderColor = [UIColor whiteColor].CGColor;
-        aview.layer.cornerRadius = aview.frame.size.width/2;
-        if ([sender isKindOfClass:[UILongPressGestureRecognizer class]]) {
-            UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake((aview.frame.size.width/2.0)-30, -30, 60, 30)];
-            label.text = @"Locked";
-            label.textColor = [UIColor hex007AFF];
-            aview.layer.borderColor = [UIColor hex007AFF].CGColor;
-            [aview addSubview:label];
-        }
-        [self.previewView addSubview:aview];
-        
-        self.previewView.focusView = aview;
-    }
-    
-    if (![sender isKindOfClass:[UILongPressGestureRecognizer class]] || ([sender isKindOfClass:[UILongPressGestureRecognizer class]] && sender.state == UIGestureRecognizerStateEnded)) {
-        NSLog(@"tap");
-        aview.alpha = 1;
-        [UIView animateWithDuration:1.5 animations:^{
-            aview.alpha = 0;
-        } completion:^(BOOL finished) {
-            [aview removeFromSuperview];
-        }];
-    }
+- (void)animateInfoButton {
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+		[UIView animateWithDuration:0.15 animations:^{
+			self.infoButton.transform = CGAffineTransformMakeScale(1.2, 1.2);
+		} completion:^(BOOL finished) {
+		[UIView animateWithDuration:0.2 animations:^{
+			self.infoButton.transform = CGAffineTransformIdentity;
+		} completion:^(BOOL finished) {
+		[UIView animateWithDuration:0.15 animations:^{
+			self.infoButton.transform = CGAffineTransformMakeScale(1.15, 1.15);
+		} completion:^(BOOL finished) {
+		[UIView animateWithDuration:0.5
+							  delay:0.0
+			 usingSpringWithDamping:0.15
+			  initialSpringVelocity:0.2
+							options:UIViewAnimationOptionCurveLinear
+						 animations:^{
+			self.infoButton.transform = CGAffineTransformIdentity;
+		} completion:^(BOOL finished) {}]; }]; }]; }];
+	});
 }
 
 #pragma mark - OSVCameraManagerDelegate
@@ -526,7 +576,7 @@
     }
 }
 
-- (void)showOBD:(BOOL)value {
+- (void)hideOBD:(BOOL)value {
     self.obdStatus.hidden = value;
 }
 

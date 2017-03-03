@@ -23,6 +23,4 @@
 
 @property (nonatomic, strong) OSVOBDData    *carSensorData;
 
-@property (nonatomic, assign) NSTimeInterval timestamp;
-
 @end

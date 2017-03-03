@@ -19,9 +19,9 @@
 @property (nonatomic, strong) CMAltimeter       *altimeter;
 @property (nonatomic, strong) OSVOBDController  *OBD;
 
-@property (nonatomic, strong) NSOperationQueue *accelerometerQueue;
-@property (nonatomic, strong) NSOperationQueue *gyroQueue;
-@property (nonatomic, strong) NSOperationQueue *magnetometerQueue;
+//@property (nonatomic, strong) NSOperationQueue *accelerometerQueue;
+//@property (nonatomic, strong) NSOperationQueue *gyroQueue;
+//@property (nonatomic, strong) NSOperationQueue *magnetometerQueue;
 @property (nonatomic, strong) NSOperationQueue *deviceMotionQueue;
 @property (nonatomic, strong) NSOperationQueue *altimeterQueue;
 
@@ -31,20 +31,31 @@
 
 @implementation OSVSensorsManager
 
++ (instancetype)sharedInstance {
+    static id sharedInstance;
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[self alloc] init];
+    });
+    
+    return sharedInstance;
+}
+
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.accelerometerQueue = [NSOperationQueue new];
-        self.gyroQueue = [NSOperationQueue new];
-        self.magnetometerQueue = [NSOperationQueue new];
+//        self.accelerometerQueue = [NSOperationQueue new];
+//        self.gyroQueue = [NSOperationQueue new];
+//        self.magnetometerQueue = [NSOperationQueue new];
         self.deviceMotionQueue = [NSOperationQueue new];
         self.altimeterQueue = [NSOperationQueue new];
         
         self.motionManager = [CMMotionManager new];
-        self.motionManager.accelerometerUpdateInterval = 0.1;
-        self.motionManager.gyroUpdateInterval = 0.1;
-        self.motionManager.magnetometerUpdateInterval = 0.1;
-        self.motionManager.deviceMotionUpdateInterval = 0.1;
+//        self.motionManager.accelerometerUpdateInterval = 0.04;
+//        self.motionManager.gyroUpdateInterval = 0.04;
+//        self.motionManager.magnetometerUpdateInterval = 0.04;
+        self.motionManager.deviceMotionUpdateInterval = 0.04;
         
         self.OBD = [[OSVOBDController alloc] initWithHandler:^(OSVOBDData *obdData) {
             
@@ -59,8 +70,7 @@
             if (obdData && obdData.speed != NSNotFound) {
                 OSVLogItem *item = [OSVLogItem new];
                 item.carSensorData = obdData;
-                item.timestamp = obdData.timestamp;
-                [[OSVSyncController sharedInstance].logger logItems:@[item] inFileForSequenceID:0];
+                [[OSVSyncController sharedInstance].logger logItem:item];
             }
         }];
         
@@ -70,57 +80,52 @@
 }
 
 - (void)startUpdatingAccelerometer {
-    [self.motionManager startAccelerometerUpdatesToQueue:self.accelerometerQueue withHandler:^(CMAccelerometerData *accelerometerData, NSError *error) {
-        OSVLogItem *item = [OSVLogItem new];
-        item.sensorData = accelerometerData;
-        item.timestamp = [[NSDate new] timeIntervalSince1970];
-        if (self.shouldLog) {
-            [[OSVSyncController sharedInstance].logger logItems:@[item] inFileForSequenceID:0];
-        }
-    }];
+//    [self.motionManager startAccelerometerUpdatesToQueue:self.accelerometerQueue withHandler:^(CMAccelerometerData *accelerometerData, NSError *error) {
+//        OSVLogItem *item = [OSVLogItem new];
+//        item.sensorData = accelerometerData;
+//        if (self.shouldLog) {
+//            [[OSVSyncController sharedInstance].logger logItem:item];
+//        }
+//    }];
 }
 
 - (void)startUpdatingGyro {
-    [self.motionManager startGyroUpdatesToQueue:self.gyroQueue withHandler:^(CMGyroData *gyroData, NSError *error) {
-        OSVLogItem *item = [OSVLogItem new];
-        item.sensorData = gyroData;
-        item.timestamp = [[NSDate new] timeIntervalSince1970];
-        if (self.shouldLog) {
-            [[OSVSyncController sharedInstance].logger logItems:@[item] inFileForSequenceID:0];
-        }
-    }];
+//    [self.motionManager startGyroUpdatesToQueue:self.gyroQueue withHandler:^(CMGyroData *gyroData, NSError *error) {
+//        OSVLogItem *item = [OSVLogItem new];
+//        item.sensorData = gyroData;
+//        if (self.shouldLog) {
+//            [[OSVSyncController sharedInstance].logger logItem:item];
+//        }
+//    }];
 }
 
 - (void)startUpdatingMagnetometer {
-    [self.motionManager startMagnetometerUpdatesToQueue:self.magnetometerQueue withHandler:^(CMMagnetometerData * magnetometerData, NSError *error) {
-        OSVLogItem *item = [OSVLogItem new];
-        item.sensorData = magnetometerData;
-        item.timestamp = [[NSDate new] timeIntervalSince1970];
-        if (self.shouldLog) {
-            [[OSVSyncController sharedInstance].logger logItems:@[item] inFileForSequenceID:0];
-        }
-    }];
+//    [self.motionManager startMagnetometerUpdatesToQueue:self.magnetometerQueue withHandler:^(CMMagnetometerData * magnetometerData, NSError *error) {
+//        OSVLogItem *item = [OSVLogItem new];
+//        item.sensorData = magnetometerData;
+//        if (self.shouldLog) {
+//            [[OSVSyncController sharedInstance].logger logItem:item];
+//        }
+//    }];
 }
 
 - (void)startUpdatingAltitude {
     [self.altimeter startRelativeAltitudeUpdatesToQueue:self.altimeterQueue withHandler:^(CMAltitudeData *altitudeData, NSError *error) {
         OSVLogItem *item = [OSVLogItem new];
         item.sensorData = altitudeData;
-        item.timestamp = [[NSDate new] timeIntervalSince1970];
         if (self.shouldLog) {
-            [[OSVSyncController sharedInstance].logger logItems:@[item] inFileForSequenceID:0];
+            [[OSVSyncController sharedInstance].logger logItem:item];
         }
     }];
 }
 
 - (void)startUpdatingDeviceMotion {
     self.OBD.isRecordingMode = YES;
-    [self.motionManager  startDeviceMotionUpdatesToQueue:self.altimeterQueue withHandler:^(CMDeviceMotion * _Nullable motion, NSError * _Nullable error) {
+    [self.motionManager  startDeviceMotionUpdatesToQueue:self.altimeterQueue withHandler:^(CMDeviceMotion *motion, NSError *error) {
         OSVLogItem *item = [OSVLogItem new];
         item.sensorData = motion;
-        item.timestamp = [[NSDate new] timeIntervalSince1970];
         if (self.shouldLog) {
-            [[OSVSyncController sharedInstance].logger logItems:@[item] inFileForSequenceID:0];
+            [[OSVSyncController sharedInstance].logger logItem:item];
         }
     }];
 }
@@ -134,15 +139,15 @@
 }
 
 - (void)stopUpdatingAccelerometer {
-    [self.motionManager stopAccelerometerUpdates];
+//    [self.motionManager stopAccelerometerUpdates];
 }
 
 - (void)stopUpdatingGyro {
-    [self.motionManager stopGyroUpdates];
+//    [self.motionManager stopGyroUpdates];
 }
 
 - (void)stopUpdatingMagnetometer {
-    [self.motionManager stopMagnetometerUpdates];
+//    [self.motionManager stopMagnetometerUpdates];
 }
 
 - (void)stopUpdatingAltitude {
@@ -168,6 +173,24 @@
 
 - (void)reconnectOBD {
     [self.OBD reconnect];
+}
+
+- (void)stopAllSensors {
+    [self stopLoggingSensors];
+    [self stopUpdatingAccelerometer];
+    [self stopUpdatingGyro];
+    [self stopUpdatingMagnetometer];
+    [self stopUpdatingAltitude];
+    [self stopUpdatingDeviceMotion];
+}
+
+- (void)startAllSensors {
+    [self startLoggingSensors];
+    [self startUpdatingDeviceMotion];
+    [self startUpdatingAccelerometer];
+    [self startUpdatingGyro];
+    [self startUpdatingMagnetometer];
+    [self startUpdatingAltitude];
 }
 
 @end

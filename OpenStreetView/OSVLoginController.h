@@ -14,20 +14,24 @@
 
 @interface OSVLoginController : NSObject
 
-@property (nonatomic) NSString                  *basePathToPhotos;
-@property (nonatomic, readonly) id<OSVUser>     user;
+@property (nonatomic, readonly, nullable) id<OSVUser>     oscUser;
 
-- (instancetype)initWithOSVAPI:(OSVAPI *)api basePath:(NSString *)basePath;
+- (instancetype _Nonnull)initWithOSVAPI:(OSVAPI *_Nonnull)api;
 
-- (void)loginWithCompletion:(void (^)(NSError *error))completion;
+- (void)loginWithPartial:(void (^_Nonnull)(NSError *_Nullable error))partial andCompletion:(void (^ _Nonnull)(NSError * _Nullable error))completion;
 - (void)logout;
 
 - (BOOL)userIsLoggedIn;
 
-- (void)rankingWithCompletion:(void (^)(NSInteger rank, NSError *error))completion;
-- (void)osvUserInfoWithCompletion:(void (^)(id<OSVUser> user, NSError *error))completion;
+- (void)rankingWithCompletion:(void (^ _Nonnull)(NSInteger rank, NSError * _Nullable error))completion;
+- (void)leaderBoardWithCompletion:(void(^ _Nonnull)(NSArray * _Nullable leaderBoard, NSError * _Nullable error))completion;
+- (void)gameLeaderBoardForRegion:(NSString * _Nullable)countryCode
+                        formDate:(NSDate * _Nullable)date
+                  withCompletion:(void (^_Nonnull)(NSArray *_Nullable, NSError * _Nullable))completion;
 
-- (NSURL *)getAppLink;
-- (void)checkForAppUpdateWithCompletion:(void (^)(BOOL response))completion;
+- (void)osvUserInfoWithCompletion:(void (^_Nonnull)(id<OSVUser> _Nullable user, NSError *_Nullable error))completion;
+
+- (NSURL *_Nullable)getAppLink;
+- (void)checkForAppUpdateWithCompletion:(void (^_Nonnull)(BOOL response))completion;
 
 @end

@@ -18,7 +18,8 @@
 @interface OSVMapViewController : UIViewController
 
 @property (strong, nonatomic) id<OSVMapStateProtocol>   controller;
-@property (strong, nonatomic) IBOutlet SKMapView        *mapView;
+@property (weak, nonatomic) IBOutlet UIView             *mapContainer;
+@property (strong, nonatomic) SKMapView                 *mapView;
 
 @property (weak, nonatomic) IBOutlet UIButton           *bottomRightButton;
 

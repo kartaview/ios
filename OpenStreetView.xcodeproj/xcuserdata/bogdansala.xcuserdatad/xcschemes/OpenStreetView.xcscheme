@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0730"
+   LastUpgradeVersion = "0820"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "CCFD49901BA02455005B5E9A"
-               BuildableName = "OSV.app"
+               BuildableName = "OSC.app"
                BlueprintName = "OpenStreetView"
                ReferencedContainer = "container:OpenStreetView.xcodeproj">
             </BuildableReference>
@@ -28,12 +28,22 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "CCFF578F1E44D0960031B8BE"
+               BuildableName = "OSCTests.xctest"
+               BlueprintName = "OSCTests"
+               ReferencedContainer = "container:OpenStreetView.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "CCFD49901BA02455005B5E9A"
-            BuildableName = "OSV.app"
+            BuildableName = "OSC.app"
             BlueprintName = "OpenStreetView"
             ReferencedContainer = "container:OpenStreetView.xcodeproj">
          </BuildableReference>
@@ -56,7 +66,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "CCFD49901BA02455005B5E9A"
-            BuildableName = "OSV.app"
+            BuildableName = "OSC.app"
             BlueprintName = "OpenStreetView"
             ReferencedContainer = "container:OpenStreetView.xcodeproj">
          </BuildableReference>
@@ -65,7 +75,7 @@
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
@@ -75,7 +85,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "CCFD49901BA02455005B5E9A"
-            BuildableName = "OSV.app"
+            BuildableName = "OSC.app"
             BlueprintName = "OpenStreetView"
             ReferencedContainer = "container:OpenStreetView.xcodeproj">
          </BuildableReference>
@@ -85,7 +95,7 @@
       buildConfiguration = "Debug">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "Enterprise"
+      buildConfiguration = "Release"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

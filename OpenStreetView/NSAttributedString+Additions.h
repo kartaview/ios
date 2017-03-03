@@ -14,6 +14,9 @@
 + (NSAttributedString *)attributedStringWithString:(NSString *)text withSize:(float)textSize color:(UIColor *)textColor fontName:(NSString *)textFont;
 + (NSAttributedString *)combineString:(NSString *)text withSize:(float)textSize color:(UIColor *)textColor fontName:(NSString *)textFont
                            withString:(NSString *)secondtext withSize:(float)secondSize color:(UIColor *)secondColor fontName:(NSString *)sencondFont;
++ (NSAttributedString *)combineString:(NSString *)text withSize:(float)textSize color:(UIColor *)textColor fontName:(NSString *)textFont
+                           withString:(NSString *)stext withSize:(float)secSize color:(UIColor *)secoColor fontName:(NSString *)secoFont
+                       adjustBaseline:(BOOL)adj;
 
 - (NSMutableAttributedString *)appendString:(NSString *)aString withSize:(float)textSize color:(UIColor *)textColor fontName:(NSString *)textfont;
 

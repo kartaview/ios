@@ -10,7 +10,7 @@
 #import "UIColor+OSVColor.h"
 
 @interface OSVTrackCell ()
-@property (weak, nonatomic) IBOutlet UIView *backgroundPaternView;
+@property (weak, nonatomic) IBOutlet UIView     *backgroundPaternView;
 
 @end
 

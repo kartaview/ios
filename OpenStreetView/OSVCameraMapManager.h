@@ -8,10 +8,18 @@
 
 #import <Foundation/Foundation.h>
 #import <SKMaps/SKMaps.h>
+#import "OSVPolyline.h"
 
+@class OSVTrackMatcher;
 
 @interface OSVCameraMapManager : NSObject
 
+@property (nonatomic, strong) OSVTrackMatcher   *matcher;
+
 - (instancetype)initWithMap:(SKMapView *)view;
+
+- (void)addPolyline:(id)sequence;
+- (void)moveToMap;
+
 
 @end

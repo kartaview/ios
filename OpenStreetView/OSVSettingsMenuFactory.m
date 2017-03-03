@@ -22,47 +22,56 @@
 #import <AVFoundation/AVFoundation.h>
 
 #import "UIDevice+Aditions.h"
+#import "OSC-Swift.h"
+
+#import <SKMaps/SKMaps.h>
+#import <SafariServices/SafariServices.h>
 
 @implementation OSVSettingsMenuFactory
 
 #pragma mark - Menu Factory
 
-+ (NSArray *)settingsMenuWithWiFiOBDStatus:(int)connectionStatus BLEStatus:(int)bleStat {
-
-// Enable debug for all builds for now.
-#ifdef ENABLED_DEBUG
-    NSArray *array = @[[self settingsSection],
-                       [self obdSectionWithWiFiStatus:connectionStatus BLEStatus:bleStat],
-                       [self feedbackSection],
-                       [self aboutSection],
-                       [self debugSection]];
-#else
-    NSArray *array = @[[self settingsSection],
-                       [self obdSectionWithWiFiStatus:connectionStatus BLEStatus:bleStat],
-                       [self feedbackSection],
-                       [self aboutSection]];
-#endif
-    return array;
++ (NSArray *)settingsMenuWithWiFiOBDStatus:(int)connectionStatus
+                                 BLEStatus:(int)bleStat
+                          enableSecretMenu:(BOOL)secretMenu {
+    
+    if (secretMenu) {
+        return @[[self settingsSection],
+                 [self obdSectionWithWiFiStatus:connectionStatus BLEStatus:bleStat],
+                 [self feedbackSection],
+                 [self aboutSection],
+                 [self debugSection]];
+    } else {
+        return @[[self settingsSection],
+                 [self obdSectionWithWiFiStatus:connectionStatus BLEStatus:bleStat],
+                 [self feedbackSection],
+                 [self aboutSection]];
+    }
 }
 
 #pragma mark - Sections Factory
 
-+ (OSVSectionItem *)defaultUserFunctionalitySection {
-    OSVSectionItem *section1 = [OSVSectionItem new];
-    section1.rowItems = [@[[self loginItem]]mutableCopy];
-    section1.title = NSLocalizedString(@"Account", nil);
-    
-    return section1;
-}
-
 + (OSVSectionItem *)settingsSection {
     OSVSectionItem *settingsSection = [OSVSectionItem new];
-    settingsSection.rowItems = [@[[self wifiItem],
-                                  [self autoUploadItem],
-                                  [self metricItem],
-                                  [self videoQualityItem],
-                                  [self showMapItem],
-                                  [self signDetectionItem]] mutableCopy];
+    if (![OSVUserDefaults sharedInstance].enableMap) {
+        settingsSection.rowItems = [@[[self wifiItem],
+                                      [self autoUploadItem],
+                                      [self metricItem],
+                                      [self videoQualityItem],
+                                      [self enableMapItem],
+                                      [self signDetectionItem],
+                                      [self gamificationItem]] mutableCopy];
+    } else {
+        settingsSection.rowItems = [@[[self wifiItem],
+                                      [self autoUploadItem],
+                                      [self metricItem],
+                                      [self videoQualityItem],
+                                      [self enableMapItem],
+                                      [self showMapItem],
+                                      [self signDetectionItem],
+                                      [self gamificationItem]] mutableCopy];
+    }
+    
     settingsSection.title = NSLocalizedString(@"GENERAL", nil);
     
     return settingsSection;
@@ -71,6 +80,7 @@
 + (OSVSectionItem *)feedbackSection {
     OSVSectionItem *feedbackItem = [OSVSectionItem new];
     feedbackItem.rowItems = [@[[self feedbackItem],
+                               [self tipsItem],
                                [self walkthrough]] mutableCopy];
     feedbackItem.title = NSLocalizedString(@"IMPROVE", nil);
     
@@ -80,6 +90,8 @@
 + (OSVSectionItem *)aboutSection {
     OSVSectionItem *aboutItem = [OSVSectionItem new];
     aboutItem.rowItems = [@[[self appVersion],
+                            [self termsConditions],
+                            [self privacyPolicy],
                             [self copyRight]] mutableCopy];
     aboutItem.title = NSLocalizedString(@"ABOUT", nil);
     
@@ -116,70 +128,6 @@
     settingsSection.rowItems = [@[[self debugItem]]mutableCopy];
     
     return settingsSection;
-}
-
-#pragma mark - User Functions Item Factory
-
-+ (OSVMenuItem *)loginItem {
-    OSVMenuItem *login = [OSVMenuItem new];
-    if (![[OSVSyncController sharedInstance].tracksController userIsLoggedIn]) {
-        login.title = NSLocalizedString(@"Login with OSM" , nil);
-        login.action = ^(OSVSettingsViewController *sender, id indexPath) {
-            if ([OSVReachablityController checkReachablility]) {
-                [[OSVSyncController sharedInstance].tracksController loginWithCompletion:^(NSError *error) {
-                    if (error) {
-                        [[OSVSyncController sharedInstance].tracksController logout];
-                    }
-                    
-                    [sender reloadData];
-                }];
-            }
-        };
-    } else {
-        NSString *name = [[OSVSyncController sharedInstance].tracksController user].name;
-        if (!name) {
-            name = @"-";
-        }
-        login.title = [NSString stringWithFormat:NSLocalizedString(@"Logout (%@)", nil), name];
-        login.action = ^(OSVSettingsViewController *sender, id indexPath) {
-            [UIAlertView showWithTitle:@""
-                               message:NSLocalizedString(@"Are you sure you want to logout?", @"Preemtiv message to stop a unwanted loggout form the current online user profile")
-                     cancelButtonTitle:NSLocalizedString(@"No", nil)
-                     otherButtonTitles:@[NSLocalizedString(@"Yes", nil)]
-                              tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
-                                  if (buttonIndex == [alertView cancelButtonIndex]) {
-                                      [sender reloadData];
-                                  } else {
-                                      [[OSVSyncController sharedInstance].tracksController logout];
-                                      [sender reloadData];
-                                  }
-                              }];
-                    };
-    }
-
-    login.type = OSVMenuItemAction;
-    
-    return login;
-}
-
-+ (OSVMenuItem *)myStreetViewItem {
-    OSVMenuItem *myStreetView = [OSVMenuItem new];
-    myStreetView.title = NSLocalizedString(@"My Recordings", @"Recordings of the User that is logged in");
-    myStreetView.type = OSVMenuItemAction;
-    myStreetView.key = @"";
-    myStreetView.action = ^(UIViewController *sender, id indexPath) {
-        [sender performSegueWithIdentifier:@"myStreetViewSegue" sender:indexPath];
-    };
-    
-    return myStreetView;
-}
-
-+ (OSVMenuItem *)progressItem {
-    OSVMenuItem *progress = [OSVMenuItem new];
-    progress.title = NSLocalizedString(@"Upload Local Recordings", @"Upload all local recordings in the context of the user Profile overview");
-    progress.type = OSVMenuItemUpload;
-    
-    return progress;
 }
 
 #pragma mark Settins Item Factory
@@ -303,11 +251,13 @@
         }
         
         if (has12MP) {
-            item.rowItems = [@[[self smallResolution],
+            item.rowItems = [@[[self smallerResolution],
+                               [self smallResolution],
                                [self mediumResolution],
                                [self highResolution]] mutableCopy];
         } else {
-            item.rowItems = [@[[self smallResolution],
+            item.rowItems = [@[[self smallerResolution],
+                               [self smallResolution],
                                [self mediumResolution]] mutableCopy];
         }
     }
@@ -320,13 +270,15 @@
     if ([UIDevice isLessTheniPhone6]) {
         resolutionsDictionary = @{k2MPQuality : array[0]};
     } else {
-        if ([array count] == 3) {
-            resolutionsDictionary = @{k5MPQuality : array[0],
-                                      k8MPQuality : array[1],
-                                      k12MPQuality: array[2]};
+        if ([array count] == 4) {
+            resolutionsDictionary = @{k2MPQuality : array[0],
+                                      k5MPQuality : array[1],
+                                      k8MPQuality : array[2],
+                                      k12MPQuality: array[3]};
         } else {
-            resolutionsDictionary = @{k5MPQuality : array[0],
-                                      k8MPQuality : array[1]};
+            resolutionsDictionary = @{k2MPQuality : array[0],
+                                      k5MPQuality : array[1],
+                                      k8MPQuality : array[2]};
         }
     }
     
@@ -369,6 +321,40 @@
     return item;
 }
 
++ (OSVMenuItem *)enableMapItem {
+    OSVMenuItem *item = [OSVMenuItem new];
+    item.title = NSLocalizedString(@"Enable map", @"");
+    item.subtitle = NSLocalizedString(@"Maps use more resources and it may decrease performace.", @"");
+    item.type = OSVMenuItemSwitch;
+    item.key = @"enableMap";
+    
+    item.action = ^(OSVSettingsViewController *sender, NSNumber *value) {
+        if ([OSVUserDefaults sharedInstance].enableMap) {
+            //init the map so it will not crash the application when trying to access SKPositioner.currentLocation
+            SKMapsInitSettings *mapsettings = [SKMapsInitSettings mapsInitSettings];
+            mapsettings.mapStyle.resourcesFolderName = @"GrayscaleStyle";
+            mapsettings.mapStyle.styleFileName = @"grayscalestyle.json";
+            [[SKMapsService sharedInstance] initializeSKMapsWithAPIKey:@"" settings:mapsettings];
+        }
+
+        [UIAlertView showWithTitle:NSLocalizedString(@"", @"")
+                           message:NSLocalizedString(@"The app has to be restarted for this to take place", @"")
+                 cancelButtonTitle:NSLocalizedString(@"Ok", @"")
+                 otherButtonTitles:@[NSLocalizedString(@"Not now", @"")]
+                          tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
+                if (buttonIndex == [alertView cancelButtonIndex]) {
+                    exit(0);
+                } else {
+                    [OSVUserDefaults sharedInstance].enableMap = ![OSVUserDefaults sharedInstance].enableMap;
+                    [sender reloadData];
+                }
+            }];
+    };
+
+    
+    return item;
+}
+
 + (OSVMenuItem *)showMapItem {
     OSVMenuItem *item = [OSVMenuItem new];
     item.title = NSLocalizedString(@"Display map while recording", @"");
@@ -389,6 +375,16 @@
     return video;
 }
 
++ (OSVMenuItem *)gamificationItem {
+    OSVMenuItem *video = [OSVMenuItem new];
+    video.title = NSLocalizedString(@"Points", @"");
+    video.subtitle = NSLocalizedString(@"Compete with other users and improve your ranking.", @"");
+    video.type = OSVMenuItemSwitch;
+    video.key = @"useGamification";
+    
+    return video;
+}
+
 #pragma mark - Feedback Item Factory
 
 + (OSVMenuItem *)feedbackItem {
@@ -399,9 +395,17 @@
     item.action = ^(OSVSettingsViewController *sender, id indexPath) {
         NSURL *url = [NSURL URLWithString:@"https://github.com/openstreetview/ios/issues"];
         
-        if (![[UIApplication sharedApplication] openURL:url]) {
-
+        if ([[SFSafariViewController alloc] respondsToSelector:@selector(initWithURL:)]) {
+            UIViewController *vc = [[SFSafariViewController alloc] initWithURL:url];
+            
+            [sender presentViewController:vc animated:YES completion:^{
+                
+            }];
+            
+        } else {
+            [[UIApplication sharedApplication] openURL:url];
         }
+
         [sender reloadData];
     };
     
@@ -410,16 +414,46 @@
 
 #pragma mark - About Item Factory 
 
-+ (OSVMenuItem *)walkthrough {
++ (OSVMenuItem *)tipsItem {
     OSVMenuItem *item = [OSVMenuItem new];
     item.title = NSLocalizedString(@"Tips", nil);
     item.subtitle = NSLocalizedString(@"See how to improve your recordings. \n", nil);
     item.type = OSVMenuItemDetails;
     item.action = ^(OSVSettingsViewController *sender, id indexPath) {
         OSVTipView *tipview = [[[NSBundle mainBundle] loadNibNamed:@"OSVTipView" owner:self options:nil] objectAtIndex:0];
+        [tipview configureViews];
         
         [sender.navigationController.view addSubview:tipview];
         tipview.frame = sender.navigationController.view.frame;
+        [sender reloadData];
+    };
+    
+    return item;
+}
+
++ (OSVMenuItem *)walkthrough {
+    OSVMenuItem *item = [OSVMenuItem new];
+    item.title = NSLocalizedString(@"Walkthrough", nil);
+    item.subtitle = NSLocalizedString(@"What OpenStreetCam is about. \n", nil);
+    item.type = OSVMenuItemDetails;
+    item.action = ^(OSVSettingsViewController *sender, id indexPath) {
+        OSVTipView *tipView = [[[NSBundle mainBundle] loadNibNamed:@"OSVTipView" owner:self options:nil] objectAtIndex:0];
+        [tipView prepareIntro];
+        [tipView configureViews];
+        
+        PortraitViewController *vc = [PortraitViewController new];
+        vc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+
+        tipView.willDissmiss = ^() {
+            [vc dismissViewControllerAnimated:YES completion:^{}];
+            return YES;
+        };
+        
+        [sender presentViewController:vc animated:NO completion:^{
+            [vc.view addSubview:tipView];
+        }];
+
+        tipView.frame = sender.navigationController.view.frame;
         [sender reloadData];
     };
     
@@ -439,10 +473,54 @@
     return item;
 }
 
++ (OSVMenuItem *)termsConditions {
+    OSVMenuItem *item = [OSVMenuItem new];
+    item.type = OSVMenuItemDetails;
+    item.title = NSLocalizedString(@"Terms & Conditions", @"");
+    
+    item.action = ^(OSVSettingsViewController *sender, id indexPath) {
+        NSURL *url = [NSURL URLWithString:@"http://openstreetcam.org/terms/"];
+        if ([[SFSafariViewController alloc] respondsToSelector:@selector(initWithURL:)]) {
+            UIViewController *vc = [[SFSafariViewController alloc] initWithURL:url];
+            
+            [sender presentViewController:vc animated:YES completion:^{
+                
+            }];
+
+        } else {
+            [[UIApplication sharedApplication] openURL:url];
+        }
+    };
+
+    return item;
+}
+
++ (OSVMenuItem *)privacyPolicy {
+    OSVMenuItem *item = [OSVMenuItem new];
+    item.type = OSVMenuItemDetails;
+    item.title = NSLocalizedString(@"Privacy Policy", @"");
+    
+    item.action = ^(OSVSettingsViewController *sender, id indexPath) {
+        NSURL *url = [NSURL URLWithString:@"http://www.telenav.com/legal/policies.html#privacy-policy"];
+        if ([[SFSafariViewController alloc] respondsToSelector:@selector(initWithURL:)]) {
+            UIViewController *vc = [[SFSafariViewController alloc] initWithURL:url];
+            
+            [sender presentViewController:vc animated:YES completion:^{
+                
+            }];
+            
+        } else {
+            [[UIApplication sharedApplication] openURL:url];
+        }
+    };
+
+    return item;
+}
+
 + (OSVMenuItem *)copyRight {
     OSVMenuItem *item = [OSVMenuItem new];
-    item.type = OSVMenuItemBasic;
-    item.title = NSLocalizedString(@"Copyright 2016 Telenav GmbH", @"");
+    item.type = OSVMenuItemAction;
+    item.title = NSLocalizedString(@"Copyright 2017 Telenav GmbH", @"");
     
     return item;
 }
@@ -456,7 +534,7 @@
     item.type = OSVMenuItemButton;
     item.action = ^(OSVSettingsViewController *sender, id indexPath) {
         sender.obdWIFIConnectionStatus = 1;
-        [[OSVLocationManager sharedInstance].sensorsManager startUpdatingOBD];
+        [[OSVSensorsManager sharedInstance] startUpdatingOBD];
         [sender reloadData];
     };
     
@@ -478,7 +556,7 @@
     item.type = OSVMenuItemButton;
     item.action = ^(OSVSettingsViewController *sender, id indexPath) {
         sender.obdWIFIConnectionStatus = 2;
-        [[OSVLocationManager sharedInstance].sensorsManager stopUpdatingOBD];
+        [[OSVSensorsManager sharedInstance] stopUpdatingOBD];
         [sender reloadData];
     };
     
@@ -491,7 +569,7 @@
     item.type = OSVMenuItemDetails;
     item.action = ^(OSVSettingsViewController *sender, id indexPath) {
         sender.obdBLEConnectionStatus = 1;
-        [[OSVLocationManager sharedInstance].sensorsManager startBLEOBDScan];
+        [[OSVSensorsManager sharedInstance] startBLEOBDScan];
         OSVSectionItem *dataItem = [self obdBLE];
         dataItem.key = @"bleDevice";
         [sender performSegueWithIdentifier:@"showSettingsDetails" sender:dataItem];
@@ -514,7 +592,7 @@
     item.type = OSVMenuItemButton;
     item.action = ^(OSVSettingsViewController *sender, id indexPath) {
         sender.obdBLEConnectionStatus = 2;
-        [[OSVLocationManager sharedInstance].sensorsManager stopUpdatingOBD];
+        [[OSVSensorsManager sharedInstance] stopUpdatingOBD];
         [sender reloadData];
     };
     

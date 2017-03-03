@@ -11,9 +11,11 @@
 
 @interface OSVServerSequence : NSObject <OSVSequence>
 
-@property (nonatomic, strong) NSString *countryCode;
-@property (nonatomic, strong) NSString *clientToken;
+@property (nonatomic, strong) NSString  *countryCode;
+@property (nonatomic, strong) NSString  *clientToken;
 @property (nonatomic, assign) NSInteger photoCount;
+@property (nonatomic, assign) NSInteger points;
+@property (nonatomic, strong) NSMutableArray   *scoreHistory;
 
 @end
 

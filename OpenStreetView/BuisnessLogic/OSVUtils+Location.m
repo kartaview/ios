@@ -70,30 +70,115 @@
     return sqrt((startP.x - endP.x) * (startP.x - endP.x) + (startP.y - endP.y) * (startP.y - endP.y));
 }
 
-+ (CGPoint)nearestPointToPoint:(CGPoint)origin onLineSegmentPointA:(CGPoint)pointA pointB:(CGPoint)pointB distance:(double *)distance {
-    CGPoint dAP = CGPointMake(origin.x - pointA.x, origin.y - pointA.y);
-    CGPoint dAB = CGPointMake(pointB.x - pointA.x, pointB.y - pointA.y);
-    CGFloat dot = dAP.x * dAB.x + dAP.y * dAB.y;
-    CGFloat squareLength = dAB.x * dAB.x + dAB.y * dAB.y;
-    CGFloat param = dot / squareLength;
++ (CLLocation *)nearestLocationToLocation:(CLLocation *)origin
+                   onLineSegmentLocationA:(CLLocation *)pointA
+                                locationB:(CLLocation *)pointB
+                                 distance:(double *)distance {
+    /*Changing to points (more compact code)*/
+    CGPoint P = CGPointMake(origin.coordinate.longitude, origin.coordinate.latitude);
+    CGPoint A = CGPointMake(pointA.coordinate.longitude, pointA.coordinate.latitude);
+    CGPoint B = CGPointMake(pointB.coordinate.longitude, pointB.coordinate.latitude);
     
-    CGPoint nearestPoint;
-    if (param < 0 || (pointA.x == pointB.x && pointA.y == pointB.y)) {
-        nearestPoint.x = pointA.x;
-        nearestPoint.y = pointA.y;
-    } else if (param > 1) {
-        nearestPoint.x = pointB.x;
-        nearestPoint.y = pointB.y;
-    } else {
-        nearestPoint.x = pointA.x + param * dAB.x;
-        nearestPoint.y = pointA.y + param * dAB.y;
+    /* Noting P' a point on AB and PP' is perpendicular on AB
+     Noting the slope of AB with mAB
+     Noting the slope of PP' with mPP'
+     AB equation: (X-A.x)/(B.y-A.x) = (Y-A.y)/(B.y-A.y)
+     Because PP' is perpendicular on AB => mAB * mPP' = -1
+     mAB equation: (B.y-A.y)/(B.x-A.x)
+     mPP'equation: (P'.y-P.y)/(P'.x-P.x)
+     Because P' is on AB => (P'.x-A.x)/(B.y-A.x) = (P'.y-A.y)/(B.y-A.y)
+     Solving this system:
+        -------------------------------------------------
+        | mAB * mPP' = -1                               |
+        | (P'.x-A.x)/(B.y-A.x) = (P'.y-A.y)/(B.y-A.y)   |
+        -------------------------------------------------
+     We get P'(x,y):
+     Where for a more compact result we made up other variables:
+        -----------------------------------------------------
+        | Z = (B.x - A.x)*(B.x - A.x)                       |
+        | T = (B.y - A.y)*(B.y - A.y)                       |
+        | V = (A.y - P.y)*(B.x - A.x)*(B.y - A.y)           |
+        | P'.x = (Z * P.x + T * A.x - V)/(Z+T)              |
+        | P'.y = (mAB/(Z+T)) * (Z * (P.x-A.x) - V) + A.y    |
+        ----------------------------------------------------- 
+     */
+    CGFloat mAB = (B.y - A.y)/(B.x - A.x);
+    
+    CGFloat Z = (B.x - A.x)*(B.x - A.x);
+    CGFloat T = (B.y - A.y)*(B.y - A.y);
+    CGFloat V = (A.y - P.y)*(B.x - A.x)*(B.y - A.y);
+    
+    CGFloat xPrim = (Z * P.x + T * A.x - V)/(Z+T);
+    CGFloat yPrim = (mAB/(Z+T)) * (Z * (P.x-A.x) - V) + A.y;
+    
+    CGPoint Pprim = CGPointMake(xPrim, yPrim);
+    
+    /* case        P
+                   |
+                   |
+       A-----------P'--B */
+    CLLocation *nearLocation = [[CLLocation alloc] initWithLatitude:Pprim.y longitude:Pprim.x];
+    
+    /*
+     Distance from A to B  is dAB
+     Distance from A to P' is dAPprim
+     Distance from B to P' is dBPrim
+     */
+    CGFloat dAB = [pointA distanceFromLocation:pointB];
+    CGFloat dAPprim = [pointA distanceFromLocation:nearLocation];
+    CGFloat dBPrim = [pointB distanceFromLocation:nearLocation];
+    
+    if (dAPprim > dAB &&
+        dAPprim > dBPrim) {
+        /* case:       P
+                      /|
+                     / |
+                    /  |
+         A---------B---P'
+         we change P' with B
+         */
+        nearLocation = pointB;
+    } else if (dBPrim > dAB &&
+               dBPrim > dAPprim) {
+        /* case:
+            P
+            |\
+            | \
+            |  \
+            P'--A---------B
+         we change P' with A
+         */
+        nearLocation = pointA;
     }
     
-    CGFloat dx = origin.x - nearestPoint.x;
-    CGFloat dy = origin.y - nearestPoint.y;
-    *distance = sqrtf(dx * dx + dy * dy);
+    *distance = [origin distanceFromLocation:nearLocation];
     
-    return nearestPoint;
+    return nearLocation;
+}
+
++ (double)degreesBetweenLineAStart:(CLLocationCoordinate2D)pointA
+                          lineAEnd:(CLLocationCoordinate2D)pointB
+                        lineBStart:(CLLocationCoordinate2D)pointC
+                          lineBEnd:(CLLocationCoordinate2D)pointD {
+    /*Changing to points (more compact code)*/
+    CGPoint A = CGPointMake(pointA.longitude, pointA.latitude);
+    CGPoint B = CGPointMake(pointB.longitude, pointB.latitude);
+    CGPoint C = CGPointMake(pointC.longitude, pointC.latitude);
+    CGPoint D = CGPointMake(pointD.longitude, pointD.latitude);
+    
+    /*
+        mAB equation: (B.y-A.y)/(B.x-A.x)
+        mCD equation: (D.y-C.y)/(D.x-C.x)
+        Noting *phi the angle between line AB and line CD
+        tan(phi) = ABS((mAB-mCD)/(1+ mAB*mCD)) (formula)
+        => phi = atan(ABS((mAB-mCD)/(1+ mAB*mCD)))
+     */
+    
+    double mAB = (B.y-A.y)/(B.x-A.x);
+    double mCD = (D.y-C.y)/(D.x-C.x);
+    double tanPHI = ABS((mAB-mCD)/(1 + mAB*mCD));
+    
+    return ABS(atan(tanPHI) * 180.0/M_PI);
 }
 
 + (BOOL)isSameLocation:(CLLocationCoordinate2D)firstLocation asLocation:(CLLocationCoordinate2D)secondLocation {

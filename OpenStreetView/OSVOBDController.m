@@ -22,6 +22,8 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <Crashlytics/Crashlytics.h>
 
+#import "UIAlertView+Blocks.h"
+
 @interface OSVOBDController () <FLScanToolDelegate, OBDServiceDelegate, OBDDeviceDelegate>
 
 @property (strong, nonatomic) ELM327        *obdScanner;
@@ -81,7 +83,10 @@ const int connectionTimeOut = 7;
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(currentStatus) name:@"kOBDStatus" object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveNetworkStatusChange:) name:kReachabilityChangedNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveNewDatasourceItem:) name:@"BLEDatasource" object:nil];
-
+        
+//        [[OSVLogger sharedInstance] createNewLogFile];
+//        [self diagnostics];
+        
     }
     
     return self;
@@ -235,6 +240,34 @@ const int connectionTimeOut = 7;
             self.isConnecting = NO;
         }
     }
+}
+
+- (void)diagnostics {
+    NSTimeInterval timePassed = [[NSDate new] timeIntervalSinceDate:self.lastReceivedDataTimestamp];
+    
+    if (!self.isConnected && !self.isConnectedBLE) {
+        [self performSelector:@selector(diagnostics) withObject:nil afterDelay:1.0/10.0];
+        return;
+    }
+    
+    if (timePassed > 4.0) {
+        [[OSVLogger sharedInstance] logMessage:@" Drop > 4 s" withLevel:LogLevelWARNING];
+        NSLog(@"Drop > 4 s");
+        [UIAlertView showWithTitle:@"Stop Recording!" message:@"Unusable OBD data" cancelButtonTitle:@"OK" otherButtonTitles:@[] tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
+            
+        }];
+    } else {
+        
+        if (timePassed > 1.0) {
+            [[OSVLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Drop > 1s => %f", timePassed] withLevel:LogLevelWARNING];
+            NSLog(@"Drop > 1s => %f", timePassed);
+        } else if (timePassed > 1.0/10.0 ) {
+            [[OSVLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Drop > 1/10s => %f", timePassed] withLevel:LogLevelWARNING];
+            NSLog(@"Drop > 1/10s => %f", timePassed);
+        }
+    }
+    
+    [self performSelector:@selector(diagnostics) withObject:nil afterDelay:1.0/10.0];
 }
 
 - (void)reconnect {

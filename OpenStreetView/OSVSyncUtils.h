@@ -16,8 +16,6 @@
 
 + (BOOL)hasInternetPermissions;
 
-+ (void)correctImageDataForPhoto:(OSVPhoto *)photo;
-
 + (long long)sizeOnDiskForSequence:(id<OSVSequence>)sequence atPath:(NSString *)path;
 + (long long)sizeOnDiskForSequence:(id<OSVSequence>)sequence atPath:(NSString *)path containsImages:(BOOL *)contains;
 + (long long)sizeOnDiskForPhoto:(id<OSVPhoto>)photo atPath:(NSString *)path;

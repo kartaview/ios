@@ -7,6 +7,7 @@
 //
 
 #import "OSVServerSequence+Convertor.h"
+#import "OSVScoreHistory.h"
 
 @implementation OSVServerSequence (Convertor)
 
@@ -32,6 +33,8 @@
         sequence.uid = [seqDictionary[@"element_id"] hash];
     }
     
+    sequence.coverage = [seqDictionary[@"coverage"] integerValue];
+    
     return sequence;
 }
 
@@ -48,6 +51,33 @@
     sequence.location = seqDictionary[@"location"];
     sequence.previewImage = seqDictionary[@"thumb_name"];
     sequence.photoCount = [seqDictionary[@"photo_no"] integerValue];
+    if ([seqDictionary[@"upload_history"] isKindOfClass:[NSDictionary class]]) {
+        sequence.points = [seqDictionary[@"upload_history"][@"points"][@"total"] integerValue];
+        sequence.scoreHistory = [NSMutableArray array];
+        
+        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+        
+        for (NSDictionary *coverage in seqDictionary[@"upload_history"][@"coverage"]) {
+            
+            NSInteger multi = [coverage[@"coverage_points"] integerValue]/[coverage[@"coverage_photos_count"] integerValue];
+
+            if (!dict[@(multi)]) {
+                dict[@(multi)] = [OSVScoreHistory new];
+            }
+            
+            OSVScoreHistory *history = dict[@(multi)];
+            history.coverage += [coverage[@"coverage_value"] integerValue];
+            history.distance += [coverage[@"coverage_distance"] doubleValue];
+            history.points += [coverage[@"coverage_points"] integerValue];
+            history.photos += [coverage[@"coverage_photos_count"] integerValue];
+            history.multiplier = history.points/history.photos;
+        }
+        
+        for (NSNumber *key in dict) {
+            [sequence.scoreHistory addObject:dict[key]];
+        }
+        
+    }
     
     if ([seqDictionary[@"distance"] respondsToSelector:@selector(doubleValue)]) {
         sequence.length = [seqDictionary[@"distance"] doubleValue] * 1000;

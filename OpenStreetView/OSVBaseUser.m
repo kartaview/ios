@@ -10,13 +10,14 @@
 
 @implementation OSVBaseUser 
 
-@synthesize type;
 @synthesize name;
+@synthesize fullName;
 @synthesize userID;
 
 @synthesize accessToken;
-@synthesize secret;
-@synthesize key;
+@synthesize providerSecret;
+@synthesize providerKey;
+@synthesize provider;
 
 
 @synthesize totalKM;
@@ -25,5 +26,7 @@
 @synthesize totalTracks;
 @synthesize weekRank;
 @synthesize rank;
+
+@synthesize gameInfo;
 
 @end

@@ -11,6 +11,7 @@
 #import "Godzippa.h"
 #import "UIDevice+Aditions.h"
 #import "OSVLogger.h"
+#import <UIKit/UIKit.h>
 
 @interface OSVTrackLogger ()
 
@@ -18,6 +19,12 @@
 @property (nonatomic) NSFileHandle      *currentLogFileHandle;
 @property (nonatomic) NSString          *basePath;
 @property (nonatomic, assign) NSInteger currentID;
+
+@property (nonatomic, strong) dispatch_queue_t  serialDispatchQueue;
+@property (nonatomic, assign) long              count;
+@property (nonatomic, strong) NSMutableString   *flushMessage;
+
+@property (nonatomic, assign) NSTimeInterval    offsetTime;
 
 @end
 
@@ -28,17 +35,24 @@
     if (self) {
         self.createLock = [NSLock new];
         self.basePath = string;
+        
+        self.serialDispatchQueue = dispatch_queue_create("trackLoggingQueue", DISPATCH_QUEUE_SERIAL);
     }
     
     return self;
 }
 
 - (void)createNewLogFileForSequenceID:(NSInteger)uid {
+    // Get NSTimeInterval of uptime i.e. the delta: now - bootTime
+    self.offsetTime = [[NSDate date] timeIntervalSince1970] - [NSProcessInfo processInfo].systemUptime;
+    
     if (self.currentID) {
         [self closeLoggFileForSequenceID:self.currentID];
     }
-
+    
     self.currentID = uid;
+    self.flushMessage = [NSMutableString string];
+    self.count = 0;
     
     NSString *logsFileName = [self fileNameForTrackID:uid];
     
@@ -58,7 +72,11 @@
         self.currentLogFileHandle = [NSFileHandle fileHandleForWritingAtPath:logsFileName];
         
         if (self.currentLogFileHandle) {
-            NSString *metainfo = [NSString stringWithFormat:@"%@;%@;1.1;%@(%@)\n", [UIDevice modelString], [UIDevice osVersion], [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]];
+            NSString *metainfo = [NSString stringWithFormat:@"%@;%@;1.1.5;%@(%@)\n",
+                                  [UIDevice modelString],
+                                  [UIDevice osVersion],
+                                  [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"],
+                                  [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]];
             [self safeWriteString:metainfo];
         }
     }
@@ -73,51 +91,82 @@
     return [folderPathString stringByAppendingString:@"/track.txt"];
 }
 
-- (void)logItems:(NSArray<CMLogItem *> *)trackLogItems inFileForSequenceID:(NSInteger)uid {
+- (void)logItem:(OSVLogItem *)item {
     if (!self.currentLogFileHandle || self.currentID == 0) {
         return;
     }
-    NSMutableString *logMessage = [NSMutableString new];
-    NSString *rowMessage = @"";
-    // @"timestamp;longitude;latitude;elevation;horizontal_accuracy;GPSspeed;yaw;pitch;roll;accelerationX;accelerationY;accelerationZ;pressure;compass;videoIndex;tripFrameIndex;gravityX;gravityY;gravityZ;OBD2speed\n";
-    for (OSVLogItem *item in trackLogItems) {
-        if (item.photodata){
-            CLLocation *location = item.photodata.location;
-            rowMessage = [NSString stringWithFormat:@"%f;%f;%f;%f;%f;%f;;;;;;;;;%ld;%ld;;;;\n", item.photodata.timestamp, location.coordinate.longitude, location.coordinate.latitude, location.altitude, location.horizontalAccuracy, location.speed, (long)item.photodata.videoIndex, (long)item.photodata.sequenceIndex];
-        } else if (item.location) {
-            CLLocation *location = item.location;
-            rowMessage = [NSString stringWithFormat:@"%f;%f;%f;%f;%f;%f;;;;;;;;;;;;;;\n", [location.timestamp timeIntervalSince1970], location.coordinate.longitude, location.coordinate.latitude, location.altitude, location.horizontalAccuracy, location.speed];
-        } else if (item.heading) {
-            rowMessage = [NSString stringWithFormat:@"%f;;;;;;;;;;;;;%f;;;;;;\n", item.timestamp, item.heading.trueHeading];
-        } else if ([item.sensorData isKindOfClass:[CMAltitudeData class]]) {
-            CMAltitudeData *altitudeData = (CMAltitudeData *)item.sensorData;
-            rowMessage = [NSString stringWithFormat:@"%f;;;;;;;;;;;;%f;;;;;;;\n", item.timestamp, [altitudeData.pressure doubleValue]];
-        } else if ([item.sensorData isKindOfClass:[CMDeviceMotion class]]) {
-            CMDeviceMotion *deviceMotionData = (CMDeviceMotion *)item.sensorData;
-            rowMessage = [NSString stringWithFormat:@"%f;;;;;;%f;%f;%f;%f;%f;%f;;;;;%f;%f;%f;\n", item.timestamp, deviceMotionData.attitude.yaw, deviceMotionData.attitude.pitch, deviceMotionData.attitude.roll, deviceMotionData.userAcceleration.x, deviceMotionData.userAcceleration.y, deviceMotionData.userAcceleration.z, deviceMotionData.gravity.x, deviceMotionData.gravity.y, deviceMotionData.gravity.z];
-        } else if (item.carSensorData) {
-            rowMessage = [rowMessage stringByAppendingFormat:@"%f;;;;;;;;;;;;;;;;;;;%f\n", item.timestamp, item.carSensorData.speed];
-        }
-        [logMessage appendString:rowMessage];
+    
+    NSString *rowMessage = nil;
+    
+    if (item.photodata){
+        rowMessage = [NSString stringWithFormat:@"%f;;;;;;;;;;;;;;%ld;%ld;;;;;\n",
+                      item.photodata.timestamp,
+                      (long)item.photodata.videoIndex,
+                      (long)item.photodata.sequenceIndex];
+    } else if (item.location) {
+        CLLocation *location = item.location;
+        rowMessage = [NSString stringWithFormat:@"%f;%f;%f;%f;%f;%f;;;;;;;;;;;;;;;%f\n",
+                      [location.timestamp timeIntervalSince1970],
+                      location.coordinate.longitude,
+                      location.coordinate.latitude,
+                      location.altitude,
+                      location.horizontalAccuracy,
+                      location.speed,
+                      location.verticalAccuracy];
+    } else if (item.heading) {
+        rowMessage = [NSString stringWithFormat:@"%f;;;;;;;;;;;;;%f;;;;;;;\n",
+                      [item.heading.timestamp timeIntervalSince1970],
+                      [self adjustHeadingToOrientation:item.heading.trueHeading]];
+    } else if ([item.sensorData isKindOfClass:[CMAltitudeData class]]) {
+        CMAltitudeData *altitudeData = (CMAltitudeData *)item.sensorData;
+        rowMessage = [NSString stringWithFormat:@"%f;;;;;;;;;;;;%f;;;;;;;;\n",
+                      altitudeData.timestamp + self.offsetTime,
+                      [altitudeData.pressure doubleValue]];
+    } else if ([item.sensorData isKindOfClass:[CMDeviceMotion class]]) {
+        CMDeviceMotion *deviceMotionData = (CMDeviceMotion *)item.sensorData;
+        rowMessage = [NSString stringWithFormat:@"%f;;;;;;%f;%f;%f;%f;%f;%f;;;;;%f;%f;%f;;\n",
+                      deviceMotionData.timestamp + self.offsetTime,
+                      deviceMotionData.attitude.yaw,
+                      deviceMotionData.attitude.pitch,
+                      deviceMotionData.attitude.roll,
+                      deviceMotionData.userAcceleration.x,
+                      deviceMotionData.userAcceleration.y,
+                      deviceMotionData.userAcceleration.z,
+                      deviceMotionData.gravity.x,
+                      deviceMotionData.gravity.y,
+                      deviceMotionData.gravity.z];
+    } else if (item.carSensorData) {
+        rowMessage = [NSString stringWithFormat:@"%f;;;;;;;;;;;;;;;;;;;%f;\n",
+                      item.carSensorData.timestamp,
+                      item.carSensorData.speed];
     }
     
-    if (self.currentLogFileHandle) {
-        [self safeWriteString:logMessage];
+    if (self.currentLogFileHandle && rowMessage != nil) {
+        [self safeWriteString:rowMessage];
     }
 }
 
 - (void)safeWriteString:(NSString *)string {
-    int i = 0;
-    while (![self retryToWriteString:string] && i < 5) {
-        i++;
-    }
+    dispatch_async(self.serialDispatchQueue, ^{
+        int i = 0;
+        self.count++;
+        [self.flushMessage appendString:string];
+        
+        if (self.flushMessage.length > 1700) {
+            while (![self retryToWriteString:self.flushMessage] && i < 5) {
+                i++;
+            }
+            [self.flushMessage setString:@""];
+        }
+    });
 }
 
 - (BOOL)retryToWriteString:(NSString *)string {
     @try {
-        [self.currentLogFileHandle seekToEndOfFile];
         NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
         [self.currentLogFileHandle writeData:data];
+        [self.currentLogFileHandle synchronizeFile];
+        
     } @catch (NSException *exception) {
         return NO;
     }
@@ -126,8 +175,14 @@
 }
 
 - (void)closeLoggFileForSequenceID:(NSInteger)uid {
-    [self.currentLogFileHandle closeFile];
-    self.currentLogFileHandle = nil;
+    dispatch_async(self.serialDispatchQueue, ^{
+        if (self.flushMessage.length > 0) {
+            [self retryToWriteString:self.flushMessage];
+        }
+        [self retryToWriteString:@"DONE"];
+        [self.currentLogFileHandle closeFile];
+        self.currentLogFileHandle = nil;
+    });
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSString *txtfile = [NSString stringWithFormat:@"%@%ld/track.txt", self.basePath, (long)uid];
         NSString *zipfile = [NSString stringWithFormat:@"%@%ld/track.txt.gz", self.basePath, (long)uid];
@@ -135,6 +190,26 @@
         
         [[NSFileManager defaultManager] GZipCompressFile:[NSURL URLWithString:txtfile] writingContentsToFile:[NSURL URLWithString:zipfile] error:&error];
     });
+}
+
+- (double)adjustHeadingToOrientation:(double)heading {
+    double value = heading;
+    
+    switch ([[UIDevice currentDevice] orientation]) {
+        case UIDeviceOrientationLandscapeLeft:
+            value = fmod((heading + 90), 359.0);
+            break;
+        case UIDeviceOrientationLandscapeRight:
+            value = fmod((heading + 270), 359.0);
+            break;
+        case UIDeviceOrientationPortraitUpsideDown:
+            value = fmod((heading + 180), 359.0);
+            break;
+        default:
+            break;
+    }
+    
+    return value;
 }
 
 @end

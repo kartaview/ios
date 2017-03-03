@@ -2,16 +2,17 @@
 #import "AVCamViewController.h"
 #import "AVCamPreviewView.h"
 #import "OSVUserDefaults.h"
+#import "UIColor+OSVColor.h"
 
-static void *CapturingStillImageContext = &CapturingStillImageContext;
-
-@interface AVCamViewController ()
+@interface AVCamViewController () 
 
 // Session management.
 @property (nonatomic) dispatch_queue_t              sessionQueue; // Communicate with the session and other session objects on this queue.
 @property (nonatomic) AVCaptureSession              *session;
 @property (nonatomic) AVCaptureDeviceInput          *videoDeviceInput;
 @property (nonatomic) AVCaptureStillImageOutput     *stillImageOutput;
+@property (nonatomic, strong) AVCaptureVideoDataOutput  *videoOutput;
+
 // Utilities.
 @property (nonatomic) UIBackgroundTaskIdentifier                                    backgroundRecordingID;
 @property (nonatomic, readonly, getter = isSessionRunningAndDeviceAuthorized) BOOL  sessionRunningAndDeviceAuthorized;
@@ -60,13 +61,21 @@ static void *CapturingStillImageContext = &CapturingStillImageContext;
 		
         [welf configureActiveFormat];
         
-		AVCaptureStillImageOutput *stillImageOutput = [[AVCaptureStillImageOutput alloc] init];
-		if ([session canAddOutput:stillImageOutput]) {
-            [stillImageOutput setOutputSettings:@{(id)kCVPixelBufferPixelFormatTypeKey:@(kCVPixelFormatType_32BGRA)}];
-			[session addOutput:stillImageOutput];
-			[self setStillImageOutput:stillImageOutput];
-		}
-
+        AVCaptureVideoDataOutput *output = [[AVCaptureVideoDataOutput alloc] init] ;
+        [output setAlwaysDiscardsLateVideoFrames:YES];
+        [output setVideoSettings:@{(id)kCVPixelBufferPixelFormatTypeKey:@(kCVPixelFormatType_32BGRA)}];
+        
+        if ([self.session canAddOutput:output]) {
+            [self.session addOutput:output];
+            self.videoOutput = output;
+        }
+        
+        AVCaptureConnection *avc = [welf.videoOutput connectionWithMediaType:AVMediaTypeVideo];
+        if ([OSVUserDefaults sharedInstance].debugStabilization && avc.isVideoStabilizationSupported) {
+            avc.preferredVideoStabilizationMode = AVCaptureVideoStabilizationModeStandard;
+        } else {
+            avc.preferredVideoStabilizationMode = AVCaptureVideoStabilizationModeOff;
+        }
 	});
 }
 
@@ -84,7 +93,6 @@ static void *CapturingStillImageContext = &CapturingStillImageContext;
         if (dim.width != requestedDim.width && dim.height != requestedDim.height) {
             [welf configureActiveFormat];
         }
-		[welf addObserver:welf forKeyPath:@"stillImageOutput.capturingStillImage" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew) context:CapturingStillImageContext];
 		[[NSNotificationCenter defaultCenter] addObserver:welf selector:@selector(subjectAreaDidChange:) name:AVCaptureDeviceSubjectAreaDidChangeNotification object:[[welf videoDeviceInput] device]];
 		
 		[welf setRuntimeErrorHandlingObserver:[[NSNotificationCenter defaultCenter] addObserverForName:AVCaptureSessionRuntimeErrorNotification object:[welf session] queue:nil usingBlock:^(NSNotification *note) {
@@ -106,8 +114,6 @@ static void *CapturingStillImageContext = &CapturingStillImageContext;
 		
 		[[NSNotificationCenter defaultCenter] removeObserver:self name:AVCaptureDeviceSubjectAreaDidChangeNotification object:[[self videoDeviceInput] device]];
 		[[NSNotificationCenter defaultCenter] removeObserver:[self runtimeErrorHandlingObserver]];
-		
-		[self removeObserver:self forKeyPath:@"stillImageOutput.capturingStillImage" context:CapturingStillImageContext];
 	});
 }
 
@@ -132,18 +138,6 @@ static void *CapturingStillImageContext = &CapturingStillImageContext;
 	return UIInterfaceOrientationMaskAll;
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-	if (context == CapturingStillImageContext) {
-		BOOL isCapturingStillImage = [change[NSKeyValueChangeNewKey] boolValue];
-		
-		if (isCapturingStillImage) {
-			[self runStillImageCaptureAnimation];
-		}
-    } else {
-		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-	}
-}
-
 #pragma mark Actions
 
 - (void)subjectAreaDidChange:(NSNotification *)notification {
@@ -151,30 +145,47 @@ static void *CapturingStillImageContext = &CapturingStillImageContext;
 	[self focusWithMode:AVCaptureFocusModeContinuousAutoFocus exposeWithMode:AVCaptureExposureModeContinuousAutoExposure atDevicePoint:devicePoint monitorSubjectAreaChange:NO];
 }
 
-#pragma mark File Output Delegate
-
-- (void)captureOutput:(AVCaptureFileOutput *)captureOutput didFinishRecordingToOutputFileAtURL:(NSURL *)outputFileURL fromConnections:(NSArray *)connections error:(NSError *)error {
-    if (error) {
-        NSLog(@"%@", error);
+- (void)animateFocusAtPoint:(CGPoint)point withGesture:(UIGestureRecognizer *)sender {
+    
+    UIView *previousView = self.previewView.focusView;
+    if (previousView) {
+        [UIView animateWithDuration:0 animations:^{
+            previousView.alpha = 0;
+        } completion:^(BOOL finished) {
+            [previousView removeFromSuperview];
+        }];
+        previousView = nil;
     }
-	
-	[self setLockInterfaceRotation:NO];
-	
-	// Note the backgroundRecordingID for use in the ALAssetsLibrary completion handler to end the background task associated with this recording. This allows a new recording to be started, associated with a new UIBackgroundTaskIdentifier, once the movie file output's -isRecording is back to NO — which happens sometime after this method returns.
-	UIBackgroundTaskIdentifier backgroundRecordingID = [self backgroundRecordingID];
-	[self setBackgroundRecordingID:UIBackgroundTaskInvalid];
-	
-	[[[ALAssetsLibrary alloc] init] writeVideoAtPathToSavedPhotosAlbum:outputFileURL completionBlock:^(NSURL *assetURL, NSError *error) {
-        if (error) {
-            NSLog(@"%@", error);
+    
+    self.previewView.focusView = nil;
+    
+    UIView *aview = nil;
+    if (!self.previewView.focusView) {
+        aview = [[UIView alloc] initWithFrame:CGRectMake(point.x - 35, point.y - 35, 70, 70)];
+        aview.center = point;
+        aview.layer.borderWidth = 3;
+        aview.layer.borderColor = [UIColor whiteColor].CGColor;
+        aview.layer.cornerRadius = aview.frame.size.width/2;
+        if ([sender isKindOfClass:[UILongPressGestureRecognizer class]]) {
+            UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake((aview.frame.size.width/2.0)-30, -30, 60, 30)];
+            label.text = NSLocalizedString(@"Locked", @"Camera focus and exposure locked.");
+            label.textColor = [UIColor hex007AFF];
+            aview.layer.borderColor = [UIColor hex007AFF].CGColor;
+            [aview addSubview:label];
         }
-		
-		[[NSFileManager defaultManager] removeItemAtURL:outputFileURL error:nil];
-		
-        if (backgroundRecordingID != UIBackgroundTaskInvalid) {
-            [[UIApplication sharedApplication] endBackgroundTask:backgroundRecordingID];
-        }
-	}];
+        [self.previewView addSubview:aview];
+        
+        self.previewView.focusView = aview;
+    }
+    
+    if (![sender isKindOfClass:[UILongPressGestureRecognizer class]] || ([sender isKindOfClass:[UILongPressGestureRecognizer class]] && sender.state == UIGestureRecognizerStateEnded)) {
+        aview.alpha = 1;
+        [UIView animateWithDuration:1.5 animations:^{
+            aview.alpha = 0;
+        } completion:^(BOOL finished) {
+            [aview removeFromSuperview];
+        }];
+    }
 }
 
 #pragma mark Device Configuration
@@ -309,19 +320,6 @@ static void *CapturingStillImageContext = &CapturingStillImageContext;
 }
 
 #pragma mark UI
-
-- (void)runStillImageCaptureAnimation {
-	dispatch_async(dispatch_get_main_queue(), ^{
-        static SystemSoundID soundID = 0;
-        
-        if (soundID == 0) {
-            NSString *path = [[NSBundle mainBundle] pathForResource:@"photoShutter2" ofType:@"caf"];
-            NSURL *filePath = [NSURL fileURLWithPath:path isDirectory:NO];
-            AudioServicesCreateSystemSoundID((__bridge CFURLRef)filePath, &soundID);
-        }
-        AudioServicesPlaySystemSound(soundID);
-    });
-}
 
 - (void)checkDeviceAuthorizationStatus {
 	NSString *mediaType = AVMediaTypeVideo;

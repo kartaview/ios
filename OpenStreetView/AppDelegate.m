@@ -12,6 +12,10 @@
 #import <Realm/Realm.h>
 #import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
+#import <GoogleSignIn/GoogleSignIn.h>
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
+#import <UIKit/UIKit.h>
+
 #import "OSVLocationManager.h"
 
 #import "OSVSyncController.h"
@@ -20,19 +24,30 @@
 
 #import "UIAlertView+Blocks.h"
 #import "OSVReachablityController.h"
+#import "OSVLocalNotificationsController.h"
 
 #import "OSVUser.h"
 
-@interface AppDelegate ()
+#import "OSVUtils.h"
+
+@interface AppDelegate () <GIDSignInDelegate>
 
 @end
 
 @implementation AppDelegate
 
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    UILocalNotification *localNotification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
+    
+    if (localNotification) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [OSVLocalNotificationsController handleNotification:localNotification application:application];
+        });
+    }
+
     [Fabric with:@[[Crashlytics class]]];
-    NSString *username = [OSVSyncController sharedInstance].tracksController.user.name;
+    NSString *username = [OSVSyncController sharedInstance].tracksController.oscUser.name;
     if (username) {
         [CrashlyticsKit setUserName:username];
     }
@@ -43,13 +58,22 @@
         }
     }];
     
-    SKMapsInitSettings *mapsettings = [SKMapsInitSettings mapsInitSettings];
+    if ([OSVUserDefaults sharedInstance].enableMap) {
+        SKMapsInitSettings *mapsettings = [SKMapsInitSettings mapsInitSettings];
+        mapsettings.mapStyle.resourcesFolderName = @"GrayscaleStyle";
+        mapsettings.mapStyle.styleFileName = @"grayscalestyle.json";
+        if ([OSVUtils isHighDensity]) {
+        } else {
+        }
+        
+        [[SKMapsService sharedInstance] initializeSKMapsWithAPIKey:@"" settings:mapsettings];
+        [SKMapsService sharedInstance].tilesCacheManager.cacheLimit = 100 * 1024 * 1024;
+    }
     
-    [[SKMapsService sharedInstance] initializeSKMapsWithAPIKey:@"47c0589b94694c04e757f6c36157f13b21d30d051d662b7c8034bf3988bd9843" settings:mapsettings];
-    [[OSVLocationManager sharedInstance].sensorsManager startUpdatingOBD];
+    [[OSVSensorsManager sharedInstance] startUpdatingOBD];
 
     if ([CLLocationManager authorizationStatus] !=  kCLAuthorizationStatusNotDetermined) {
-        [[SKPositionerService sharedInstance] startLocationUpdate];        
+        [[OSVLocationManager sharedInstance] startLocationUpdate];
     }
     
     if ([OSVUserDefaults sharedInstance].isUploading && ![OSVUserDefaults sharedInstance].automaticUpload) {
@@ -73,18 +97,26 @@
         }];
     }
 
-    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
         [[OSVSyncController sharedInstance].tracksController finishUploadingEmptySequencesWithCompletionBlock:^(NSError *error) {
         }];
     });
-
+    
+    [GIDSignIn sharedInstance].clientID = kOSCGoogleClientID;
+    [GIDSignIn sharedInstance].delegate = self;
+	
+	if ([[GIDSignIn sharedInstance] hasAuthInKeychain]) {
+		[[GIDSignIn sharedInstance] signInSilently];
+	}
+    
+    [[FBSDKApplicationDelegate sharedInstance] application:application
+                             didFinishLaunchingWithOptions:launchOptions];
+    
     return YES;
 }
 
-- (void)applicationWillResignActive:(UIApplication *)application {
-    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-    // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
+    [OSVLocalNotificationsController handleNotification:notification application:application];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
@@ -109,7 +141,7 @@
         }
     }];
     
-    [[OSVLocationManager sharedInstance].sensorsManager startUpdatingOBD];
+    [[OSVSensorsManager sharedInstance] startUpdatingOBD];
     if (([OSVReachablityController hasWiFiAccess] || [OSVReachablityController hasCellularAcces]) &&
         [OSVUserDefaults sharedInstance].automaticUpload &&
         [OSVSyncUtils hasInternetPermissions] &&
@@ -121,18 +153,15 @@
     }
 }
 
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-}
-
-- (void)applicationWillTerminate:(UIApplication *)application {
-    // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
-}
-
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-    [[NSNotificationCenter defaultCenter] postNotificationName:kAFApplicationLaunchedWithURLNotification object:@{kAFApplicationLaunchOptionsURLKey:url}];
-    
-    return NO;
+    return [self handleOpenURL:url forApplication:application
+             sourceApplication:sourceApplication annotation:annotation];
+}
+
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
+	return [self handleOpenURL:url	forApplication:app
+			 sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey]
+					annotation:options[UIApplicationOpenURLOptionsAnnotationKey]];
 }
 
 - (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier completionHandler:(void (^)())completionHandler {
@@ -142,5 +171,31 @@
 - (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
     return [window.rootViewController supportedInterfaceOrientations];
 }
+    
+#pragma mark - GIDSignInDelegate
+    
+- (void)signIn:(GIDSignIn *)signIn didSignInForUser:(GIDGoogleUser *)user withError:(NSError *)error {
+	
+	if (user) {
+		[[NSNotificationCenter defaultCenter] postNotificationName:@"kOSVGoogleSignIn" object:nil userInfo:@{@"user":user}];
+	}
+}
+	
+#pragma mark - URL handle
 
+- (BOOL)handleOpenURL:(NSURL *)url forApplication:(UIApplication *)application sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+    [[NSNotificationCenter defaultCenter] postNotificationName:kAFApplicationLaunchedWithURLNotification object:@{kAFApplicationLaunchOptionsURLKey:url}];
+    
+    BOOL facebookHandled = [[FBSDKApplicationDelegate sharedInstance] application:application
+                                                                          openURL:url
+                                                                sourceApplication:sourceApplication
+                                                                       annotation:annotation];
+    BOOL googleHandled = [[GIDSignIn sharedInstance] handleURL:url
+                                             sourceApplication:sourceApplication
+                                                    annotation:annotation];
+	BOOL osmHandled = [url.absoluteString containsString:@"osmlogin"];
+	
+    return facebookHandled||googleHandled||osmHandled;
+}
+    
 @end

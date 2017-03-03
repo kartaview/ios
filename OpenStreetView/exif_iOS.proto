@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+message OSCImageInfo
+{
+    optional uint32 frameIndex          = 1;
+	optional float  aperture  			= 2;
+	optional float	brightness 			= 3;
+	optional float 	exposureTime		= 4;
+	optional float  isoSpeed			= 5;
+	optional uint32 sceneType			= 6;
+	optional uint32 sensingMethod		= 7;
+	optional uint32 shutterSpeedValue	= 8;
+	optional uint32 whiteBalance 		= 9;
+	optional uint32 meteringMode		= 10;
+}
+
+message OSCTrackInfo {
+    repeated OSCImageInfo   images              = 1;
+    optional string         lensModel 			= 2;
+    optional string         lensMake  			= 3;
+    optional float          fNumber 			= 4;
+    optional uint32         focalLenIn35mmFilm 	= 5;
+    optional float          focalLenght			= 6;
+	optional uint32			pixelXDimension		= 7;
+	optional uint32			pixelYDimension		= 8;
+	repeated float          lensSpecification 	= 9;
+
+}

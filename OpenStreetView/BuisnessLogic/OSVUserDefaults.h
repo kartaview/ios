@@ -28,25 +28,25 @@
 //distance unit persistence;
 @property (nonatomic, assign) NSString  *distanceUnitSystem;
 @property (nonatomic, assign) BOOL      automaticDistanceUnitSystem;
-
+//server selection
 @property (nonatomic, strong) NSString  *environment;
-
+//recording options
 @property (nonatomic, assign) BOOL      hdrOption;
-
 @property (nonatomic, assign) BOOL      realPositions;
-
-@property (nonatomic, strong) NSString  *userName;
-
-@property (nonatomic, assign) BOOL      isFreshInstall;
-
-@property (nonatomic, assign) BOOL      isUploading;
-
 @property (nonatomic, assign) NSString  *videoQuality;
-
 @property (nonatomic, assign, readonly) CMVideoDimensions videoQualityDimension;
+@property (nonatomic, assign) BOOL      useImageRecognition;
+@property (nonatomic, assign) BOOL      showMapWhileRecording;
+@property (nonatomic, assign) BOOL      enableMap;
+@property (nonatomic, assign) BOOL      useGamification;
+@property (nonatomic, assign) BOOL      isFreshInstall;
+@property (nonatomic, assign) NSInteger zoomLevel;
 
+//OBD BLE
 @property (nonatomic, strong) NSString  *bleDevice;
-
+//Upload info
+@property (nonatomic, assign) BOOL      isUploading;
+//debug
 @property (nonatomic, assign) BOOL      debugLogOBD;
 @property (nonatomic, assign) BOOL      debugSLUS;
 @property (nonatomic, assign) float     debugFrameRate;
@@ -54,9 +54,9 @@
 @property (nonatomic, assign) float     debugBitRate;
 @property (nonatomic, assign) NSString  *debugEncoding;
 @property (nonatomic, assign) BOOL      debugHighDesintyOn;
-
-@property (nonatomic, assign) BOOL      useImageRecognition;
-@property (nonatomic, assign) BOOL      showMapWhileRecording;
+@property (nonatomic, assign) BOOL      debugStabilization;
+@property (nonatomic, assign) BOOL      debugMatcher;
+@property (nonatomic, assign) NSInteger debugLocationAccuracy;
 
 + (instancetype)sharedInstance;
 - (void)save;

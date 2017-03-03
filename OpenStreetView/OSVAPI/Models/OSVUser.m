@@ -12,12 +12,13 @@
 
 @synthesize userID;
 @synthesize name;
-@synthesize type;
+@synthesize fullName;
 @synthesize totalKM;
 @synthesize rank;
 
-@synthesize key;
-@synthesize secret;
+@synthesize providerKey;
+@synthesize providerSecret;
+@synthesize provider;
 
 @synthesize accessToken;
 
@@ -26,5 +27,7 @@
 @synthesize totalPhotos;
 @synthesize totalTracks;
 @synthesize weekRank;
+
+@synthesize gameInfo;
 
 @end

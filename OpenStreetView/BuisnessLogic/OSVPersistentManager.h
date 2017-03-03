@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "OSVPhoto.h"
 #import "OSVSequence.h"
+#import "OSVScoreHistory.h"
 #import "RLMBoundingBox.h"
 
 @interface OSVPersistentManager : NSObject
@@ -26,7 +27,10 @@
 + (void)removeSequenceWithID:(NSInteger)sequenceID;
 + (void)removePhotosWithVideoIndex:(NSInteger)videoIndex localSequenceID:(NSInteger)localSequenceID;
 
-+ (void)updatedPhoto:(OSVPhoto *)photo withAddress:(NSString *)address;
++ (void)updatedPhoto:(OSVPhoto *)photo;
 + (void)updatePhotosHavingLocalSequenceID:(NSInteger)sequenceID withServerID:(NSInteger)serverID;
+
++ (NSMutableArray *)getScoreHistoryForSequenceWithID:(NSInteger)sequenceID;
++ (void)storeScoreHistory:(OSVScoreHistory *)history;
 
 @end

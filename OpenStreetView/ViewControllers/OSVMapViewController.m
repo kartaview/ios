@@ -15,17 +15,25 @@
 #import "OSVSequenceMapController.h"
 #import "OSVBasicMapController.h"
 #import "OSVVideoPlayerViewController.h"
+#import "UIViewController+Additions.h"
 
 #import "OSVMainViewController.h"
 #import "OSVSyncController.h"
 #import "OSVSettingsViewController.h"
 #import "OSVLayersViewController.h"
+#import "OSVRecordTransition.h"
+#import "OSVDissmissRecordTransition.h"
+#import "OSVPushTransition.h"
+#import "OSVPopTransition.h"
 
 #import "OSVLogger.h"
 
+#import "OSVTipView.h"
+#import "OSC-Swift.h"
+
 #define kMainViewController                            (OSVMainViewController *)[UIApplication sharedApplication].delegate.window.rootViewController
 
-@interface OSVMapViewController () <CLLocationManagerDelegate, SKMapViewDelegate>
+@interface OSVMapViewController () <CLLocationManagerDelegate, SKMapViewDelegate, UIViewControllerTransitioningDelegate, UINavigationControllerDelegate>
 
 @property (strong, nonatomic) OSVSyncController     *syncController;
 
@@ -42,6 +50,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    if ([OSVUserDefaults sharedInstance].enableMap) {
+        self.mapView = [[SKMapView alloc] initWithFrame:self.mapContainer.bounds];
+    }
+    [UIViewController addMapView:self.mapView toView:self.mapContainer];
+    
     self.mapView.settings.showCurrentPosition = NO;
     self.mapView.mapScaleView.hidden = YES;
     
@@ -53,11 +66,6 @@
     self.sequenceMapController = [OSVSequenceMapController new];
     self.sequenceMapController.viewController = self;
    
-    SKMapViewStyle *mapViewStyle = [SKMapViewStyle mapViewStyle];
-    mapViewStyle.resourcesFolderName = @"GrayscaleStyle";
-    mapViewStyle.styleFileName = @"grayscalestyle.json";
-    [SKMapView setMapStyle:mapViewStyle];
-    
     self.syncController.didChangeReachabliyStatus = ^(OSVReachabilityStatus status) {
         BOOL shouldUseCellular = ((status == OSVReachabilityStatusCellular) && [OSVUserDefaults sharedInstance].useCellularData);
 
@@ -79,10 +87,12 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
+    self.navigationController.delegate = self;
+    self.mapView.frame = self.mapContainer.bounds;
     if ([CLLocationManager authorizationStatus] !=  kCLAuthorizationStatusNotDetermined) {
-        if ([OSVUserDefaults sharedInstance].realPositions) {
-            [[SKPositionerService sharedInstance] setPositionerMode:SKPositionerModeRealPositions];
+        if ([OSVUserDefaults sharedInstance].realPositions &&
+            [OSVUserDefaults sharedInstance].enableMap) {
+            [OSVLocationManager sharedInstance].positionerMode = SKPositionerModeRealPositions;
         }
     } else {
         SKCoordinateRegion region;
@@ -91,8 +101,9 @@
         [self.mapView setVisibleRegion:region];
     }
     
-    if (![OSVUserDefaults sharedInstance].realPositions) {
-        [[SKPositionerService sharedInstance] setPositionerMode:SKPositionerModePositionSimulation];
+    if (![OSVUserDefaults sharedInstance].realPositions &&
+        [OSVUserDefaults sharedInstance].enableMap) {
+        [OSVLocationManager sharedInstance].positionerMode = SKPositionerModePositionSimulation;
     }
     
     [OSVLocationManager sharedInstance].delegate = self;
@@ -103,6 +114,28 @@
     
     [self.controller willChangeUIControllerFrom:self.controller animated:NO];
     self.actIndicator.hidden = YES;
+    
+    if ([OSVUserDefaults sharedInstance].isFreshInstall) {
+
+        [OSVUserDefaults sharedInstance].isFreshInstall = NO;
+        [[OSVUserDefaults sharedInstance] save];
+        
+        PortraitViewController *vc = [PortraitViewController new];
+        vc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+        
+        OSVTipView *tipView = [[[NSBundle mainBundle] loadNibNamed:@"OSVTipView" owner:self options:nil] objectAtIndex:0];
+        [tipView prepareIntro];
+        [tipView configureViews];
+        tipView.willDissmiss = ^() {
+            [vc dismissViewControllerAnimated:YES completion:^{}];
+            return YES;
+        };
+        
+        [self presentViewController:vc animated:NO completion:^{
+            [vc.view addSubview:tipView];
+        }];
+        tipView.frame = self.navigationController.view.frame;
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -115,6 +148,8 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    
+    [self.mapView clearAllOverlays];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -122,12 +157,18 @@
     [self.controller didReceiveMemoryWarning];
 }
 
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleDefault;
+}
+
+#pragma mark - Orientation
+
 - (BOOL)shouldAutorotate {
-    return NO;
+    return YES;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskPortrait;
+    return UIInterfaceOrientationMaskAll;
 }
 
 - (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation {
@@ -135,10 +176,6 @@
 }
 
 #pragma mark - Actions
-
-- (IBAction)didTapRightButton:(id)sender {
-    [self.sequenceMapController didTapRightButton];
-}
 
 - (IBAction)didTapPositionMe:(id)sender {
     [self.controller didTapBottomRightButton];
@@ -156,8 +193,9 @@
 #pragma mark - CLLocationManagerDelegate
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)newLocation {
-    if (![OSVUserDefaults sharedInstance].realPositions) {
-        [[SKPositionerService sharedInstance] reportGPSLocation:[newLocation firstObject]];
+    if (![OSVUserDefaults sharedInstance].realPositions &&
+        [OSVUserDefaults sharedInstance].enableMap) {
+        [[OSVLocationManager sharedInstance] reportGPSLocation:[newLocation firstObject]];
     } else {
         if (!self.hasFirstLocation) {
             self.mapView.settings.showCurrentPosition = YES;
@@ -190,11 +228,7 @@
 
 - (IBAction)didTapCameraShow:(id)sender {
     [self.mapView clearAllOverlays];
-
-    UIStoryboard *storyBoard = self.storyboard;
-    UIViewController *targetViewController = [storyBoard instantiateViewControllerWithIdentifier:@"cameraViewController"];
-
-    [self.navigationController pushViewController:targetViewController animated:NO];
+    [self performSegueWithIdentifier:@"showCamera" sender:self];
 }
 
 #pragma mark - Overriden
@@ -213,7 +247,57 @@
     } else if ([segue.identifier isEqualToString:@"showLayers"]) {
         OSVLayersViewController *vc = segue.destinationViewController;
         vc.datasource = sender;
+    } else if ([segue.identifier isEqualToString:@"showCamera"] ||
+               [segue.identifier isEqualToString:@"showMyProfile"] ||
+               [segue.identifier isEqualToString:@"showLocalTracks"] ||
+               [segue.identifier isEqualToString:@"showLeaderboard"] ||
+			   [segue.identifier isEqualToString:@"showLoginController"]) {
+        UIViewController *vc = segue.destinationViewController;
+        vc.transitioningDelegate = self;
     }
 }
+
+#pragma mark - UIViewControllerTransitioningDelegate
+
+- (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source {
+    if ([presented isKindOfClass:NSClassFromString(@"OSVCamViewController")]) {
+        return [OSVRecordTransition new];
+    }
+    
+    return nil;
+}
+
+- (id <UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
+    if ([dismissed isKindOfClass:NSClassFromString(@"OSVCamViewController")]) {
+        [self.controller didTapBottomRightButton];
+        return [OSVDissmissRecordTransition new];
+    }
+    return nil;
+}
+
+- (nullable id <UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
+                                            animationControllerForOperation:(UINavigationControllerOperation)operation
+                                                         fromViewController:(UIViewController *)fromVC
+                                                           toViewController:(UIViewController *)toVC {
+    if ([toVC isKindOfClass:NSClassFromString(@"OSVMyProfileViewController")]||
+        [toVC isKindOfClass:NSClassFromString(@"OSVLocalTracksViewController")]||
+        [toVC isKindOfClass:NSClassFromString(@"OSVSettingsViewController")]||
+        [toVC isKindOfClass:NSClassFromString(@"OSVLeaderboardViewController")] ||
+		[NSStringFromClass(toVC.class) containsString:@"LoginViewController"]) {
+		
+        return [[OSVPushTransition alloc] initWithoutAnimatingSource:YES];
+    } else if ([fromVC isKindOfClass:NSClassFromString(@"OSVMyProfileViewController")]||
+               [fromVC isKindOfClass:NSClassFromString(@"OSVLocalTracksViewController")]||
+               [fromVC isKindOfClass:NSClassFromString(@"OSVSettingsViewController")]||
+               [fromVC isKindOfClass:NSClassFromString(@"OSVLeaderboardViewController")] ||
+			   [NSStringFromClass(fromVC.class) containsString:@"LoginViewController"]) {
+        
+        return [[OSVPopTransition alloc] initWithoutAnimatingSource:YES];
+    }
+    
+    return nil;
+}
+
+
 
 @end

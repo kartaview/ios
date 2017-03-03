@@ -4,6 +4,11 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>OSC_ORBB_Dev.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
 		<key>OpenStreetView.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -17,12 +22,22 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>CC92F6771E095E5C00427256</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>CCA16C241C92F64B001EEB57</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
 		<key>CCFD49901BA02455005B5E9A</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>CCFF578F1E44D0960031B8BE</key>
 		<dict>
 			<key>primary</key>
 			<true/>

@@ -10,5 +10,13 @@
 
 @implementation OSVPolyline
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.coverage = 0;
+    }
+    return self;
+}
 
 @end

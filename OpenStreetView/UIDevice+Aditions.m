@@ -52,6 +52,10 @@ static NSString *result = nil;
                                      @"iPhone7,2" : @"iPhone6",
                                      @"iPhone8,1" : @"iPhone6S",
                                      @"iPhone8,2" : @"iPhone6SPlus",
+                                     @"iPhone9,1" : @"iPhone7",
+                                     @"iPhone9,3" : @"iPhone7",
+                                     @"iPhone9,2" : @"iPhone7Plus",
+                                     @"iPhone9,4" : @"iPhone7Plus",
                                      @"iPad1,1" : @"iPad",
                                      @"iPad2,1" : @"iPad2",
                                      @"iPad2,2" : @"iPad2",
@@ -91,7 +95,7 @@ static NSString *result = nil;
         
         deviceModel = [dictionary objectForKey:result];
         if (!deviceModel) {
-            deviceModel = @"unknown";
+            deviceModel = result;
         }
     });
     

@@ -8,22 +8,16 @@
 
 #import "OSVAPIConfigurator.h"
 
-//#ifdef ENABLED_DEBUG
-////#define kBaseURLOSV             @"http://openstreetview.com"
-////#define kBaseURLOSV             @"http://testing.openstreetview.com"
-//#define kBaseURLOSV             @"http://staging.openstreetview.com"
-//#else
-#define kBaseURLOSV             @"http://openstreetview.com"
-//#define kBaseURLOSV             @"http://staging.openstreetview.com"
-//#endif
-
 #define kAPIVersion             @"1.0/"
-//#define kAPIVersion             @""
+
+#define kProductionBaseURLOSC           @"http://openstreetcam.org"
+#define kTstBaseURLOSC                  @"http://testing.openstreetcam.org"
+#define kStagingBaseURLOSC              @"http://staging.openstreetcam.org"
 
 @implementation OSVAPIConfigurator
 
 - (nonnull NSString *)osvBaseURL {
-    return kBaseURLOSV;
+    return kProductionBaseURLOSC;
 }
 
 - (nonnull NSString *)osvAPIVerion {
@@ -41,5 +35,18 @@
 - (nonnull NSString *)appVersion {
     return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 }
+
++ (nonnull NSString *)testingEnvironment {
+	return kTstBaseURLOSC;
+}
+
++ (nonnull NSString *)stagingEnvironment {
+	return kStagingBaseURLOSC;
+}
+
++ (nonnull NSString *)productionEnvironment {
+	return kProductionBaseURLOSC;
+}
+
 
 @end

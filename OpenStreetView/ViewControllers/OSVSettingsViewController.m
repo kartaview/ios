@@ -32,6 +32,10 @@
 @property (weak, nonatomic) IBOutlet UITableView    *tableView;
 @property (strong, nonatomic) NSArray               *datasource;
 
+@property (assign, nonatomic) BOOL                  enableSecretMenu;
+
+@property (strong, nonatomic) IBOutlet UILongPressGestureRecognizer *longPressRecognizer;
+
 @end
 
 @implementation OSVSettingsViewController
@@ -40,7 +44,10 @@
     [super viewDidLoad];
     
     self.syncController = [OSVSyncController sharedInstance];
-    self.datasource = [OSVSettingsMenuFactory settingsMenuWithWiFiOBDStatus:self.obdWIFIConnectionStatus BLEStatus:self.obdBLEConnectionStatus];
+    self.enableSecretMenu = NO;
+    self.datasource = [OSVSettingsMenuFactory settingsMenuWithWiFiOBDStatus:self.obdWIFIConnectionStatus
+                                                                  BLEStatus:self.obdBLEConnectionStatus
+                                                           enableSecretMenu:self.enableSecretMenu];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -62,17 +69,19 @@
 }
 
 - (BOOL)shouldAutorotate {
-    return NO;
+    return YES;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskPortrait;
+    return UIInterfaceOrientationMaskAll;
 }
 
 #pragma mark - Private
 
 - (void)reloadData {
-    self.datasource = [OSVSettingsMenuFactory settingsMenuWithWiFiOBDStatus:self.obdWIFIConnectionStatus BLEStatus:self.obdBLEConnectionStatus];
+    self.datasource = [OSVSettingsMenuFactory settingsMenuWithWiFiOBDStatus:self.obdWIFIConnectionStatus
+                                                                  BLEStatus:self.obdBLEConnectionStatus
+                                                           enableSecretMenu:self.enableSecretMenu];
     [self.tableView reloadData];
 }
 
@@ -123,6 +132,9 @@
         cell.toggleBlock = ^(BOOL value) {
             [[OSVUserDefaults sharedInstance] setValue:[NSNumber numberWithBool:value] forKeyPath:item.key];
             [[OSVUserDefaults sharedInstance] save];
+            if (item.action) {
+                item.action(self, [NSNumber numberWithBool:value]);
+            }
         };
         
         return cell;
@@ -138,6 +150,7 @@
         cell.subTitleLabel.text = item.subtitle;
         if (!item.action) {
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            [cell addGestureRecognizer:self.longPressRecognizer];
         }
         
         return cell;
@@ -223,6 +236,11 @@
 
 - (void)managerDidFailToConnectOBD:(NSNotification *)notif {
     self.obdWIFIConnectionStatus = 0;
+    [self reloadData];
+}
+
+- (IBAction)longPressGesture:(id)sender {
+    self.enableSecretMenu = YES;
     [self reloadData];
 }
 

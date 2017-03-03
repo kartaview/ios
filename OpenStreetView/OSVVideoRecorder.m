@@ -30,24 +30,23 @@
 
 @implementation OSVVideoRecorder
 
-- (instancetype)initWithVideoSize:(CMVideoDimensions)size encoding:(NSString *)encod bitrate:(NSInteger)bitrate {
-    self = [super init];
-    if (self) {
-        self.size = size;
-        self.videoEncoding = encod;
-        self.bitrate = bitrate;
-    }
-    
-    return self;
-}
-
+//- (instancetype)initWithVideoSize:(CMVideoDimensions)size encoding:(NSString *)encod bitrate:(NSInteger)bitrate {
+//    self = [super init];
+//    if (self) {
+//        self.size = size;
+//        self.videoEncoding = encod;
+//        self.bitrate = bitrate;
+//    }
+//    
+//    return self;
+//}
 
 - (instancetype)initWithVideoSize:(CMVideoDimensions)size {
     self = [super init];
     if (self) {
         self.size = size;
         self.videoEncoding = AVVideoProfileLevelH264HighAutoLevel;
-        self.bitrate = 40000000;
+        self.bitrate = 80000000;
     }
     
     return self;
@@ -60,10 +59,9 @@
     self.videoWriter = [[AVAssetWriter alloc] initWithURL:self.videoURL fileType:AVFileTypeMPEG4 error:&error];
     NSParameterAssert(self.videoWriter);
    
-    NSDictionary *videoCompressionProps = [NSDictionary
-                                           dictionaryWithObjectsAndKeys:
-                                           [NSNumber numberWithInteger:self.bitrate], AVVideoAverageBitRateKey, // 40 Mbps
-                                           self.videoEncoding, AVVideoProfileLevelKey, // profiles...
+    NSDictionary *videoCompressionProps = [NSDictionary dictionaryWithObjectsAndKeys:
+                                           [NSNumber numberWithInteger:self.bitrate],   AVVideoAverageBitRateKey, // 40 Mbps
+                                           self.videoEncoding,                          AVVideoProfileLevelKey, // profiles...
                                            nil];
     
     CMVideoDimensions videoSize;
@@ -76,18 +74,20 @@
     }
 
     NSDictionary *videoSettings = [NSDictionary dictionaryWithObjectsAndKeys:
-                                   AVVideoCodecH264, AVVideoCodecKey,
-                                   [NSNumber numberWithInt:videoSize.height], AVVideoHeightKey,
-                                   [NSNumber numberWithInt:videoSize.width], AVVideoWidthKey,
-                                   videoCompressionProps, AVVideoCompressionPropertiesKey,
+                                   AVVideoCodecH264,                                    AVVideoCodecKey,
+                                   [NSNumber numberWithInt:videoSize.height],           AVVideoHeightKey,
+                                   [NSNumber numberWithInt:videoSize.width],            AVVideoWidthKey,
+                                   videoCompressionProps,                               AVVideoCompressionPropertiesKey,
                                    nil];
     
-    self.videoWriterInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:videoSettings];
+    self.videoWriterInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo
+                                                               outputSettings:videoSettings];
     
     NSParameterAssert(self.videoWriterInput);
     self.videoWriterInput.expectsMediaDataInRealTime = YES;
     NSDictionary *bufferAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                      [NSNumber numberWithInt:kCVPixelFormatType_32BGRA], kCVPixelBufferPixelFormatTypeKey, nil];
+                                      [NSNumber numberWithInt:kCVPixelFormatType_32BGRA], kCVPixelBufferPixelFormatTypeKey,
+                                      nil];
     
     self.avAdaptor = [AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:self.videoWriterInput
                                                                                       sourcePixelBufferAttributes:bufferAttributes];

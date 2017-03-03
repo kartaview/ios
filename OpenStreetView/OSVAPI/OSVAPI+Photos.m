@@ -45,8 +45,13 @@
     
     NSNumber *sequenceId        = @(sequence.uid);
     NSString *access_token      = user.accessToken;
-    
-    AFHTTPRequestOperation *requestOperation = [OSVAPIUtils requestWithURL:url parameters:NSDictionaryOfVariableBindings(sequenceId, access_token) method:@"POST"];
+	
+	AFHTTPRequestOperation *requestOperation = nil;
+	if (access_token) {
+		requestOperation = [OSVAPIUtils requestWithURL:url parameters:NSDictionaryOfVariableBindings(sequenceId, access_token) method:@"POST"];
+	} else {
+		requestOperation = [OSVAPIUtils requestWithURL:url parameters:NSDictionaryOfVariableBindings(sequenceId) method:@"POST"];
+	}
     
     [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         if (!operation.isCancelled) {

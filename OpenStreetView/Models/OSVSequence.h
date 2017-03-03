@@ -28,6 +28,7 @@
 @property (nonatomic, assign) BOOL                          hasOBD;
 @property (nonatomic, strong) NSString                      *location;
 @property (nonatomic, strong) NSString                      *previewImage;
+@property (nonatomic, assign) NSInteger                     coverage;
 
 - (BOOL)intersectWithTopLeftCoordinate:(CLLocationCoordinate2D)topLeftCoordinate andBottomRightCoordinate:(CLLocationCoordinate2D)bottomRightCoordinate;
 
@@ -37,6 +38,8 @@
 @interface OSVSequence : NSObject <OSVSequence>
 
 @property (nonatomic, assign) NSInteger                     uploadID; // the id used to upload a sequence of photos
+@property (nonatomic, assign) NSInteger                     points;
+@property (nonatomic, strong) NSMutableArray                *scoreHistory;
 @property (nonatomic, strong) NSMutableDictionary           *videos;
 
 @end

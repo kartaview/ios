@@ -43,12 +43,16 @@
 - (void)getUserInfo:(nonnull id<OSVUser>)user
      withCompletion:(nullable void (^)(id<OSVUser> _Nullable user, NSError *_Nullable error))completion;
 
+- (void)logOut;
+	
 @end
 
 @interface OSVAPI (Ranking)
 
 - (void)leaderBoardWithCompletion:(nullable void (^)(NSArray *_Nullable leaderBoard, NSError *_Nullable error))completion;
-
+- (void)gameLeaderBoardForCountry:(nullable NSString *)countryCode
+                         fromDate:(nullable NSDate *)date
+                   withCompletion:(nullable void (^)(NSArray *_Nullable leaderBoard, NSError *_Nullable error))completion;
 @end
 
 @interface OSVAPI (Version)
@@ -91,6 +95,7 @@ withCompletionBlock:(nullable void (^)(NSError *_Nullable error))completionBlock
 - (void)requestNewSequenceIdForUser:(nonnull id<OSVUser>)user
                        withSequence:(nonnull OSVSequence *)seq
                            metadata:(nonnull NSDictionary *)metaDataDict
+                       scoreDetails:(nonnull NSString *)details
                   withProgressBlock:(nullable void (^)(long long totalBytes, long long totalBytesExpected))uploadProgressBlock
                     completionBlock:(nullable void (^)(NSInteger sequenceId, NSError * _Nullable error))completionBlock;
 
@@ -104,6 +109,12 @@ withCompletionBlock:(nullable void (^)(NSError *_Nullable error))completionBlock
                              inBoundingBox:(nullable id<OSVBoundingBox>)box
                                   withZoom:(double)zoom
                        withCompletionBlock:(nullable void (^)(NSArray *_Nullable, NSError *_Nullable, OSVMetadata *_Nullable))completionBlock;
+- (nullable NSOperation *)serialListTracksForUser:(nonnull id<OSVUser>)user
+                                           atPage:(NSInteger)pageIndex
+                                    inBoundingBox:(nullable id<OSVBoundingBox>)box
+                                         withZoom:(double)zoom
+                              withCompletionBlock:(nullable void (^)(NSArray *_Nullable, NSError *_Nullable, OSVMetadata *_Nullable))completionBlock;
+
 //list layers
 - (void)getLayersFromLocation:(CLLocationCoordinate2D)coordinate
                        radius:(double)distance

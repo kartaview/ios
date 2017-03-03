@@ -8,8 +8,7 @@
 
 #import "OSVSyncUtils.h"
 #import "OSVUserDefaults.h"
-#import "OSVUtils+Image.m"
-#import "OSVBaseUser+OSM.h"
+#import "OSVUtils.h"
 #import "ConnectivityHandler.h"
 #import "OSVPhoto.h"
 #import "OSVServerPhoto.h"
@@ -19,18 +18,12 @@
 @implementation OSVSyncUtils
 
 + (BOOL)hasInternetPermissions {
-    if ([ConnectivityHandler sharedInstance].isConnectionViaWWAN && ![OSVUserDefaults sharedInstance].useCellularData) {
+    if ([ConnectivityHandler sharedInstance].isConnectionViaWWAN &&
+        ![OSVUserDefaults sharedInstance].useCellularData) {
         return NO;
     }
     
     return YES;
-}
-
-+ (void)correctImageDataForPhoto:(OSVPhoto *)photo {
-    if (photo.image && photo.correctionOrientation != UIImageOrientationUp) {
-        photo.image = [OSVUtils rotateImage:photo.image toImageOrientation:photo.correctionOrientation];
-        photo.correctionOrientation = UIImageOrientationUp;
-    }
 }
 
 + (long long)sizeOnDiskForSequence:(id<OSVSequence>)sequence atPath:(NSString *)path {

@@ -13,15 +13,17 @@
 #import <Crashlytics/Crashlytics.h>
 #import <AVFoundation/AVFoundation.h>
 
-#define kProductionBaseURLOSV           @"http://openstreetview.com"
-#define kTstBaseURLOSV                  @"http://testing.openstreetview.com"
-#define kStagingBaseURLOSV              @"http://staging.openstreetview.com"
+#import "OSVSequence.h"
+#import "OSVPersistentManager.h"
+#import "OSVUtils.h"
+#import "OSVAPIConfigurator.h"
 
 @interface OSVDebugViewController ()
 
 @property (weak, nonatomic) IBOutlet UILabel            *revisionNumber;
 @property (weak, nonatomic) IBOutlet UISwitch           *positionerSwitch;
 @property (weak, nonatomic) IBOutlet UIButton           *simulatorButton;
+@property (weak, nonatomic) IBOutlet UISwitch           *highDensity;
 
 @property (weak, nonatomic) IBOutlet UIButton           *testEnvironment;
 @property (weak, nonatomic) IBOutlet UIButton           *stagingEnvironment;
@@ -41,6 +43,13 @@
 @property (weak, nonatomic) IBOutlet UIButton *encodingMediumQ;
 @property (weak, nonatomic) IBOutlet UIButton *encodingLowQ;
 @property (weak, nonatomic) IBOutlet UIButton *encodingHighQ;
+@property (weak, nonatomic) IBOutlet UISwitch *stabilization;
+@property (weak, nonatomic) IBOutlet UISwitch *matcherRedering;
+
+@property (weak, nonatomic) IBOutlet UIButton *redGPS;
+@property (weak, nonatomic) IBOutlet UIButton *yellowGPS;
+@property (weak, nonatomic) IBOutlet UIButton *greenGPS;
+@property (weak, nonatomic) IBOutlet UIButton *nonDebugGPS;
 
 @end
 
@@ -55,28 +64,39 @@
     self.revisionNumber.text = [NSString stringWithFormat:@"Revision %@", content];
     self.simulatorButton.hidden = [OSVUserDefaults sharedInstance].realPositions;
     
-    self.testEnvironment.selected = [[OSVUserDefaults sharedInstance].environment isEqualToString:kTstBaseURLOSV];
-    self.stagingEnvironment.selected = [[OSVUserDefaults sharedInstance].environment isEqualToString:kStagingBaseURLOSV];
-    self.productionEnvironment.selected = [[OSVUserDefaults sharedInstance].environment isEqualToString:kProductionBaseURLOSV];
+    self.testEnvironment.selected = [[OSVUserDefaults sharedInstance].environment isEqualToString:[OSVAPIConfigurator testingEnvironment]];
+    self.stagingEnvironment.selected = [[OSVUserDefaults sharedInstance].environment isEqualToString:[OSVAPIConfigurator stagingEnvironment]];
+    self.productionEnvironment.selected = [[OSVUserDefaults sharedInstance].environment isEqualToString:[OSVAPIConfigurator productionEnvironment]];
     
     self.encodingLowQ.selected = [[OSVUserDefaults sharedInstance].debugEncoding isEqualToString:AVVideoProfileLevelH264BaselineAutoLevel];
     self.encodingHighQ.selected = [[OSVUserDefaults sharedInstance].debugEncoding isEqualToString:AVVideoProfileLevelH264HighAutoLevel];
     self.encodingMediumQ.selected = [[OSVUserDefaults sharedInstance].debugEncoding isEqualToString:AVVideoProfileLevelH264MainAutoLevel];
     
+    self.nonDebugGPS.selected = [OSVUserDefaults sharedInstance].debugLocationAccuracy == 0;
+    self.greenGPS.selected = [OSVUserDefaults sharedInstance].debugLocationAccuracy == 1;
+    self.yellowGPS.selected = [OSVUserDefaults sharedInstance].debugLocationAccuracy == 2;
+    self.redGPS.selected = [OSVUserDefaults sharedInstance].debugLocationAccuracy == 3;
+    
     [self.hdrSwitch setOn:[OSVUserDefaults sharedInstance].hdrOption animated:NO];
     
     [self.debugLogsOBD setOn:[OSVUserDefaults sharedInstance].debugLogOBD animated:NO];
     [self.debugSLUS setOn:[OSVUserDefaults sharedInstance].debugSLUS animated:NO];
+    
+    [self.stabilization setOn:[OSVUserDefaults sharedInstance].debugStabilization animated:NO];
 
+    [self.matcherRedering setOn:[OSVUserDefaults sharedInstance].debugMatcher animated:NO];
+    
     double value = [OSVUserDefaults sharedInstance].debugFrameRate;
     self.frameRateLabel.text = [NSString stringWithFormat:@"%.f frames/sec when possible", value];
     value = [OSVUserDefaults sharedInstance].debugFrameSize;
     self.frameMaxDimensionLabel.text = [NSString stringWithFormat:@"%.f w x %.f h (landscape)\n %.f w x %.f h (portrait)", value, floorf(value/1.33), floorf(value/1.33), value];
     
     if ([OSVUserDefaults sharedInstance].debugHighDesintyOn) {
-        self.hqLabel.text = @"HighQualityVideoLowDensity ON";
+        self.hqLabel.text = @"HighDensity ON";
+        [self.highDensity setOn:YES];
     } else {
-        self.hqLabel.text = @"HighQualityVideoLowDensity OFF";
+        self.hqLabel.text = @"HighDensity OFF";
+        [self.highDensity setOn:NO];
     }
     
     value = [OSVUserDefaults sharedInstance].debugBitRate;
@@ -89,11 +109,11 @@
 }
 
 - (BOOL)shouldAutorotate {
-    return NO;
+    return YES;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskPortrait;
+    return UIInterfaceOrientationMaskAll;
 }
 
 #pragma mark - UI Actions
@@ -127,16 +147,18 @@
     if (sender == self.testEnvironment) {
         self.stagingEnvironment.selected = NO;
         self.productionEnvironment.selected = NO;
-        [OSVUserDefaults sharedInstance].environment = kTstBaseURLOSV;
+        [OSVUserDefaults sharedInstance].environment = [OSVAPIConfigurator testingEnvironment];
     } else if (sender == self.stagingEnvironment) {
         self.testEnvironment.selected = NO;
         self.productionEnvironment.selected = NO;
-        [OSVUserDefaults sharedInstance].environment = kStagingBaseURLOSV;
+        [OSVUserDefaults sharedInstance].environment = [OSVAPIConfigurator stagingEnvironment];
     } else if (sender == self.productionEnvironment) {
         self.testEnvironment.selected = NO;
         self.stagingEnvironment.selected = NO;
-        [OSVUserDefaults sharedInstance].environment = kProductionBaseURLOSV;
+        [OSVUserDefaults sharedInstance].environment = [OSVAPIConfigurator productionEnvironment];
     }
+	
+	[[OSVUserDefaults sharedInstance] save];
 }
 
 - (IBAction)didTouchEncodingButton:(UIButton *)sender {
@@ -154,6 +176,32 @@
         self.encodingHighQ.selected = NO;
         self.encodingLowQ.selected = NO;
         [OSVUserDefaults sharedInstance].debugEncoding = AVVideoProfileLevelH264MainAutoLevel;
+    }
+}
+
+- (IBAction)didTouchGPSQualityButton:(UIButton *)sender {
+    sender.selected = YES;
+    
+    if (sender == self.nonDebugGPS) {
+        self.greenGPS.selected = NO;
+        self.yellowGPS.selected = NO;
+        self.redGPS.selected = NO;
+        [OSVUserDefaults sharedInstance].debugLocationAccuracy = 0;
+    } else if (sender == self.greenGPS) {
+        self.nonDebugGPS.selected = NO;
+        self.yellowGPS.selected = NO;
+        self.redGPS.selected = NO;
+        [OSVUserDefaults sharedInstance].debugLocationAccuracy = 1;
+    } else if (sender == self.yellowGPS) {
+        self.greenGPS.selected = NO;
+        self.nonDebugGPS.selected = NO;
+        self.redGPS.selected = NO;
+        [OSVUserDefaults sharedInstance].debugLocationAccuracy = 2;
+    } else if (sender == self.redGPS) {
+        self.greenGPS.selected = NO;
+        self.yellowGPS.selected = NO;
+        self.nonDebugGPS.selected = NO;
+        [OSVUserDefaults sharedInstance].debugLocationAccuracy = 3;
     }
 }
 
@@ -191,7 +239,6 @@
     self.frameMaxDimensionLabel.text = [NSString stringWithFormat:@"%.f w x %.f h (landscape)\n %.f w x %.f h (portrait)", value, floorf(value/1.33), floorf(value/1.33), value];
     
     [sender resignFirstResponder];
-
 }
 
 - (IBAction)didChangeBitRate:(UITextField *)sender {
@@ -208,10 +255,42 @@
 - (IBAction)didChangeHQSwitch:(UISwitch *)sender {
     [OSVUserDefaults sharedInstance].debugHighDesintyOn = sender.on;
     if (sender.on) {
-        self.hqLabel.text = @"HighQualityVideoLowDensity ON";
+        self.hqLabel.text = @"HighDensity ON";
     } else {
-        self.hqLabel.text = @"HighQualityVideoLowDensity OFF";
+        self.hqLabel.text = @"HighDensity OFF";
     }
+}
+
+- (IBAction)didChangeStabilization:(UISwitch *)sender {
+    [OSVUserDefaults sharedInstance].debugStabilization = sender.on;
+}
+
+- (IBAction)didChangeMatcherDebug:(UISwitch *)sender {
+    [OSVUserDefaults sharedInstance].debugMatcher = sender.on;
+    [[OSVUserDefaults sharedInstance] save];
+}
+
+- (IBAction)moveTrackFiles:(id)sender {
+    NSFileManager * fm = [[NSFileManager alloc] init];
+    
+    [OSVPersistentManager getAllSequencesWithCompletion:^(NSArray *sequences, NSInteger photosCount) {
+        for (OSVSequence *track in sequences) {
+            NSString *pathToTrack = [self metadataForTrack:track];
+            NSString *pathToMove = [[OSVUtils documentsDirectoryPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"/%ld_track.txt", (long)track.uid]];
+            [fm copyItemAtPath:pathToTrack toPath:pathToMove error:nil];
+        }
+    }];
+}
+
+- (NSString *)metadataForTrack:(OSVSequence *)seq {
+
+    NSString *photoPath = [[OSVUtils createOSCBasePath] stringByAppendingPathComponent:[NSString stringWithFormat:@"/%ld/track.txt", (long)seq.uid]];
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:photoPath]) {
+        return photoPath;
+    }
+    
+    return nil;
 }
 
 @end

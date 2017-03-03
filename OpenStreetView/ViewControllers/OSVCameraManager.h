@@ -11,6 +11,8 @@
 #import <UIKit/UIKit.h>
 
 @class CLLocation;
+@class OSVCameraMapManager;
+@class OSVTrackMatcher;
 
 @protocol OSVCameraManagerDelegate <NSObject>
 
@@ -18,7 +20,7 @@
 - (void)shouldDisplayTraficSign:(UIImage *)traficSign;
 - (void)didChangeGPSStatus:(UIImage *)gpsStatus;
 - (void)didChangeOBDInfo:(double)speed withError:(NSError *)error;
-- (void)showOBD:(BOOL)value;
+- (void)hideOBD:(BOOL)value;
 // TODO change naming to something more explicit
 - (void)didAddNewLocation:(CLLocation *)location;
 
@@ -26,30 +28,36 @@
 
 @end
 
-@interface OSVCameraManager : NSObject
+@interface OSVCameraManager : NSObject <AVCaptureVideoDataOutputSampleBufferDelegate>
 
-@property (assign, nonatomic) BOOL                          isSnapping;
+@property (assign, nonatomic) BOOL                          isRecording;
 @property (assign, atomic   ) NSInteger                     frameCount;
-@property (assign, nonatomic) NSInteger                     usedMemory;
+@property (assign, nonatomic, readonly) NSInteger           usedMemory;
 @property (assign, nonatomic) NSInteger                     distanceCoverd;
 @property (weak,   nonatomic) id<OSVCameraManagerDelegate>  delegate;
 @property (assign, nonatomic) UIBackgroundTaskIdentifier    backgroundRenderingID;
+@property (weak,   nonatomic) OSVCameraMapManager           *cameraMapManager;
+@property (nonatomic, strong) OSVTrackMatcher               *matcher;
+@property (nonatomic, assign, readonly) NSInteger           currentSequence;
 
-- (instancetype)initWithOutput:(AVCaptureStillImageOutput *)stillOutput
+
+- (instancetype)initWithOutput:(AVCaptureVideoDataOutput *)stillOutput
                        preview:(AVCaptureVideoPreviewLayer *)layer
                   deviceFromat:(AVCaptureDeviceFormat *)deviceFormat
                          queue:(dispatch_queue_t)sessionQueue;
 
 - (void)makeStillCaptureWithLocation:(CLLocation *)location;
 
-- (void)startLowResolutionCapture;
 - (void)startHighResolutionCapure;
 
-- (void)stopLowResolutionCapture;
 - (void)stopHighResolutionCapture;
 
 - (void)resetValues;
 
 - (void)badGPSHandling;
+
+- (double)score;
+- (double)multiplier;
+- (BOOL)hasCoverage;
 
 @end

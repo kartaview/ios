@@ -10,6 +10,7 @@
 #import <CoreMedia/CoreMedia.h>
 #import <UIKit/UIKit.h>
 
+
 @interface OSVSensorLibManager : NSObject
 
 @property (strong, nonatomic) UIImage *debugFrame;
@@ -23,4 +24,9 @@
 
 - (UIImage *)imageForSpeedLimit:(NSString *)speedLimit;
 
+- (void)createNewTrackWithInfo:(NSDictionary *)info trackID:(NSInteger)trackID;
+- (void)addPhotoWithInfo:(NSDictionary *)info withFrameIndex:(NSInteger)frameIndex;
+
+- (void)read;
+	
 @end

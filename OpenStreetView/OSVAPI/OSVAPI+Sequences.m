@@ -18,7 +18,7 @@
 
 #define kNewSequneceMethod      @"sequence"
 #define kLayersMethod           @"nearby-tracks"
-#define kMyListSequnceMethod    @"list/my-list"
+#define kMyListSequnceMethod    @"my-list"
 #define kFinishedUploading      @"sequence/finished-uploading"
 #define kSequncesRemoveMethod   @"sequence/remove"
 #define kTracksMethod           @"tracks"
@@ -37,7 +37,12 @@
 
 #pragma mark - Upload Requests
 
-- (void)requestNewSequenceIdForUser:(nonnull id<OSVUser>)user withSequence:(nonnull OSVSequence *)seq metadata:(NSDictionary *)metaDataDict withProgressBlock:(void (^)(long long tBytes, long long tBExpected))uploadProgressBlock completionBlock:(nullable void (^)(NSInteger sequenceId, NSError * _Nullable error))completionBlock  {
+- (void)requestNewSequenceIdForUser:(id<OSVUser>)user
+                       withSequence:(OSVSequence *)seq
+                           metadata:(NSDictionary *)metaDataDict
+                       scoreDetails:(NSString *)details
+                  withProgressBlock:(void (^)(long long, long long))uploadProgressBlock
+                    completionBlock:(void (^)(NSInteger, NSError * _Nullable))completionBlock {
     
     OSVPhoto *photo = nil;
     if (seq.photos.count) {
@@ -56,6 +61,9 @@
     NSString *platformName      = [self.configurator platformName];
     NSString *currentCoordinate = [NSString stringWithFormat:@"%f,%f", photo.photoData.location.coordinate.latitude, photo.photoData.location.coordinate.longitude];
     NSString *uploadSource      = [self.configurator platformName];
+    NSNumber *clientTotal       = @(seq.points);
+    NSString *clientTotalDetails= details;
+    
     
     NSStringEncoding stringEncoding = NSUTF8StringEncoding;
     NSString *boundaryString    = [OSVAPIUtils generateRandomBoundaryString];
@@ -63,7 +71,12 @@
     [urlRequest setValue:value forHTTPHeaderField:@"Content-Type"];
     
     @autoreleasepool {
-        [urlRequest setHTTPBody:[OSVAPIUtils multipartFormDataQueryStringFromParameters:NSDictionaryOfVariableBindings(access_token, metaData, obdInfo, platformName, platformVersion, uploadSource, appVersion, currentCoordinate) withEncoding:stringEncoding boundary:boundaryString parametersInfo:@{@"metaData" : metaDataDict[@"metadataMime"]}]];
+        [urlRequest setHTTPBody:[OSVAPIUtils multipartFormDataQueryStringFromParameters:NSDictionaryOfVariableBindings(access_token, metaData, obdInfo, platformName,
+                                                                                                                       platformVersion, uploadSource, appVersion, currentCoordinate,
+                                                                                                                       clientTotal, clientTotalDetails)
+                                                                           withEncoding:stringEncoding
+                                                                               boundary:boundaryString
+                                                                         parametersInfo:@{@"metaData" : metaDataDict[@"metadataMime"]}]];
     }
     [urlRequest setHTTPMethod:@"POST"];
     
@@ -108,7 +121,7 @@
 #pragma mark - List Requests
 
 - (void)listMySequncesForUser:(id<OSVUser>)user atPage:(NSInteger)pageIndex withCompletionBlock:(void (^)(NSArray *, NSError *, OSVMetadata *))completionBlock {
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@/", [self.configurator osvBaseURL], [self.configurator osvAPIVerion], kMyListSequnceMethod]];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", [self.configurator osvBaseURL], kMyListSequnceMethod]];
     
     NSNumber *ipp               = @50;
     NSNumber *page              = @(pageIndex + 1);
@@ -189,7 +202,6 @@
                     } else {
                         NSLog(@"removed somethig");
                     }
-                    
                 }
 
                 dispatch_async(dispatch_get_main_queue() , ^{
@@ -205,6 +217,7 @@
                     completionBlock(sequenceArray, nil, meta);
                 });
             } else {
+                NSLog(@"operation is canceled");
                 completionBlock(nil, nil, nil);
             }
         });
@@ -220,6 +233,77 @@
     
     return requestOperation;
 }
+
+- (NSOperation *)serialListTracksForUser:(id<OSVUser>)user atPage:(NSInteger)pageIndex
+                           inBoundingBox:(id<OSVBoundingBox>)box
+                                withZoom:(double)zomParam
+                     withCompletionBlock:(void (^)(NSArray *, NSError *, OSVMetadata *))completionBlock {
+    
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@/", [self.configurator osvBaseURL], [self.configurator osvAPIVerion], kTracksMethod]];
+    
+    AFHTTPRequestOperation *requestOperation;
+    
+    NSNumber *ipp               = @300;
+    NSNumber *page              = @(pageIndex + 1);
+    //adding optional bounding box parameter
+    if (box) {
+        NSString *bbTopLeft = [NSString stringWithFormat:@"%f,%f", box.topLeftCoordinate.latitude, box.topLeftCoordinate.longitude];
+        NSString *bbBottomRight = [NSString stringWithFormat:@"%f,%f", box.bottomRightCoordinate.latitude, box.bottomRightCoordinate.longitude];
+        NSNumber *zoom = @(zomParam);
+        requestOperation = [OSVAPIUtils requestWithURL:url parameters:NSDictionaryOfVariableBindings(bbTopLeft, bbBottomRight, zoom, ipp, page) method:@"POST"];
+    }
+    
+    [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            if (!operation.isCancelled) {
+                if (!responseObject) {
+                    completionBlock(nil, [NSError errorWithDomain:@"OSVAPI" code:1 userInfo:@{@"Response":@"NoResponse"}], [OSVMetadata metadataError]);
+                    return;
+                }
+                NSDictionary *response = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
+                NSArray *array = response[@"currentPageItems"];
+                
+                NSMutableArray *sequenceArray = [NSMutableArray array];
+                
+                for (NSDictionary *seqDictionary in array) {
+                    OSVServerSequence *sequence = [OSVServerSequence trackFromDictionary:seqDictionary];
+                    if (sequence) {
+                        [sequenceArray addObject:sequence];
+                    } else {
+                        NSLog(@"removed somethig");
+                    }
+                }
+                
+                //                dispatch_async(dispatch_get_main_queue() , ^{
+                
+                OSVMetadata *meta = [OSVMetadata new];
+                NSArray *totalItems = response[@"totalFilteredItems"];
+                NSInteger numberOfItems = ((NSNumber *)totalItems.firstObject).integerValue;
+                meta.totalItems = numberOfItems;
+                meta.pageIndex = pageIndex;
+                meta.itemsPerPage = [ipp integerValue];
+                meta.index = 0;
+                
+                completionBlock(sequenceArray, nil, meta);
+                //                });
+            } else {
+                NSLog(@"operation is canceled");
+                completionBlock(nil, nil, nil);
+            }
+        });
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        if (!operation.isCancelled) {
+            completionBlock(nil, error, [OSVMetadata metadataError]);
+        } else {
+            completionBlock(nil, nil, nil);
+        }
+    }];
+    
+    [_serialQueue addOperation:requestOperation];
+    
+    return requestOperation;
+}
+
 
 
 - (void)getLayersFromLocation:(CLLocationCoordinate2D)coordinate radius:(double)dist withCompletion:(nullable void (^)(NSArray *_Nullable, NSError *_Nullable))completionBlock {
@@ -270,7 +354,6 @@
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@/", [self.configurator osvBaseURL], [self.configurator osvAPIVerion], kSequncesRemoveMethod]];
     
     NSNumber *sequenceId        = @(sequence.uid);
-
     NSString *access_token      = user.accessToken;
     
     AFHTTPRequestOperation *requestOperation = [OSVAPIUtils requestWithURL:url parameters:NSDictionaryOfVariableBindings(sequenceId, access_token) method:@"POST"];

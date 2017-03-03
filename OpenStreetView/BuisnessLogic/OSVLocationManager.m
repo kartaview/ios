@@ -16,7 +16,8 @@
 
 @interface OSVLocationManager () <CLLocationManagerDelegate, SKPositionerServiceDelegate>
 
-@property (nonatomic, strong) CLLocation *currentLocation;
+@property (nonatomic, strong) CLLocation *firstLocation;
+@property (nonatomic, strong) CLLocationManager *locationManager;
 
 @end
 
@@ -38,9 +39,12 @@
     
     if (self) {
         self.realPositions = [OSVUserDefaults sharedInstance].realPositions;
-        [SKPositionerService sharedInstance].delegate = self;
-
-        self.sensorsManager = [OSVSensorsManager new];
+        if ([OSVUserDefaults sharedInstance].enableMap) {
+            [SKPositionerService sharedInstance].delegate = self;
+        } else {
+            self.locationManager = [CLLocationManager new];
+            self.locationManager.delegate = self;
+        }
     }
     
     return self;
@@ -51,23 +55,14 @@
         return;
     }
     
-    if (!self.currentLocation) {
-        if ([OSVUserDefaults sharedInstance].automaticDistanceUnitSystem) {
-            [OSVUserDefaults sharedInstance].distanceUnitSystem = [OSVUtils isUSCoordinate:currentLocation.coordinate] ? kImperialSystem : kMetricSystem;
-        }
-        self.currentLocation = currentLocation;
-    }
-    
-    [self.delegate locationManager:(CLLocationManager *)self didUpdateLocations:@[currentLocation]];
-    
-    self.currentLocation = currentLocation;
+
+    [self sendLocationToDelegate:@[currentLocation]];
 }
 
 - (void)positionerService:(SKPositionerService *)positionerService updatedCurrentHeading:(CLHeading *)currentHeading {
     OSVLogItem *item = [OSVLogItem new];
     item.heading = currentHeading;
-    item.timestamp = [[NSDate new] timeIntervalSince1970];
-    [[OSVSyncController sharedInstance].logger logItems:@[item] inFileForSequenceID:0];
+    [[OSVSyncController sharedInstance].logger logItem:item];
 }
 
 - (void)positionerService:(SKPositionerService *)positionerService changedGPSAccuracyToLevel:(SKGPSAccuracyLevel)level {
@@ -90,24 +85,122 @@
 
 }
 
+#pragma mark - CllocationDelegate 
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)newLocationArray {
+    [self sendLocationToDelegate:newLocationArray];
+}
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading {
+    OSVLogItem *item = [OSVLogItem new];
+    item.heading = newHeading;
+    [[OSVSyncController sharedInstance].logger logItem:item];
+}
+
+- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status  {
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"didChangeAuthorizationStatus" object:nil userInfo:@{@"status":@(status)}];
+}
 #pragma mark - Public 
-
-- (void)startUpdatingLocation {
-    [[SKPositionerService sharedInstance] startLocationUpdate];
-    [self refreshSimulationDelegate];
-}
-
-- (void)startUpdatingHeading {
-    [self refreshSimulationDelegate];
-}
 
 - (void)setRealPositions:(BOOL)realPositions {
     _realPositions = realPositions;
-    [self refreshSimulationDelegate];
 }
 
-- (void)refreshSimulationDelegate {
+- (CLLocation *)currentMatchedPosition {
+    if ([OSVUserDefaults sharedInstance].enableMap) {
+        SKPosition matchedPosition = [SKPositionerService sharedInstance].currentMatchedPosition;
+        return [[CLLocation alloc] initWithLatitude:matchedPosition.latY longitude:matchedPosition.lonX];
+    } else {
+        return self.locationManager.location;
+    }
+}
 
+- (CLLocation *)currentLocation {
+    if ([OSVUserDefaults sharedInstance].enableMap) {
+        CLLocationCoordinate2D coordinate = [SKPositionerService sharedInstance].currentCoordinate;
+        return [[CLLocation alloc] initWithLatitude:coordinate.latitude longitude:coordinate.longitude];
+    } else {
+        return self.locationManager.location;
+    }
+}
+
+- (void)startLocationUpdate {
+    if ([OSVUserDefaults sharedInstance].enableMap) {
+        [[SKPositionerService sharedInstance] startLocationUpdate];
+    } else {
+        [self.locationManager startUpdatingLocation];
+    }
+}
+
+- (void)cancelLocationUpdate {
+    if ([OSVUserDefaults sharedInstance].enableMap) {
+        [[SKPositionerService sharedInstance] cancelLocationUpdate];
+    } else {
+        [self.locationManager stopUpdatingLocation];
+    }
+}
+
+- (void)setPositionerMode:(SKPositionerMode)positionerMode {
+    if ([OSVUserDefaults sharedInstance].enableMap) {
+        [[SKPositionerService sharedInstance] setPositionerMode:positionerMode];
+    }
+}
+
+- (void)reportGPSLocation:(CLLocation *)location {
+    if ([OSVUserDefaults sharedInstance].enableMap) {
+        [[SKPositionerService sharedInstance] reportGPSLocation:location];
+    }
+}
+
+- (void)sendLocationToDelegate:(NSArray *)currentLocations {
+    CLLocation *currentLocation = currentLocations.lastObject;
+
+    if (!self.firstLocation &&
+        currentLocation.coordinate.latitude != 0.0 &&
+        currentLocation.coordinate.longitude != 0.0) {
+        self.firstLocation = currentLocation;
+        if ([OSVUserDefaults sharedInstance].automaticDistanceUnitSystem) {
+            [OSVUserDefaults sharedInstance].distanceUnitSystem = [OSVUtils isUSCoordinate:currentLocation.coordinate] ? kImperialSystem : kMetricSystem;
+        }
+    }
+    
+    NSInteger debugLocationAccuracy = [OSVUserDefaults sharedInstance].debugLocationAccuracy;
+    if (debugLocationAccuracy) {
+        CLLocation *debugLocation = nil;
+        switch (debugLocationAccuracy ) {
+            case 1: //high
+                debugLocation = [[CLLocation alloc] initWithCoordinate:currentLocation.coordinate
+                                                              altitude:currentLocation.altitude
+                                                    horizontalAccuracy:5
+                                                      verticalAccuracy:currentLocation.verticalAccuracy
+                                                             timestamp:currentLocation.timestamp];
+                
+                break;
+            case 2: // medium
+                debugLocation = [[CLLocation alloc] initWithCoordinate:currentLocation.coordinate
+                                                              altitude:currentLocation.altitude
+                                                    horizontalAccuracy:30
+                                                      verticalAccuracy:currentLocation.verticalAccuracy
+                                                             timestamp:currentLocation.timestamp];
+                
+                break;
+            case 3: // low
+                debugLocation = [[CLLocation alloc] initWithCoordinate:currentLocation.coordinate
+                                                              altitude:currentLocation.altitude
+                                                    horizontalAccuracy:50
+                                                      verticalAccuracy:currentLocation.verticalAccuracy
+                                                             timestamp:currentLocation.timestamp];
+                
+                break;
+            default: // non debug
+				debugLocation = currentLocation;
+                break;
+        }
+        [self.delegate locationManager:(CLLocationManager *)self didUpdateLocations:@[debugLocation]];
+        
+    } else {
+        [self.delegate locationManager:(CLLocationManager *)self didUpdateLocations:@[currentLocation]];
+    }
 }
 
 @end

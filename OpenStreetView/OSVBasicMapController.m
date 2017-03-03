@@ -17,6 +17,8 @@
 #import "OSVServerSequence.h"
 #import "OSVUserDefaults.h"
 
+#import "OSVLocationManager.h"
+
 @interface OSVBasicMapController ()
 
 @property (nonatomic, assign) NSInteger                 polylineID;
@@ -50,7 +52,12 @@
     self.localSeq = nil;
     [self addLocalSequences];
 
-    self.viewController.bottomRightButton.hidden = NO;
+    if (![OSVUserDefaults sharedInstance].enableMap) {
+        self.viewController.bottomRightButton.hidden = YES;
+    } else {
+        self.viewController.bottomRightButton.hidden = NO;
+    }
+    
     
     [self.viewController.bottomRightButton setImage:[UIImage imageNamed:@"recenter"] forState:UIControlStateNormal];  
    
@@ -81,10 +88,11 @@
 
 - (void)didTapBottomRightButton {
     if ([CLLocationManager authorizationStatus] ==  kCLAuthorizationStatusNotDetermined) {
-        [[SKPositionerService sharedInstance] startLocationUpdate];
+        [[OSVLocationManager sharedInstance] startLocationUpdate];
     } else {
         [self.viewController.mapView centerOnCurrentPosition];
         [self.viewController.mapView animateToZoomLevel:14];
+        [self reloadVisibleTracks];
     }
 }
 
@@ -121,10 +129,13 @@ int iii = 0;
         polyline.backgroundLineWidth = 6;
         polyline.coordinates = track;
         polyline.identifier = iii++;
+        
         if ([sequence isKindOfClass:[OSVSequence class]]) {
             polyline.fillColor = [UIColor blackColor];
+            polyline.identifier += 20000;
         } else {
-            polyline.fillColor = self.colorPurple;
+            polyline.fillColor = [self.colorPurple colorWithAlphaComponent:MIN(sequence.coverage, 10.0)/10.0 + 0.01];
+            polyline.strokeColor = [self.colorPurple colorWithAlphaComponent:MIN(sequence.coverage, 10.0)/10.0 + 0.01];
         }
         
         polyline.isLocal = YES;
@@ -160,54 +171,6 @@ int iii = 0;
     [self.viewController.mapView centerOnCurrentPosition];
 }
 
-- (OSVPolyline *)nearestPolylineLocationToCoordinate:(CLLocationCoordinate2D)coordinate index:(NSInteger *)index {
-//    OSVPolyline *bestPolyline = nil;
-//    NSInteger bestIndex = 0;
-//    double bestDistance = DBL_MAX;
-//
-//    CGPoint originPoint = [self.viewController.mapView pointForCoordinate:coordinate];
-    
-//    for (OSVPolyline *polyline in self.viewController.polylines) {
-//        if (!polyline.coordinates.count) {
-//            continue;
-//        }
-//        
-//        if (polyline.coordinates.count && polyline.coordinates.count < 2) { // we need at least 2 points: start and end
-//            CGPoint spoint = [self.viewController.mapView pointForCoordinate:((CLLocation *)polyline.coordinates[0]).coordinate];
-//            CGPoint epoint = [self.viewController.mapView pointForCoordinate:coordinate];
-//            double distance = [OSVUtils distanceBetweenStartPoint:spoint andEndPoint:epoint];
-//            if (distance < bestDistance) {
-//                bestIndex = 0;
-//                bestDistance = distance;
-//                bestPolyline = polyline;
-//            }
-//            continue;
-//        }
-//        
-//        for (NSInteger index = 0; index < polyline.coordinates.count - 1; index++) {
-//            CLLocation *startCoordinate = polyline.coordinates[index];
-//            CGPoint startPoint = [self.viewController.mapView pointForCoordinate:startCoordinate.coordinate];
-//            CLLocation *endCoordinate = polyline.coordinates[index + 1];
-//            CGPoint endPoint = [self.viewController.mapView pointForCoordinate:endCoordinate.coordinate];
-//            double distance;
-//            [OSVUtils nearestPointToPoint:originPoint onLineSegmentPointA:startPoint pointB:endPoint distance:&distance];
-//            
-//            if (distance < bestDistance) {
-//                bestDistance = distance;
-//                bestPolyline = polyline;
-//                bestIndex = index;
-//            }
-//        }
-//    }
-    
-//    if (bestDistance < 25) {
-//        *index = bestIndex;
-//        return bestPolyline;
-//    }
-    
-    return nil;
-}
-
 #pragma mark - Private
 
 - (void)requestAndDisplayAllSequencesOnMapInBoundingBox:(id<OSVBoundingBox>)box withZoom:(double)zoom {
@@ -239,6 +202,9 @@ int iii = 0;
                     
                     [self addSequenceOnMap:sequence];
                 }
+            } completion:^(OSVMetadata *mf) {
+                NSLog(@"!!!!!!!!!!!!!!!!!!!  o venit aici %ld %p", mf.totalPages, mf);
+
             }];
         });
     } else {
@@ -247,15 +213,15 @@ int iii = 0;
 }
 
 - (void)addLocalSequences {
-    if (self.localSeq.count) {
-        for (OSVSequence *sequence in self.localSeq) {
-            if (!sequence) {
-                return;
-            }
-            // this should not caches
-            [self addSequenceOnMap:sequence];
-        }
-    } else {
+//    if (self.localSeq.count) {
+//        for (OSVSequence *sequence in self.localSeq) {
+//            if (!sequence) {
+//                return;
+//            }
+//            // this should not caches
+//            [self addSequenceOnMap:sequence];
+//        }
+//    } else {
         [self.syncController.tracksController getLocalSequencesWithCompletion:^(NSArray *sequences) {
             self.localSeq = sequences;
             for (OSVSequence *sequence in sequences) {
@@ -266,7 +232,7 @@ int iii = 0;
                 [self addSequenceOnMap:sequence];
             }
         }];
-    }
+//    }
 }
 
 - (void)orderPhotosIntoSequence:(OSVSequence *)sequence {
@@ -298,6 +264,5 @@ int iii = 0;
 //        [self addSequenceOnMap:seq];
     }];
 }
-
 
 @end

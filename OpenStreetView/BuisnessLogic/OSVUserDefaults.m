@@ -10,6 +10,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <Crashlytics/Crashlytics.h>
 #import "UIDevice+Aditions.h"
+#import "OSVAPIConfigurator.h"
 
 #define kUserNameKey                @"kUserNameKey"
 #define kRealPositionsKey           @"kRealPositionsKey"
@@ -24,8 +25,13 @@
 #define kHdrOptionKey               @"kHdrOptionKey"
 #define kSLOptionKey                @"kSLOptionKey"
 #define kMapWhileRecodingKey        @"kMapWhileRecodingKey"
+#define kEnableMapKey               @"kEnableMapKey"
+#define kZoomLevelRecordingKey      @"kZoomLevelRecordingKey"
+
 
 #define kisUploadingKey             @"kisUploadingKey"
+
+#define kUseGamification            @"kUseGamification"
 
 #define kDebugLogOBD                @"kDebugLogOBD"
 #define kDebugSLUS                  @"kDebugSLUS"
@@ -34,7 +40,10 @@
 #define kDebugBitRate               @"kDebugBitRate"
 #define kDebugEncoding              @"kDebugEncoding"
 #define kDebugHighDensityOn         @"kDebugHighDensityOn"
+#define kdebugStabilization         @"kdebugStabilization"
+#define kDebugMatcher               @"kDebugMatcher"
 
+#define kisFreshInstall             @"kisFreshInstall_1.4.9"
 
 @implementation OSVUserDefaults
 
@@ -54,31 +63,22 @@
     
     if (self) {
         if (![[NSUserDefaults standardUserDefaults] boolForKey:@"defaultOverriden"]) {
-            self.userName = @"";
             self.useCellularData = NO;
             self.automaticUpload = NO;
             self.distanceUnitSystem = kImperialSystem;
             self.automaticDistanceUnitSystem = YES;
 
             [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"defaultOverriden"];
-            self.isFreshInstall = YES;
             self.videoQuality = k5MPQuality;
         }
         
-        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"defaultOverriden1.4.2"]) {
-            self.showMapWhileRecording = NO;
-            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"defaultOverriden1.4.2"];
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"defaultOverriden1.4.9"]) {
+            self.showMapWhileRecording = YES;
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"defaultOverriden1.4.9"];
         }
         
-        if (!self.environment) {
-#ifdef ENABLED_DEBUG
-            self.environment = @"http://openstreetview.com";
-            //@"http://testing.openstreetview.com"
-            //@"http://staging.openstreetview.com"
-            //@"http://openstreetview.com"
-#else
-            self.environment = @"http://openstreetview.com";
-#endif
+        if (!self.environment || [self.environment containsString:@"openstreetview.com"]) {
+			self.environment = [OSVAPIConfigurator productionEnvironment];
         }
         
         //if automatic not found then set automatic on
@@ -105,9 +105,7 @@
             self.debugFrameSize = 1024.0;
         }
         
-        if (self.debugFrameRate <= 0) {
-            self.debugFrameRate = 10;
-        }
+        self.debugFrameRate = 3.0;
         
         if (self.debugBitRate <= 0) {
             self.debugBitRate = 1.5;
@@ -117,13 +115,29 @@
             self.debugEncoding = AVVideoProfileLevelH264HighAutoLevel;
         }
         
-        if (![[NSUserDefaults standardUserDefaults] valueForKey:kDebugHighDensityOn]) {
-            self.debugHighDesintyOn = YES;
-        }
+        self.debugHighDesintyOn = NO;
         
         if (![[NSUserDefaults standardUserDefaults] valueForKey:kMapWhileRecodingKey]) {
-            self.showMapWhileRecording = NO;
+            self.showMapWhileRecording = YES;
         }
+        
+        if (![[NSUserDefaults standardUserDefaults] valueForKey:kUseGamification]) {
+            self.useGamification = YES;
+        }
+        
+        if (![[NSUserDefaults standardUserDefaults] valueForKey:kisFreshInstall]) {
+            self.isFreshInstall = YES;
+        }
+        
+        if (![[NSUserDefaults standardUserDefaults] valueForKey:kEnableMapKey]) {
+            self.enableMap = YES;
+        }
+		
+		if (![[NSUserDefaults standardUserDefaults] valueForKey:kZoomLevelRecordingKey]) {
+			self.zoomLevel = 17;
+		}
+        
+        self.debugStabilization = NO;
         
         [self save];
     }
@@ -201,7 +215,6 @@
     } else if ([self.videoQuality isEqualToString:k8MPQuality]) {
         dimension.width = 3264;
         dimension.height = 2448;
-        
     } else if ([self.videoQuality isEqualToString:k12MPQuality]) {
         dimension.width = 4032;
         dimension.height = 3024;
@@ -226,6 +239,14 @@
 
 - (BOOL)useImageRecognition {
     return [[NSUserDefaults standardUserDefaults] boolForKey:kSLOptionKey];
+}
+
+- (void)setEnableMap:(BOOL)enableMap {
+    return [[NSUserDefaults standardUserDefaults] setBool:enableMap forKey:kEnableMapKey];
+}
+
+- (BOOL)enableMap {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kEnableMapKey];
 }
 
 - (void)setShowMapWhileRecording:(BOOL)showMapWhileRecording {
@@ -258,6 +279,14 @@
 
 - (NSString *)bleDevice {
     return [[NSUserDefaults standardUserDefaults] objectForKey:@"kbleDevice"];
+}
+
+- (void)setUseGamification:(BOOL)useGamification {
+    return [[NSUserDefaults standardUserDefaults] setBool:useGamification forKey:kUseGamification];
+}
+
+- (BOOL)useGamification {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kUseGamification];
 }
 
 - (void)save {
@@ -320,6 +349,48 @@
 
 - (BOOL)debugHighDesintyOn{
     return [[NSUserDefaults standardUserDefaults] boolForKey:kDebugHighDensityOn];
+}
+
+- (void)setDebugStabilization:(BOOL)debugHighDesintyOn {
+    return [[NSUserDefaults standardUserDefaults] setBool:debugHighDesintyOn forKey:kdebugStabilization];
+}
+
+- (BOOL)debugStabilization {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kdebugStabilization];
+}
+
+- (void)setIsFreshInstall:(BOOL)isFreshInstall {
+    return [[NSUserDefaults standardUserDefaults] setBool:isFreshInstall forKey:kisFreshInstall];
+}
+
+- (BOOL)isFreshInstall {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kisFreshInstall];
+}
+
+- (BOOL)debugMatcher {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kDebugMatcher];
+}
+
+- (void)setDebugMatcher:(BOOL)debugMatcher {
+    return [[NSUserDefaults standardUserDefaults] setBool:debugMatcher forKey:kDebugMatcher];
+}
+
+static NSInteger accuracy = 0;
+
+- (void)setDebugLocationAccuracy:(NSInteger)debugLocationAccuracy {
+    accuracy = debugLocationAccuracy;
+}
+
+- (NSInteger)debugLocationAccuracy {
+    return accuracy;
+}
+	
+- (void)setZoomLevel:(NSInteger)zoomLevel {
+	return [[NSUserDefaults standardUserDefaults] setInteger:zoomLevel forKey:kZoomLevelRecordingKey];
+}
+
+- (NSInteger)zoomLevel {
+	return [[NSUserDefaults standardUserDefaults] integerForKey:kZoomLevelRecordingKey];
 }
 
 @end

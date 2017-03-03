@@ -14,7 +14,7 @@
 
 @implementation OSVUtils (FileManager)
 
-+ (NSString *)getDirectoryPath {
++ (NSString *)documentsDirectoryPath {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     
     return [paths objectAtIndex:0];
@@ -94,7 +94,7 @@
 + (long long)sizeOfFolder:(NSString *)directoryUrl containsImages:(BOOL *)contains {
     NSUInteger folderSize = 0;
     
-    NSArray *properties = [NSArray arrayWithObjects: NSURLLocalizedNameKey, NSURLCreationDateKey, NSURLLocalizedTypeDescriptionKey, nil];
+    NSArray *properties = [NSArray arrayWithObjects: NSURLLocalizedNameKey, NSURLLocalizedTypeDescriptionKey, nil];
     
     NSArray *array = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[NSURL URLWithString:directoryUrl] includingPropertiesForKeys:properties options:(NSDirectoryEnumerationSkipsHiddenFiles) error:nil];
     
@@ -119,6 +119,80 @@
     NSLog(@"%@", folderSizeStr);
     
     return folderSize;
+}
+
++ (NSURL *)fileNameForTrackID:(NSInteger)trackUID {
+    NSString *folderPathString = [NSString stringWithFormat:@"%@%ld", [OSVUtils createOSCBasePath], (long)trackUID];
+    
+    return [[NSURL alloc] initWithString:folderPathString];
+}
+
++ (NSArray<NSURL *> *)videoPathsFromFolder:(NSURL *)basePath {
+    NSMutableArray *videoFiles = [NSMutableArray array];
+    
+    NSArray *properties = [NSArray arrayWithObjects: NSURLLocalizedNameKey, NSURLCreationDateKey, NSURLLocalizedTypeDescriptionKey, nil];
+    
+    NSArray *array = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:basePath includingPropertiesForKeys:properties options:(NSDirectoryEnumerationSkipsHiddenFiles) error:nil];
+    
+    for (NSURL *fileSystemItem in array) {
+        BOOL directory = NO;
+        [[NSFileManager defaultManager] fileExistsAtPath:[fileSystemItem path] isDirectory:&directory];
+        if (!directory && [fileSystemItem pathExtension] && [[fileSystemItem pathExtension] isEqualToString:@"mp4"]) {
+            [videoFiles addObject:fileSystemItem];
+        }
+    }
+    
+    [videoFiles sortUsingComparator:^NSComparisonResult(NSURL *obj1, NSURL *obj2) {
+        
+        return [[[obj1 lastPathComponent] stringByDeletingPathExtension] integerValue] > [[[obj2 lastPathComponent] stringByDeletingPathExtension] integerValue];
+    }];
+    
+    return videoFiles;
+}
+
+static NSString *oscBasePath = nil;
+
++ (NSString *)createOSCBasePath {
+    NSString *photosFolderPath = [[OSVUtils documentsDirectoryPath] stringByAppendingString:@"/Photos/"];
+
+    if (!oscBasePath) {
+        if (![[NSFileManager defaultManager] fileExistsAtPath:photosFolderPath]) {
+            NSError *error;
+            [[NSFileManager defaultManager] createDirectoryAtPath:photosFolderPath withIntermediateDirectories:YES attributes:nil error:&error];
+            NSURL *URL = [NSURL fileURLWithPath:photosFolderPath];
+            
+            NSError *errorExcluding = nil;
+            BOOL success = [URL setResourceValue:[NSNumber numberWithBool:YES]
+                                          forKey:NSURLIsExcludedFromBackupKey error:&errorExcluding];
+            if (!success) {
+                NSLog(@"Error excluding %@ from backup %@", [URL lastPathComponent], errorExcluding);
+            }
+        }
+        oscBasePath = photosFolderPath;
+    }
+    
+    return oscBasePath;
+}
+
++ (NSString *)fileNameForVideoWithTrackID:(NSInteger)trackUID index:(NSInteger)videoIndex {
+    NSString *folderPathString = [NSString stringWithFormat:@"%@%ld/%ld.mp4", [OSVUtils createOSCBasePath], (long)trackUID, (long)videoIndex];
+    
+    return folderPathString;
+}
+
++ (NSURL *)fileNameForTrackID:(NSInteger)trackUID videoID:(NSInteger)videoUID {
+    NSString *folderPathString = [NSString stringWithFormat:@"%@%ld", [OSVUtils createOSCBasePath], (long)trackUID];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:folderPathString]) {
+        NSError *error;
+        BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:folderPathString withIntermediateDirectories:NO attributes:NULL error:&error];
+        if (!success) {
+            [[OSVLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Failed to create folder for trackID:%ld error:%@", (long)trackUID, error] withLevel:LogLevelDEBUG];
+            success = [[NSFileManager defaultManager] createDirectoryAtPath:folderPathString withIntermediateDirectories:NO attributes:NULL error:&error];
+            [[OSVLogger sharedInstance] logMessage:[NSString stringWithFormat:@"Retry to create folder with result:%d error:%@", success, error] withLevel:LogLevelDEBUG];
+        }
+    }
+    
+    return [NSURL fileURLWithPath:[folderPathString stringByAppendingString:[NSString stringWithFormat:@"/%ld.mp4", (long)videoUID]]];
 }
 
 @end

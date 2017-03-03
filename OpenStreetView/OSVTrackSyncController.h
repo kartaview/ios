@@ -13,6 +13,8 @@
 #import "OSVTrackCache.h"
 #import "OSVTrackLogger.h"
 
+#import "OSVScoreHistory.h"
+
 @class OSVAPI;
 
 @interface OSVTrackSyncController : OSVPhotoSyncController
@@ -30,7 +32,17 @@
 //tracks
 - (void)getServerTracksInBoundingBox:(id<OSVBoundingBox>)box
                             withZoom:(double)zoom
-               withPartialCompletion:(void (^)(id<OSVSequence> sequence, OSVMetadata *metadata, NSError *error))partComp;
+               withPartialCompletion:(void (^)(id<OSVSequence> sequence, OSVMetadata *metadata, NSError *error))partComp
+                          completion:(void (^)(OSVMetadata *mf))complet;
+
+- (void)getSerialServerTracksInBoundingBox:(id<OSVBoundingBox>)box
+                                  withZoom:(double)zoom
+                     withPartialCompletion:(void (^)(id<OSVSequence> sequence, OSVMetadata *metadata, NSError *error))partComp
+                                completion:(void (^)(OSVMetadata *mf))complet;
+
+- (void)getScoreHistoryForSequenceWithID:(NSInteger)uid
+                              completion:(void (^)(NSArray *history))completion;
+- (void)storeScoreHistory:(OSVScoreHistory *)history;
 
 //server
 - (void)cancelGetServerSequences;
@@ -44,6 +56,7 @@
 
 - (void)getLayersFromLocation:(CLLocationCoordinate2D)coordinate
                withCompletion:(void (^)(NSArray *, NSError *))completion;
+
 
 //Delete methods
 - (void)deleteSequence:(id<OSVSequence>)sequence

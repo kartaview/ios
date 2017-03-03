@@ -22,9 +22,11 @@
 }
 
 - (BOOL)isLastPage {
-    NSInteger totalPages = self.totalItems / self.itemsPerPage + (self.totalItems % self.itemsPerPage != 0 ? 1 : 0);
+    return self.pageIndex == ([self totalPages] - 1);
+}
 
-    return self.pageIndex == (totalPages-1);
+- (NSInteger)totalPages {
+    return self.totalItems / self.itemsPerPage + (self.totalItems % self.itemsPerPage != 0 ? 1 : 0);
 }
 
 - (NSString *)description {

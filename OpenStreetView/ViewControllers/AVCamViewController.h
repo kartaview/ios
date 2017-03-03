@@ -14,6 +14,12 @@
 
 
 + (void)setFlashMode:(AVCaptureFlashMode)flashMode forDevice:(AVCaptureDevice *)device;
-- (void)focusWithMode:(AVCaptureFocusMode)focusMode exposeWithMode:(AVCaptureExposureMode)exposureMode atDevicePoint:(CGPoint)point monitorSubjectAreaChange:(BOOL)monitorSubjectAreaChange;
+
+- (void)focusWithMode:(AVCaptureFocusMode)focusMode
+       exposeWithMode:(AVCaptureExposureMode)exposureMode
+        atDevicePoint:(CGPoint)point
+monitorSubjectAreaChange:(BOOL)monitorSubjectAreaChange;
+
+- (void)animateFocusAtPoint:(CGPoint)point withGesture:(UIGestureRecognizer *)sender;
 
 @end

@@ -10,6 +10,13 @@
 
 @interface OSVTipView : UIView
 
+@property (copy, nonatomic) void (^didDissmiss)();
+@property (copy, nonatomic) BOOL (^willDissmiss)();
+
 - (void)randomize;
+
+- (void)configureViews;
+- (void)prepareWalkthrough;
+- (void)prepareIntro;
 
 @end

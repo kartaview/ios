@@ -19,5 +19,6 @@
 + (OSVMetadata *)metadataError;
 
 - (BOOL)isLastPage;
+- (NSInteger)totalPages;
 
 @end

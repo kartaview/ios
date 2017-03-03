@@ -36,7 +36,17 @@
 /**
  * This method computes the distance and nereast point to a segment
  */
-+ (CGPoint)nearestPointToPoint:(CGPoint)origin onLineSegmentPointA:(CGPoint)pointA pointB:(CGPoint)pointB distance:(double *)distance;
++ (CLLocation *)nearestLocationToLocation:(CLLocation *)origin
+                   onLineSegmentLocationA:(CLLocation *)pointA
+                                locationB:(CLLocation *)pointB
+                                 distance:(double *)distance;
+/**
+ * This method computes the angle between the two lines determined by these four points.
+ */
++ (double)degreesBetweenLineAStart:(CLLocationCoordinate2D)pointA
+                          lineAEnd:(CLLocationCoordinate2D)pointB
+                        lineBStart:(CLLocationCoordinate2D)pointC
+                          lineBEnd:(CLLocationCoordinate2D)pointD;
 
 + (NSArray *)metricDistanceArray:(NSInteger)meters;
 + (NSString *)metricDistanceFormatter:(NSInteger)meters;
@@ -57,7 +67,20 @@
 
 @interface OSVUtils (FileManager)
 
-+ (NSString *)getDirectoryPath;
+/**
+ Call this method to get the path to the OSC Photos folder.
+ If the floder does not exist it is creaded.
+ 
+ @return String representing path where all OSC related files are stored.
+ */
++ (NSString *)createOSCBasePath;
+
+/**
+ Convinience method for documents directory
+ 
+ @return String representing path for the app documents directory
+ */
++ (NSString *)documentsDirectoryPath;
 
 /**
  * This method will format the space in MB, GB
@@ -80,7 +103,7 @@
  */
 + (NSString *)freeDiskSpace;
 /**
- * This method returns a formated string representing total disk space.
+ * This method returns a formated string representing total used disk space.
  */
 + (NSString *)usedDiskSpace;
 
@@ -105,6 +128,12 @@
  */
 + (long long)sizeOfFolder:(NSString *)directoryUrl containsImages:(BOOL *)contains;
 
++ (NSURL *)fileNameForTrackID:(NSInteger)trackUID;
+
++ (NSString *)fileNameForVideoWithTrackID:(NSInteger)trackUID index:(NSInteger)videoIndex;
+
++ (NSURL *)fileNameForTrackID:(NSInteger)trackUID videoID:(NSInteger)videoUID;
+
 @end
 
 /* --------------------------------------------------*/
@@ -115,6 +144,19 @@
  */
 + (UIImage *)rotateImage:(UIImage *)image toImageOrientation:(UIImageOrientation)orient;
 
+@end
+
+@interface OSVUtils (Device)
+/**
+ * This method returns if the screen density is high
+ */
++ (BOOL)isHighDensity;
+
+@end
+
+@interface OSVUtils (Gamification)
+
++ (NSString *)pointsFormatedFromPoints:(NSInteger)points;
 
 @end
 

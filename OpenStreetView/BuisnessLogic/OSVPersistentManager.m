@@ -9,8 +9,11 @@
 #import "OSVPersistentManager.h"
 #import <Realm/Realm.h>
 #import "OSVPhoto+Relm.h"
-#import "OSVUtils+Location.m"
+#import "OSVScoreHistory+Realm.h"
+#import "OSVUtils.h"
 #import "OSVVideo.h"
+
+#import "OSC-Swift.h"
 
 @implementation OSVPersistentManager
 
@@ -84,7 +87,12 @@
         localSeq.bottomRightCoordinate = bottomRightLocation;
     }
 
-    completion([dictionary allValues], results.count);
+    NSMutableArray *array = [[dictionary allValues] mutableCopy];
+    [array sortUsingComparator:^NSComparisonResult(OSVSequence *obj1, OSVSequence *obj2) {
+        return [obj2.dateAdded compare:obj1.dateAdded];
+    }];
+    
+    completion(array, results.count);
 }
 
 + (void)getSequencesInBox:(id<RLMBoundingBox>)box withCompletion:(void (^)(NSArray *sequences, NSInteger photosCount))completion {
@@ -130,6 +138,12 @@
     
     for (RLMPhoto *managedObject in  realmResults) {
         OSVPhoto *photo = [OSVPhoto fromRealmObject:managedObject];
+        
+        if (localSeq.photos.count) {
+            CLLocationCoordinate2D last = [localSeq.photos lastObject].photoData.location.coordinate;
+            localSeq.length += [OSVUtils getAirDistanceBetweenCoordinate:last andCoordinate:photo.photoData.location.coordinate];
+        }
+        
         [localSeq.photos addObject:photo];
         
         if (topLeftLocation.latitude > photo.photoData.location.coordinate.latitude ) {
@@ -186,10 +200,8 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     RLMResults *realmResults = [RLMPhoto objectsWhere:[NSString stringWithFormat:@"videoIndex == %ld AND localSequenceID == %ld", (long)videoIndex,(long)localSequenceID]];
     
-    //NSLog(@"Try remove from DB: %@",realmResults);
     if (realmResults.count) {
         [realm transactionWithBlock:^{
-            //NSLog(@"Removing from DB");
             [realm deleteObjects:realmResults];
         }];
     }
@@ -220,7 +232,7 @@
     }];
 }
 
-+ (void)updatedPhoto:(OSVPhoto *)photo withAddress:(NSString *)address {
++ (void)updatedPhoto:(OSVPhoto *)photo {
     RLMRealm *realm = [RLMRealm defaultRealm];
     RLMPhoto *realmPhoto = [photo toRealmObject];
 
@@ -228,5 +240,51 @@
         [realm addOrUpdateObject:realmPhoto];
     }];
 }
+
+#pragma mark - OSVScoreHistory 
+
++ (NSMutableArray *)getScoreHistoryForSequenceWithID:(NSInteger)sequenceID {
+
+    RLMResults *results = [RLMScoreHistory objectsWhere:[NSString stringWithFormat:@"localSequenceID == %ld", (long)sequenceID]];
+
+    NSMutableDictionary *scoreHistoryDict = [NSMutableDictionary dictionary];
+
+    for (RLMScoreHistory *managedObject in results) {
+        
+        OSVScoreHistory *history = [OSVScoreHistory fromRealmObject:managedObject];
+        history.multiplier = [ScoreManager scoreForCoverage:history.coverage];
+        OSVScoreHistory *sch = scoreHistoryDict[@(history.multiplier)];
+        
+        if (!sch) {
+            scoreHistoryDict[@(history.multiplier)] = history;
+            sch = history;
+        } else {
+            sch.photos += history.photos;
+            sch.photosWithOBD += history.photosWithOBD;
+            sch.detectedSigns += history.detectedSigns;
+            sch.distance += history.distance;
+        }
+        
+        sch.points = sch.multiplier * sch.photos + sch.multiplier * 2 * sch.photosWithOBD + sch.detectedSigns;
+    }
+    
+    NSMutableArray *scoreHistoryArray = [NSMutableArray array];
+    
+    for (NSNumber *number in scoreHistoryDict) {
+        [scoreHistoryArray addObject:scoreHistoryDict[number]];
+    }
+    
+    return scoreHistoryArray;
+}
+
++ (void)storeScoreHistory:(OSVScoreHistory *)history {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMScoreHistory *realmScore = [history toRealmObject];
+    
+    [realm transactionWithBlock:^{
+        [realm addOrUpdateObject:realmScore];
+    }];
+}
+
 
 @end

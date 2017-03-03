@@ -13,11 +13,10 @@
 
 @interface OSVSettingsMenuFactory : NSObject
 
-+ (NSArray *)settingsMenuWithWiFiOBDStatus:(int)connectionStatus BLEStatus:(int)bleStat;
++ (NSArray *)settingsMenuWithWiFiOBDStatus:(int)connectionStatus
+                                 BLEStatus:(int)bleStat
+                          enableSecretMenu:(BOOL)secretMenu;
 
-+ (OSVSectionItem *)defaultUserFunctionalitySection;
 + (OSVSectionItem *)settingsSection;
-
-+ (OSVMenuItem *)myStreetViewItem;
 
 @end

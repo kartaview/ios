@@ -9,9 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "OSMUser.h"
 
-#define kCredentialsID          @"osmLoginCredentials"
-#define kOSMUsernameKey         @"OSMUsernameKey"
-#define kOSMUserIdKey           @"OSMUserIdKey"
+#define kOSCCredentialsID		@"kOSCCredentialsID"
+#define kOSCAuthProvider        @"kOSCAuthProvider"
 
 @protocol OSMAPIDelegate;
 @class AFOAuth1Token;
@@ -19,7 +18,6 @@
 @interface OSMAPI : NSObject
 
 @property (nonatomic, copy) void (^didFinishLogin)(OSMUser *user, BOOL success);
-@property (nonatomic, assign, readonly, getter = isAuthorized) BOOL authorized;
 
 #pragma mark Initialization
 + (instancetype)sharedInstance;
@@ -28,6 +26,8 @@
 - (void)logIn;
 - (BOOL)logout;
 - (void)signUp;
+
+- (BOOL)isAuthorized;
 
 - (OSMUser *)osmUser;
 - (AFOAuth1Token *)osmAccessToken;

@@ -1,0 +1,59 @@
+[
+    {
+        "segmentStartLocation":[46.773304, 23.590858],
+        "segmentEndLocation":[46.773253, 23.592299],
+        "aLocation":[46.773108, 23.591604],
+        "distance":18.46,
+        "description":"Midle bottom"
+    },
+    {
+        "segmentStartLocation":[46.773304, 23.590858],
+        "segmentEndLocation":[46.773253, 23.592299],
+        "aLocation":[46.773102, 23.592602],
+        "distance":28.25,
+        "description":"Exterior bottom right"
+    },
+    {
+        "segmentStartLocation":[46.773304, 23.590858],
+        "segmentEndLocation":[46.773253, 23.592299],
+        "aLocation":[46.773109, 23.590691],
+        "distance":25.14,
+        "description":"Exterior bottom left"
+    },
+    {
+        "segmentStartLocation":[46.773304, 23.590858],
+        "segmentEndLocation":[46.773253, 23.592299],
+        "aLocation":[46.773484, 23.590600],
+        "distance":28.48,
+        "description":"Exterior top left"
+    },
+    {
+        "segmentStartLocation":[46.773304, 23.590858],
+        "segmentEndLocation":[46.773253, 23.592299],
+        "aLocation":[46.773409, 23.592524],
+        "distance":24.67,
+        "description":"Exterior top right"
+    },
+    {
+        "segmentStartLocation":[46.773304, 23.590858],
+        "segmentEndLocation":[46.773253, 23.592299],
+        "aLocation":[46.773361, 23.591657],
+        "distance":9.21,
+        "description":"Midle top"
+    },
+    {
+        "segmentStartLocation":[46.773304, 23.590858],
+        "segmentEndLocation":[46.773253, 23.592299],
+        "aLocation":[46.773305, 23.591074],
+        "distance":0.51,
+        "description":"Midle top very close"
+    },
+    {
+        "segmentStartLocation":[46.773304, 23.590858],
+        "segmentEndLocation":[46.773253, 23.592299],
+        "aLocation":[46.773217, 23.592151],
+        "aLocationOnSegment":[46.773258, 23.592155],
+        "distance":5.3,
+        "description":"Midle bottom very close"
+    }
+]

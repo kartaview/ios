@@ -10,8 +10,8 @@
 
 @interface OSVTipPageViewController : UIViewController
 
-@property (weak, nonatomic) IBOutlet UILabel *tipTitleLabel;
-@property (weak, nonatomic) IBOutlet UILabel *tipDescriptionLabel;
+@property (weak, nonatomic) IBOutlet UILabel    *tipTitleLabel;
+@property (weak, nonatomic) IBOutlet UILabel    *tipDescriptionLabel;
 
 @property (assign, nonatomic) NSInteger         index;
 

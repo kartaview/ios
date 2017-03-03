@@ -267,7 +267,7 @@
 
     // -----
 
-    _rootViewStyleView = [UIView new];
+//    _rootViewStyleView = [UIView new];
     _rootViewStyleView.hidden = YES;
     _rootViewStyleView.backgroundColor = [UIColor blackColor];
     _rootViewStyleView.layer.masksToBounds = NO;

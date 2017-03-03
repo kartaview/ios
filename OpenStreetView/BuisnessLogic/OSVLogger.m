@@ -33,7 +33,23 @@ static OSVLogger *sharedInstance;
 - (id)init {
     self = [super init];
     if (self) {
+        NSString *logsFolder = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:kLogsFolderName];
+
+        NSFileManager *fm = NSFileManager.defaultManager;
+        NSArray *subPaths = [fm subpathsAtPath:logsFolder];
+        NSDate *current = [NSDate date];
         
+        for (NSString *path in subPaths) {
+            NSString *logPath = [logsFolder stringByAppendingString:[NSString stringWithFormat:@"/%@", path]];
+            NSDictionary *attributes = [fm attributesOfItemAtPath:logPath error:nil];
+            NSDate *lastModificationDate = [attributes objectForKey:NSFileModificationDate];
+            
+            NSTimeInterval timeInterval = [current timeIntervalSinceDate:lastModificationDate];
+            
+            if (fabs(timeInterval) > 3600 * 24 * 10) {
+                [fm removeItemAtPath:logPath error:nil];
+            }
+        }
     }
     return self;
 }

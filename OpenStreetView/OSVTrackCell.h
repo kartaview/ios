@@ -14,7 +14,9 @@
 @property (weak, nonatomic) IBOutlet UILabel *photoCountLabel;
 @property (weak, nonatomic) IBOutlet UILabel *distanceLabel;
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
+@property (weak, nonatomic) IBOutlet UILabel *pointsLabel;
 
+@property (weak, nonatomic) IBOutlet UIImageView *pointsImage;
 @property (weak, nonatomic) IBOutlet UIImageView *previewImage;
 
 @end

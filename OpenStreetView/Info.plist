@@ -15,7 +15,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.4.2</string>
+	<string>1.5.1</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -28,13 +28,41 @@
 				<string>osmLogin</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string></string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string></string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb</string>
+			</array>
+		</dict>
 	</array>
+	<key>FacebookAppID</key>
+	<string></string>
+	<key>FacebookDisplayName</key>
+	<string>OpenStreetCam</string>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>4</string>
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>
-		<string>c1f1517ab073bd0f7235948145e059192e8cb582</string>
+		<string></string>
 		<key>Kits</key>
 		<array>
 			<dict>
@@ -52,14 +80,20 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>This app needs Bluetooth access.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs to access your camera.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app needs your location</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app need to access you Photo Library.</string>
 	<key>OSMCredentials</key>
 	<dict>
 		<key>OSMKey</key>
-		<string>rBWV8Eaottv44tXfdLofdNvVemHOL62Lsutpb9tw</string>
+		<string></string>
 		<key>OSMSecret</key>
-		<string>rpmeZIp49sEjjcz91X9dsY0vD1PpEduixuPy8T6S</string>
+		<string></string>
 	</dict>
 	<key>UIFileSharingEnabled</key>
 	<true/>
@@ -83,6 +117,15 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>fbapi</string>
+		<string>fb-messenger-api</string>
+		<string>fbauth2</string>
+		<string>fbshareextension</string>
 	</array>
 </dict>
 </plist>

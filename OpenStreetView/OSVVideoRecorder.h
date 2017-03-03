@@ -19,7 +19,7 @@
 
 @property (weak, nonatomic) id<OSVVideoRecorder> delegate;
 
-- (instancetype)initWithVideoSize:(CMVideoDimensions)size encoding:(NSString *)encod bitrate:(NSInteger)bitrate;
+//- (instancetype)initWithVideoSize:(CMVideoDimensions)size encoding:(NSString *)encod bitrate:(NSInteger)bitrate;
 - (instancetype)initWithVideoSize:(CMVideoDimensions)size;
 
 - (BOOL)createRecordingWithURL:(NSURL *)url orientation:(AVCaptureVideoOrientation)orientaton;

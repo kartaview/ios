@@ -75,14 +75,18 @@
     }
 }
 
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
+}
+
 #pragma mark - Orientation
 
 - (BOOL)shouldAutorotate {
-    return NO;
+    return YES;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskPortrait;
+    return UIInterfaceOrientationMaskAll;
 }
 
 #pragma mark - UITableViewDatasource
@@ -98,6 +102,12 @@
     OSVTrackCell *trackCell = [tableView dequeueReusableCellWithIdentifier:@"layerCell"];
     [[OSVSyncController sharedInstance].tracksController loadPreviewForTrack:track intoImageView:trackCell.previewImage withCompletion:^(UIImage *image, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
+            float x = image.size.height / image.size.width;
+            if (fabs(x - 4.0/3.0) > 0.1 && fabs(x - 3.0/4.0) > 0.1) {
+                trackCell.previewImage.contentMode = UIViewContentModeScaleAspectFill;
+            } else {
+                trackCell.previewImage.contentMode = UIViewContentModeScaleAspectFit;
+            }
             trackCell.previewImage.image = image;
         });
     }];
@@ -122,6 +132,7 @@
     
     trackCell.dateLabel.attributedText = [NSAttributedString combineString:dString withSize:12.f color:[UIColor whiteColor] fontName:@"HelveticaNeue"
                                                                 withString:hString withSize:12.f color:[UIColor colorWithHex:0x6e707b] fontName:@"HelveticaNeue"];
+    trackCell.locationLabel.text = @"-";
     
     if ((!track.location || [track.location isEqualToString:@""])) {
         CLLocation *location = [[CLLocation alloc] initWithLatitude:track.coordinate.latitude longitude:track.coordinate.longitude] ;
@@ -135,8 +146,10 @@
                     CLPlacemark *placemark = placemarks[0];
                     NSArray *lines = placemark.addressDictionary[@"FormattedAddressLines"];
                     NSString *addressString = [lines componentsJoinedByString:@","];
-                    track.location = addressString;
-                    trackCell.locationLabel.text = addressString;
+                    if (!addressString || [addressString isEqualToString:@""]) {
+                        track.location = addressString;
+                        trackCell.locationLabel.text = addressString;
+                    }
                 }
                 [woperation asyncTaskDone];
             }];

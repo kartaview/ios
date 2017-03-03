@@ -22,6 +22,8 @@
 @synthesize hasOBD;
 @synthesize location;
 @synthesize previewImage;
+@synthesize coverage;
+@synthesize scoreHistory;
 
 - (BOOL)intersectWithTopLeftCoordinate:(CLLocationCoordinate2D)tlCoordinate andBottomRightCoordinate:(CLLocationCoordinate2D)brCoordinate {
     if ((!self.topLeftCoordinate.latitude && !self.topLeftCoordinate.longitude) || (!self.bottomRightCoordinate.latitude && !self.bottomRightCoordinate.longitude)) {
@@ -53,6 +55,7 @@
 @synthesize hasOBD;
 @synthesize location;
 @synthesize previewImage;
+@synthesize coverage;
 
 - (BOOL)intersectWithTopLeftCoordinate:(CLLocationCoordinate2D)tlCoordinate andBottomRightCoordinate:(CLLocationCoordinate2D)brCoordinate {
     if ((!self.topLeftCoordinate.latitude && !self.topLeftCoordinate.longitude) || (!self.bottomRightCoordinate.latitude && !self.bottomRightCoordinate.longitude)) {

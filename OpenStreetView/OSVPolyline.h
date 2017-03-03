@@ -10,6 +10,7 @@
 
 @interface OSVPolyline : SKPolyline
 
-@property (nonatomic, assign) BOOL isLocal;
+@property (nonatomic, assign) BOOL          isLocal;
+@property (nonatomic, assign) NSInteger     coverage;
 
 @end

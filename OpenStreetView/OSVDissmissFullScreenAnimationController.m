@@ -31,8 +31,7 @@
                                     [UIView addKeyframeWithRelativeStartTime:0.0 relativeDuration:1.0 animations:^{
                                       source.imageView.frame = self.destinationFrame;
                                     }];
-                              }
-                              completion:^(BOOL finished) {
+                              } completion:^(BOOL finished) {
                                      [transitionContext completeTransition:YES];
                               }];
     

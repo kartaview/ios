@@ -21,4 +21,8 @@
 
 @interface OSVAPIConfigurator : NSObject <OSVAPIConfigurator>
 
++ (nonnull NSString *)testingEnvironment;
++ (nonnull NSString *)stagingEnvironment;
++ (nonnull NSString *)productionEnvironment;
+
 @end

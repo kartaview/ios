@@ -17,11 +17,23 @@
 @implementation OSVMainMenuFactory
 
 + (NSArray *)mainMenu {
-    NSArray *array = @[[self myProfileItem],  [self localTracksItem], [self settingsItem]];
+    NSArray *array;
+    if ([OSVUserDefaults sharedInstance].useGamification) {
+        array = @[[self myProfileItem],
+                   [self localTracksItem],
+                   [self leaderboardItem],
+                   [self settingsItem]];
+    } else {
+        array = @[[self myProfileItem],
+                   [self localTracksItem],
+                   [self settingsItem]];
+    }
+    
     
     return array;
 }
 
+//TODO check version from 07/02/2017
 + (OSVMenuItem *)myProfileItem {
     OSVMenuItem *item = [OSVMenuItem new];
     item.title = NSLocalizedString(@"My Profile", @"");
@@ -29,18 +41,7 @@
     
     item.action = ^(UIViewController *sender, id info) {
         if (![[OSVSyncController sharedInstance].tracksController userIsLoggedIn]) {
-            [[OSVSyncController sharedInstance].tracksController loginWithCompletion:^(NSError *error) {
-                if (error) {
-                    [UIAlertView showWithTitle:@"" message:@"Failed to login. Please retry." cancelButtonTitle:@"Ok" otherButtonTitles:nil tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
-                        
-                    }];
-                } else {
-                    
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [sender performSegueWithIdentifier:@"showMyProfile" sender:info];
-                    });
-                }
-            }];
+			[sender performSegueWithIdentifier:@"showLoginController" sender:info];
         } else {
             [sender performSegueWithIdentifier:@"showMyProfile" sender:info];
         }
@@ -49,30 +50,16 @@
     return item;
 }
 
+//TODO check version from 07/02/2017
 + (OSVMenuItem *)localTracksItem {
     OSVMenuItem *item = [OSVMenuItem new];
     item.title = NSLocalizedString(@"Upload", @"");
     item.additional = @{@"icon":[UIImage imageNamed:@"tracks"]};
     
-    item.action = ^(UIViewController * sender, id info) {
+    item.action = ^(UIViewController *sender, id info) {
         if ([OSVSyncController hasSequencesToUpload]) {
             if ([OSVUserDefaults sharedInstance].isUploading) {
-                if (![[OSVSyncController sharedInstance].tracksController userIsLoggedIn]) {
-                    [[OSVSyncController sharedInstance].tracksController loginWithCompletion:^(NSError *error) {
-                        if (error) {
-                            [UIAlertView showWithTitle:@"" message:@"Failed to login. Please retry." cancelButtonTitle:@"Ok" otherButtonTitles:nil tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
-                                
-                            }];
-                        } else {
-                            
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                [sender performSegueWithIdentifier:@"showUploading" sender:info];
-                            });
-                        }
-                    }];
-                } else {
-                    [sender performSegueWithIdentifier:@"showUploading" sender:info];
-                }
+				[sender performSegueWithIdentifier:@"showUploading" sender:info];
             } else {
                 [sender performSegueWithIdentifier:@"showLocalTracks" sender:info];
             }
@@ -86,12 +73,24 @@
     return item;
 }
 
++ (OSVMenuItem *)leaderboardItem {
+    OSVMenuItem *item = [OSVMenuItem new];
+    item.title = NSLocalizedString(@"Leaderboard", @"");
+    item.additional = @{@"icon":[UIImage imageNamed:@"leaderboard"]};
+    
+    item.action = ^(UIViewController *sender, id info) {
+        [sender performSegueWithIdentifier:@"showLeaderboard" sender:info];
+    };
+    
+    return item;
+}
+
 + (OSVMenuItem *)settingsItem {
     OSVMenuItem *item = [OSVMenuItem new];
     item.title = NSLocalizedString(@"Settings", @"");
     item.additional = @{@"icon":[UIImage imageNamed:@"settings"]};
     
-    item.action = ^(UIViewController * sender, id info) {
+    item.action = ^(UIViewController *sender, id info) {
         [sender performSegueWithIdentifier:@"showSettings" sender:info];
     };
     

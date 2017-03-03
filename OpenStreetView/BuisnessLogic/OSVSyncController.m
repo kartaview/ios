@@ -13,7 +13,7 @@
 #import "ConnectivityHandler.h"
 #import "OSVServerPhoto.h"
 #import "OSVServerSequence+Convertor.h"
-#import "OSVBaseUser+OSM.h"
+#import "OSVBaseUser.h"
 
 #import "UIDevice+Aditions.h"
 #import "OSVAPISerialOperation.h"
@@ -28,7 +28,7 @@
 @interface OSVSyncController () <OSVAPIConfigurator>
 
 @property (nonatomic, assign) BOOL              cancelGetRequests;
-@property (nonatomic) NSString                  *basePath;
+
 @end
 
 @implementation OSVSyncController
@@ -39,9 +39,9 @@
     if (self) {
         OSVAPI *osvAPI = [OSVAPI new];
         osvAPI.configurator = self;
-        self.basePath = [self createBasePath];
-        self.tracksController = [[OSVTrackSyncController alloc] initWithOSVAPI:osvAPI basePath:self.basePath];
-        self.logger = [[OSVTrackLogger alloc] initWithBasePath:self.basePath];
+
+        self.tracksController = [[OSVTrackSyncController alloc] initWithOSVAPI:osvAPI];
+        self.logger = [[OSVTrackLogger alloc] initWithBasePath:[OSVUtils createOSCBasePath]];
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveNetworkStatusChange:) name:kReachabilityChangedNotification object:nil];
     }
@@ -64,35 +64,16 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (NSString *)createBasePath {
-    NSError *error;
-    NSString *photosFolderPath = [[OSVUtils getDirectoryPath] stringByAppendingString:@"/Photos/"];
-    
-    if (![[NSFileManager defaultManager] fileExistsAtPath:photosFolderPath]) {
-        [[NSFileManager defaultManager] createDirectoryAtPath:photosFolderPath withIntermediateDirectories:YES attributes:nil error:&error];
-        NSError *error = nil;
-        NSURL *URL = [NSURL fileURLWithPath:photosFolderPath];
-        
-        BOOL success = [URL setResourceValue:[NSNumber numberWithBool:YES]
-                                      forKey:NSURLIsExcludedFromBackupKey error: &error];
-        if(!success){
-            NSLog(@"Error excluding %@ from backup %@", [URL lastPathComponent], error);
-        }
-    }
-    
-    return photosFolderPath;
-}
-
 + (BOOL)isUploading {
     return [[OSVSyncController sharedInstance].tracksController isUploading];
 }
 
 + (long long)sizeOnDiskForSequences {
-    return [OSVSyncUtils sizeOnDiskForSequencesAtPath:[OSVSyncController sharedInstance].basePath];
+    return [OSVSyncUtils sizeOnDiskForSequencesAtPath:[OSVUtils createOSCBasePath]];
 }
 
 + (long long)sizeOnDiskForSequence:(id<OSVSequence>)sequence  {
-    return [OSVSyncUtils sizeOnDiskForSequence:sequence atPath:[OSVSyncController sharedInstance].basePath];
+    return [OSVSyncUtils sizeOnDiskForSequence:sequence atPath:[OSVUtils createOSCBasePath]];
 }
 
 + (BOOL)hasSequencesToUpload {

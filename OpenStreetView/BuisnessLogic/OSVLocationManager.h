@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "OSVSensorsManager.h"
+#import <SKMaps/SKPositionerService.h>
 
 @protocol CLLocationManagerDelegate;
 @class CLLocation;
@@ -16,14 +17,17 @@
 
 @property (weak, nonatomic) id<CLLocationManagerDelegate>    delegate;
 @property (assign, nonatomic) BOOL                           realPositions;
-@property (strong, nonatomic) OSVSensorsManager              *sensorsManager;
 
-@property (strong, nonatomic, readonly) CLLocation           *currentLocation;
+@property (assign, nonatomic) SKPositionerMode              positionerMode;
 
 + (instancetype)sharedInstance;
 
-- (void)startUpdatingLocation;
-- (void)startUpdatingHeading;
+- (CLLocation *)currentMatchedPosition;
+- (CLLocation *)currentLocation;
+
+- (void)startLocationUpdate;
+- (void)cancelLocationUpdate;
+- (void)reportGPSLocation:(CLLocation *)location;
 
 @end
 

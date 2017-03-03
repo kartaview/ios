@@ -13,13 +13,17 @@
 #import "UIColor+OSVColor.h"
 #import "UIAlertView+Blocks.h"
 #import "OSVUserDefaults.h"
+#import "OSVPopTransition.h"
 
 #import <SKMaps/SKPositionerService.h>
 #import "NSAttributedString+Additions.h"
 #import "NSMutableAttributedString+Additions.h"
 #import "UIColor+OSVColor.h"
+#import "UIDevice+Aditions.h"
 
-@interface OSVUploadViewController ()
+#import "OSVLocationManager.h"
+
+@interface OSVUploadViewController () <UINavigationControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet KAProgressLabel    *progressView;
 @property (weak, nonatomic) IBOutlet UIButton           *stopButton;
@@ -86,7 +90,7 @@
     self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
 
     if ([CLLocationManager authorizationStatus] ==  kCLAuthorizationStatusAuthorizedWhenInUse) {
-        [[SKPositionerService sharedInstance] cancelLocationUpdate];
+        [[OSVLocationManager sharedInstance] cancelLocationUpdate];
     }
     if ([OSVSyncController sharedInstance].tracksController.isPaused) {
         self.isPaused = YES;
@@ -102,7 +106,7 @@
     self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
 
     if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse) {
-        [[SKPositionerService sharedInstance] startLocationUpdate];
+        [[OSVLocationManager sharedInstance] startLocationUpdate];
     }
 }
 
@@ -110,25 +114,18 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
+}
+
+#pragma mark - Orientation
+
 - (BOOL)shouldAutorotate {
-    return NO;
+    return YES;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskPortrait;
-}
-
-- (void)addRightNavigationItemWithText:(NSString *)text andCount:(NSString *)stringCount {
-    
-    if (!self.status) {
-        CGRect rect = CGRectMake(0, 0, self.view.frame.size.width/1.5, 40);
-        self.status = [[UILabel alloc] initWithFrame:rect];
-        self.status.textAlignment = NSTextAlignmentRight;
-        self.navigationItem.rightBarButtonItems = @[[[UIBarButtonItem alloc] initWithCustomView:self.status]];
-    }
-    
-    self.status.attributedText = [NSAttributedString combineString:text withSize:22.f color:[UIColor hex6E707B] fontName:@"HelveticaNeue-Light"
-                                                  withString:stringCount withSize:22.f color:[UIColor whiteColor] fontName:@"HelveticaNeue-Light"];
+    return UIInterfaceOrientationMaskAll;
 }
 
 #pragma mark - Actions
@@ -149,7 +146,8 @@
 }
 
 - (IBAction)didTapBack:(id)sender {
-    [self.navigationController popViewControllerAnimated:YES];
+    self.navigationController.delegate = self;
+    [self didFinishUploadingAllSequncesWitError:nil];
 }
 
 #pragma mark - Uploading notifications
@@ -271,13 +269,23 @@
         
         NSString *progString =[NSString stringWithFormat:@"%.0f%%", currentProgress/totalSize * 100];
         
-        progressAttributedString = [NSMutableAttributedString mutableAttributedStringWithString:progString withSize:80 color:[UIColor whiteColor] fontName:@"HelveticaNeue-UltraLight"];
+        float progressFontSize = [UIDevice isLessTheniPhone6]?60:80;
+        progressAttributedString = [NSMutableAttributedString mutableAttributedStringWithString:progString
+                                                                                       withSize:progressFontSize
+                                                                                          color:[UIColor whiteColor]
+                                                                                       fontName:@"HelveticaNeue-UltraLight"];
+        
         NSString *cProgress = [NSString stringWithFormat:@"\n%@ ", [OSVUtils  memoryFormatter:currentProgress]];
-        NSAttributedString *curentProgAttributed = [NSAttributedString attributedStringWithString:cProgress withSize:12.f color:[UIColor whiteColor] fontName:@"HelveticaNeue"];
+        NSAttributedString *curentProgAttributed = [NSAttributedString attributedStringWithString:cProgress
+                                                                                         withSize:12.f
+                                                                                            color:[UIColor whiteColor]
+                                                                                         fontName:@"HelveticaNeue"];
         
         NSString *tSize = [NSString stringWithFormat:@"| %@", [OSVUtils memoryFormatter:totalSize]];
-        
-        NSAttributedString *totalAttributed = [NSAttributedString attributedStringWithString:tSize withSize:12.f color:[UIColor hex6E707B] fontName:@"HelveticaNeue"];
+        NSAttributedString *totalAttributed = [NSAttributedString attributedStringWithString:tSize
+                                                                                    withSize:12.f
+                                                                                       color:[UIColor hex6E707B]
+                                                                                    fontName:@"HelveticaNeue"];
         
         [progressAttributedString appendAttributedString:curentProgAttributed];
         [progressAttributedString appendAttributedString:totalAttributed];
@@ -333,5 +341,30 @@ const int kTimeSecondsInDay = 86400;
     
     return [NSString stringWithFormat:@"%.1f %@/s", speed, unitString];
 }
+
+- (nullable id <UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
+                                            animationControllerForOperation:(UINavigationControllerOperation)operation
+                                                         fromViewController:(UIViewController *)fromVC
+                                                           toViewController:(UIViewController *)toVC {
+    if ([toVC isKindOfClass:NSClassFromString(@"OSVMapViewController")]) {
+        return [[OSVPopTransition alloc] initWithoutAnimatingSource:YES];
+    }
+    
+    return nil;
+}
+
+- (void)addRightNavigationItemWithText:(NSString *)text andCount:(NSString *)stringCount {
+    
+    if (!self.status) {
+        CGRect rect = CGRectMake(0, 0, self.view.frame.size.width/1.5, 40);
+        self.status = [[UILabel alloc] initWithFrame:rect];
+        self.status.textAlignment = NSTextAlignmentRight;
+        self.navigationItem.rightBarButtonItems = @[[[UIBarButtonItem alloc] initWithCustomView:self.status]];
+    }
+    
+    self.status.attributedText = [NSAttributedString combineString:text withSize:22.f color:[UIColor hex6E707B] fontName:@"HelveticaNeue-Light"
+                                                        withString:stringCount withSize:22.f color:[UIColor whiteColor] fontName:@"HelveticaNeue-Light"];
+}
+
 
 @end

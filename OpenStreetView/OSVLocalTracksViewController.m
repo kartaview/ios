@@ -20,11 +20,13 @@
 #import "OSVReachablityController.h"
 #import "OSVUploadViewController.h"
 #import "OSVVideoPlayerViewController.h"
+#import "OSVPushTransition.h"
+#import "OSVPopTransition.h"
 
 #import "UIColor+OSVColor.h"
 #import "NSAttributedString+Additions.h"
 
-@interface OSVLocalTracksViewController ()
+@interface OSVLocalTracksViewController () <UINavigationControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet UIButton *tracksCount;
 @property (weak, nonatomic) IBOutlet UIButton *viewControllerTitle;
@@ -49,17 +51,24 @@
     self.metricSystem = [[OSVUserDefaults sharedInstance].distanceUnitSystem isEqualToString:kMetricSystem];
 
     [self addRightNavigationItemWithText:NSLocalizedString(@"Upload ", @"") andCount:@"-"];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+        NSString *string = [OSVUtils memoryFormatter:[OSVSyncController sizeOnDiskForSequences]];
+        dispatch_async(dispatch_get_main_queue(), ^{
+         [self addRightNavigationItemWithText:NSLocalizedString(@"Upload ", @"") andCount:string];
+        });
+    });
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [[OSVSyncController sharedInstance].tracksController getLocalSequencesWithCompletion:^(NSArray<OSVSequence *> *sequences) {
             self.dataSource = [sequences mutableCopy];
-        
-            [self addRightNavigationItemWithText:NSLocalizedString(@"Upload ", @"") andCount:[@(self.dataSource.count) stringValue]];
             
             [self.tableView reloadData];
         }];
     });
     [self.uploadAll setTitle:NSLocalizedString(@"UPLOAD ALL", @"") forState:UIControlStateNormal];
     self.tableView.allowsMultipleSelectionDuringEditing = NO;
+    self.navigationController.delegate = self;
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -75,11 +84,11 @@
 }
 
 - (BOOL)shouldAutorotate {
-    return NO;
+    return YES;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskPortrait;
+    return UIInterfaceOrientationMaskAll;
 }
 
 #pragma mark - Private 
@@ -94,11 +103,16 @@
     self.navigationItem.rightBarButtonItems = @[[[UIBarButtonItem alloc] initWithCustomView:label]];
 }
 
-
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     OSVSequence *sequence = self.dataSource[indexPath.row];
-    [self performSegueWithIdentifier:@"videoPlayerSegueID" sender:sequence];
+    [[OSVSyncController sharedInstance].tracksController getScoreHistoryForSequenceWithID:sequence.uid completion:^(NSArray *history) {
+        sequence.scoreHistory = [history mutableCopy];
+        sequence.points = 0;
+        for (OSVScoreHistory *sch in history) {
+            sequence.points += sch.points;
+        }
+        [self performSegueWithIdentifier:@"videoPlayerSegueID" sender:sequence];
+    }];
 }
 
 #pragma mark - UITableViewDatasource
@@ -113,7 +127,7 @@
     
     OSVSequence *track = self.dataSource[indexPath.row];
     OSVPhoto    *photo = track.photos.firstObject;
-    
+        
     cell.locationLabel.text = [NSString stringWithFormat:@"%@", track.location];
     cell.photoCountLabel.attributedText = [NSAttributedString combineString:[@(track.photos.count) stringValue] withSize:12.f color:[UIColor colorWithHex:0x6e707b] fontName:@"HelveticaNeue"
                                                                  withString:@" IMG" withSize:12.f color:[UIColor colorWithHex:0xb7bac5] fontName:@"HelveticaNeue"];
@@ -149,10 +163,10 @@
                 if ([placemarks count] > 0) {
                     CLPlacemark *placemark = placemarks[0];
                     NSArray *lines = placemark.addressDictionary[@"FormattedAddressLines"];
-                    NSString *addressString = [lines componentsJoinedByString:@","];
+                    NSString *addressString = [lines componentsJoinedByString:@", "];
                     photo.photoData.addressName = addressString;
                     if ([photo isKindOfClass:[OSVPhoto class]]) {
-                        [OSVPersistentManager updatedPhoto:photo withAddress:addressString];
+                        [OSVPersistentManager updatedPhoto:photo];
                     }
                     cell.locationLabel.text = addressString;
                 }
@@ -177,7 +191,14 @@
         [[OSVSyncController sharedInstance].tracksController deleteSequence:self.dataSource[indexPath.row] withCompletionBlock:^(NSError *error) {
             [self.dataSource removeObjectAtIndex:indexPath.row];
             [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-            [self addRightNavigationItemWithText:NSLocalizedString(@"Upload ", @"") andCount:[@(self.dataSource.count) stringValue]];
+           
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+                NSString *string = [OSVUtils memoryFormatter:[OSVSyncController sizeOnDiskForSequences]];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self addRightNavigationItemWithText:NSLocalizedString(@"Upload ", @"") andCount:string];
+                });
+            });
+            
             if (self.dataSource.count == 0) {
                 [self.navigationController popViewControllerAnimated:YES];
             }
@@ -209,7 +230,9 @@
         if (reach && hasServerAccess) {
             [self performSegueWithIdentifier:@"uploadViewControllerSegueID" sender:@(shouldUpload)];
         } else if (reach && !hasServerAccess) {
-            [[OSVSyncController sharedInstance].tracksController loginWithCompletion:^(NSError *error) {
+            [[OSVSyncController sharedInstance].tracksController loginWithPartial:^(NSError * _Nullable error) {
+				
+			} andCompletion:^(NSError * _Nullable error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self performSegueWithIdentifier:@"uploadViewControllerSegueID" sender:@(shouldUpload)];
                 });
@@ -217,5 +240,25 @@
         }
     }
 }
+
+#pragma mark - UINavigationControllerDelegate
+
+- (nullable id <UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
+                                            animationControllerForOperation:(UINavigationControllerOperation)operation
+                                                         fromViewController:(UIViewController *)fromVC
+                                                           toViewController:(UIViewController *)toVC {
+    if ([toVC isKindOfClass:[OSVUploadViewController class]]) {
+        
+        return [OSVPushTransition new];
+    } else if ([fromVC isKindOfClass:[OSVUploadViewController class]]) {
+    
+        return [OSVPopTransition new];
+    } else if ([toVC isKindOfClass:NSClassFromString(@"OSVMapViewController")]) {
+        return [[OSVPopTransition alloc] initWithoutAnimatingSource:YES];
+    }
+    
+    return nil;
+}
+
 
 @end

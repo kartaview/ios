@@ -12,7 +12,8 @@
 #import "UIColor+OSVColor.h"
 #import "OSVUtils.h"
 #import "OSVLocationManager.h"
-
+#import "OSVTrackMatcher.h"
+#import "OSVUserDefaults.h"
 
 @interface OSVCameraMapManager () <SKMapViewDelegate>
 
@@ -29,13 +30,15 @@
 @property (assign, nonatomic) BOOL isRequestingRight;
 
 @property (strong, nonatomic) NSMutableArray *bufferV;
-
-@property (strong, nonatomic) NSMutableArray *bufferT;
-@property (strong, nonatomic) NSMutableArray *bufferB;
-@property (strong, nonatomic) NSMutableArray *bufferL;
-@property (strong, nonatomic) NSMutableArray *bufferR;
+@property (strong, nonatomic) NSMutableArray *bufferN;
 
 @property (strong, nonatomic) SKBoundingBox *viewBox;
+@property (strong, nonatomic) SKBoundingBox *midBox;
+@property (strong, nonatomic) SKBoundingBox *loadedBox;
+
+@property (assign, nonatomic) NSInteger     bestIndex;
+
+@property (strong, nonnull) NSLock          *lock;
 
 @end
 
@@ -47,120 +50,93 @@
         self.first = YES;
 
         self.mapView = view;
-        self.mapView.delegate = self;
+		self.mapView.delegate = self;
+		self.mapView.clipsToBounds = YES;
+		
+		self.mapView.mapScaleView.hidden = YES;
+
+		self.mapView.settings.showHouseNumbers = NO;
+		self.mapView.settings.showCompass = NO;
+		self.mapView.settings.displayMode = SKMapDisplayMode2D;
+		self.mapView.settings.showStreetNamePopUps = YES;
+		self.mapView.settings.osmAttributionPosition = SKOSMAttributionPositionTopLeft;
+		self.mapView.settings.panningEnabled = NO;
+		
+		SKMapZoomLimits zoomLimits;
+		zoomLimits.mapZoomLimitMax = 20;
+		zoomLimits.mapZoomLimitMin = 15;
+		self.mapView.settings.zoomLimits = zoomLimits;
+		
+		SKCoordinateRegion region;
+		region.zoomLevel = [OSVUserDefaults sharedInstance].zoomLevel;
+		region.center = [OSVLocationManager sharedInstance].currentLocation.coordinate;
+		self.mapView.visibleRegion = region;
+		
         self.colorPurple = [UIColor colorWithHex:0xbd10e0];
         self.bufferV = [NSMutableArray array];
+        self.bufferN = [NSMutableArray array];
+
+        self.matcher = [OSVTrackMatcher new];
+        self.matcher.delegate = self;
+        self.lock = [NSLock new];
     }
     
     return self;
 }
 
 - (void)mapView:(SKMapView *)mapView didChangeToRegion:(SKCoordinateRegion)region {
-    if (self.first) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self addTracksOnMapWithRegion:region];
-            self.first = NO;
-        });
-    } else {
-        [self addTracksOnMapWithRegion:region];
-    }
+    [self.matcher getTracksForMap:self.mapView withRegion:region];
 }
 
-
-- (void)addTracksOnMapWithRegion:(SKCoordinateRegion)region {
-    SKBoundingBox *box = [SKBoundingBox boundingBoxForRegion:region inMapViewWithSize:self.mapView.frame.size];
-    
-    double diagonalTopL = [OSVUtils getAirDistanceBetweenCoordinate:box.topLeftCoordinate andCoordinate:self.viewBox.topLeftCoordinate];
-    double diagonalBotR = [OSVUtils getAirDistanceBetweenCoordinate:box.bottomRightCoordinate andCoordinate:self.viewBox.bottomRightCoordinate];
-    
-    CLLocationCoordinate2D boxTopRight = CLLocationCoordinate2DMake(box.topLeftCoordinate.latitude, box.bottomRightCoordinate.longitude);
-    CLLocationCoordinate2D boxBotLeft = CLLocationCoordinate2DMake(box.bottomRightCoordinate.latitude, box.topLeftCoordinate.longitude);
-    CLLocationCoordinate2D viewTopRight = CLLocationCoordinate2DMake(self.viewBox.topLeftCoordinate.latitude, self.viewBox.bottomRightCoordinate.longitude);
-    CLLocationCoordinate2D viewBotLeft = CLLocationCoordinate2DMake(self.viewBox.bottomRightCoordinate.latitude, self.viewBox.topLeftCoordinate.longitude);
-    
-    double diagonalTopR = [OSVUtils getAirDistanceBetweenCoordinate:boxTopRight andCoordinate:viewTopRight];
-    double diagonalBotL = [OSVUtils getAirDistanceBetweenCoordinate:boxBotLeft andCoordinate:viewBotLeft];
-    
-    double diagonal = [OSVUtils getAirDistanceBetweenCoordinate:self.viewBox.topLeftCoordinate andCoordinate:self.viewBox.bottomRightCoordinate];
-    
-    if (((![self.viewBox containsLocation:box.bottomRightCoordinate] && ![self.viewBox containsLocation:box.topLeftCoordinate]) ||
-         !self.isRequestingView) &&
-        (diagonalTopL  / diagonal < 0.4   ||
-         diagonalBotR  / diagonal < 0.4   ||
-         diagonalTopR  / diagonal < 0.4   ||
-         diagonalBotL  / diagonal < 0.4   ||
-         ![self.viewBox containsLocation:box.topLeftCoordinate] ||
-         ![self.viewBox containsLocation:box.bottomRightCoordinate]) ) {
-            
-            self.isRequestingView = YES;
-            self.viewBox = [SKBoundingBox new];
-            self.viewBox.topLeftCoordinate = CLLocationCoordinate2DMake(box.topLeftCoordinate.latitude + 0.02, box.topLeftCoordinate.longitude - 0.02);
-            self.viewBox.bottomRightCoordinate = CLLocationCoordinate2DMake(box.bottomRightCoordinate.latitude - 0.02, box.bottomRightCoordinate.longitude + 0.02);
-            
-            [self deleteBuffer:self.bufferV];
-            self.bufferV = [NSMutableArray array];
-            
-            NSLog(@"requested view");
-
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-                [[OSVSyncController sharedInstance].tracksController getServerTracksInBoundingBox:(id<OSVBoundingBox>)self.viewBox withZoom:region.zoomLevel withPartialCompletion:^(id<OSVSequence> sequence, OSVMetadata *metadata, NSError *error) {
-                    if ([metadata isLastPage] || error || !sequence) {
-                        self.isRequestingView = NO;
-                    }
-                    
-                    [self addSequenceOnMap:sequence];
-                    [self.bufferV addObject:@(_iii_)];
-                }];
-            });
-        }
+- (void)mapView:(SKMapView *)mapView didEndRegionChangeToRegion:(SKCoordinateRegion)region {
+	if (region.zoomLevel <= 20 && region.zoomLevel >= 15) {
+		[OSVUserDefaults sharedInstance].zoomLevel = region.zoomLevel;
+		[[OSVUserDefaults sharedInstance] save];
+	}
+}
+	
+- (void)addPolyline:(OSVPolyline *)polyline {
+    [self.lock lock];
+        [self.bufferN addObject:polyline];
+    [self.lock unlock];
 }
 
 int _iii_ = 0;
 
-- (void)addSequenceOnMap:(id<OSVSequence>)sequence {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSArray *track = [self getTrackForSequence:sequence];
-        OSVPolyline *polyline = [OSVPolyline new];
-        polyline.lineWidth = 6;
-        polyline.backgroundLineWidth = 6;
-        polyline.coordinates = track;
-        if (_iii_ > 2000) {
-            _iii_ = 0;
-        }
-        polyline.identifier = _iii_++;
+- (void)moveToMap {
+    
+    [self.lock lock];
+//    NSLog(@"___x___ %p - %ld,  %p - %ld", self.bufferV, self.bufferV.count, self.bufferN, self.bufferN.count);
 
-        if ([sequence isKindOfClass:[OSVSequence class]]) {
-            polyline.fillColor = [UIColor blackColor];
-        } else {
-            polyline.fillColor = self.colorPurple;
-        }
-        
-        polyline.isLocal = YES;
-        [self.mapView addPolyline:polyline];
-    });
-}
-
-
-- (void)deleteBuffer:(NSMutableArray *)array {
-    for (NSNumber *uid in array) {
+    for (NSNumber *uid in self.bufferV) {
         [self.mapView clearOverlayWithID:(int)[uid integerValue]];
     }
-}
-
-- (NSMutableArray *)getTrackForSequence:(id<OSVSequence>)sequence {
+    self.bufferV = [NSMutableArray array];
     
-    NSMutableArray *positions;
-    if ([sequence isKindOfClass:[OSVSequence class]] || !sequence.track.count) {
-        positions = [NSMutableArray array];
-        for (OSVPhoto *photo in sequence.photos) {
-            CLLocation *location = photo.photoData.location;
-            [positions addObject:location];
+    for (OSVPolyline *polyline in self.bufferN) {
+        
+        if (_iii_ > 3000) {
+            _iii_ = 0;
         }
-    } else {
-        positions = [sequence.track mutableCopy];
+        
+        polyline.identifier = _iii_;
+        polyline.lineWidth = 6;
+        polyline.backgroundLineWidth = 6;
+        polyline.fillColor = [self.colorPurple colorWithAlphaComponent:MIN(polyline.coverage, 10.0)/10.0 + 0.01];
+        polyline.strokeColor = [self.colorPurple colorWithAlphaComponent:MIN(polyline.coverage, 10.0)/10.0 + 0.01];
+        
+        [self.bufferV addObject:@(_iii_)];
+        
+        _iii_ += 1;
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.mapView addPolyline:polyline];
+        });
     }
     
-    return positions;
+    self.bufferN = [NSMutableArray array];
+    
+    [self.lock unlock];
 }
 
 @end

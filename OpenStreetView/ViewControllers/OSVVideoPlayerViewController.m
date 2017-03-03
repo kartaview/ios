@@ -11,6 +11,7 @@
 #import "OSVSyncController.h"
 #import "OSVPolyline.h"
 #import "UIColor+OSVColor.h"
+#import "UIViewController+Additions.h"
 #import "OSVPhotoPlayer.h"
 
 #import "OSVServerSequence.h"
@@ -21,16 +22,26 @@
 
 #import <SKMaps/SKMaps.h>
 
+#import "OSVScoreDetailsView.h"
+#import "OSVScoreHistory.h"
+#import "OSVUserDefaults.h"
+
+#import "OSVUtils.h"
+
+#import "OSC-Swift.h"
+
 @interface OSVVideoPlayerViewController () <OSVPlayerDelegate, UIViewControllerTransitioningDelegate, OSVFullScreenImageViewControllerDelegate, UIGestureRecognizerDelegate>
 
 @property (weak, nonatomic) IBOutlet UIButton       *playButton;
-@property (weak, nonatomic) IBOutlet SKMapView      *mapView;
+@property (strong, nonatomic) SKMapView             *mapView;
 @property (weak, nonatomic) IBOutlet UILabel        *dateLabel;
 @property (weak, nonatomic) IBOutlet UILabel        *frameIndexLabel;
 @property (weak, nonatomic) IBOutlet UIImageView    *frameIndexImage;
 @property (weak, nonatomic) IBOutlet UISlider       *basicSlider;
 @property (weak, nonatomic) IBOutlet UIButton       *fullScreenButton;
 @property (weak, nonatomic) IBOutlet UIButton       *deletePhotoButton;
+@property (weak, nonatomic) IBOutlet UILabel        *pointsLabel;
+@property (weak, nonatomic) IBOutlet UIButton       *pointsButton;
 
 @property (strong, nonatomic) id<OSVPlayer>         player;
 @property (assign, nonatomic) NSInteger             frameIndex;
@@ -45,9 +56,23 @@
 @property (strong, nonatomic) OSVDissmissFullScreenAnimationController  *dissmissFullScreenAnimationController;
 
 @property (strong, nonatomic) id savedGestureRecognizerDelegate;
+
+@property (weak, nonatomic) IBOutlet OSVScoreDetailsView    *scoreDetails;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint     *detailsLeading;
+@property (weak, nonatomic) IBOutlet UIView                 *circleAnimation;
+@property (weak, nonatomic) IBOutlet UIView                 *mapViewContainer;
+
 @end
 
 @implementation OSVVideoPlayerViewController
+
+-  (void)viewDidLoad {
+    [super viewDidLoad];
+    if ([OSVUserDefaults sharedInstance].enableMap) {
+        self.mapView = [[SKMapView alloc] initWithFrame:self.mapViewContainer.bounds];
+    }
+    [UIViewController addMapView:self.mapView toView:self.mapViewContainer];
+}
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -74,13 +99,15 @@
                 self.player = [[OSVPhotoPlayer alloc] initWithView:self.videoPlayerPreview andSlider:self.basicSlider];
             } else {
                 [[OSVSyncController sharedInstance].tracksController getPhotosForTrack:self.selectedSequence withCompletionBlock:^(id<OSVSequence> seq, NSError *error) {
-                    self.player = [[OSVPhotoPlayer alloc] initWithView:self.videoPlayerPreview andSlider:self.basicSlider];
-                    self.player.delegate = self;
-                    if (self.player.currentPlayableItem != self.selectedSequence.photos) {
-                        [self.player prepareForPlayableItem:self.selectedSequence.photos startingFromIndex:self.startingFrameIndex];
-                        [self zoomOnSequence:self.selectedSequence];
-                        [self addSequenceOnMap:self.selectedSequence];
-                    }
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        self.player = [[OSVPhotoPlayer alloc] initWithView:self.videoPlayerPreview andSlider:self.basicSlider];
+                        self.player.delegate = self;
+                        if (self.player.currentPlayableItem != self.selectedSequence.photos) {
+                            [self.player prepareForPlayableItem:self.selectedSequence.photos startingFromIndex:self.startingFrameIndex];
+                            [self zoomOnSequence:self.selectedSequence];
+                            [self addSequenceOnMap:self.selectedSequence];
+                        }
+                    });
                 }];
             }
         } else {
@@ -103,18 +130,65 @@
     self.videoPlayerPreview.layer.borderColor = [[UIColor colorWithHex:0x6e707b] colorWithAlphaComponent:0.3].CGColor;
     self.videoPlayerPreview.layer.borderWidth = 1;
     self.videoPlayerPreview.layer.cornerRadius = 3;
+    
+    if ([OSVUserDefaults sharedInstance].useGamification &&
+        ![self.selectedSequence isKindOfClass:[OSVServerSequencePart class]]) {
+        NSString *pointsString = [@(((OSVSequence *)self.selectedSequence).points) stringValue];
+        if (((OSVSequence *)self.selectedSequence).points > 9999) {
+            pointsString = [NSString  stringWithFormat:@"%ldK", ((OSVSequence *)self.selectedSequence).points/1000];
+        }
+        NSAttributedString *points = [NSAttributedString combineString:pointsString
+                                                              withSize:16.f
+                                                                 color:[UIColor whiteColor]
+                                                              fontName:@"HelveticaNeue"
+                                                            withString:@"\npts"
+                                                              withSize:10.f
+                                                                 color:[UIColor whiteColor]
+                                                              fontName:@"HelveticaNeue"];
+        self.pointsLabel.attributedText = points;
+        self.pointsButton.hidden = NO;
+        self.pointsLabel.hidden = NO;
+        self.scoreDetails.hidden = NO;
+        self.circleAnimation.hidden = NO;
+    } else {
+        self.pointsLabel.text = @"";
+        self.pointsButton.hidden = YES;
+        self.pointsLabel.hidden = YES;
+        self.scoreDetails.hidden = YES;
+        self.circleAnimation.hidden = YES;
+    }
+    
+    self.scoreDetails.alpha = 0;
+    self.circleAnimation.layer.cornerRadius = self.circleAnimation.frame.size.width/2.0;
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self enlageMultiplyerWithCompletion:^{
+            [UIView animateWithDuration:0.2 animations:^{
+                self.pointsButton.transform = CGAffineTransformIdentity;
+                self.pointsLabel.transform = CGAffineTransformIdentity;
+                self.circleAnimation.transform = CGAffineTransformIdentity;
+            } completion:^(BOOL finished) {
+                [self enlageMultiplyerWithCompletion:^{
+                    [self diminishMultiplyerWithCompletion:^{
+                        
+                    }];
+                }];
+            }];
+        }];
+    });
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
     if (self.frameIndex == 0) {
-        if ([self.selectedSequence isKindOfClass:[OSVServerSequence class]]) {
+        if ([self.selectedSequence isKindOfClass:[OSVServerSequence class]]||
+            [self.selectedSequence isKindOfClass:[OSVServerSequencePart class]]) {
             if (self.player.currentPlayableItem != self.selectedSequence.photos) {
                 [self.player prepareForPlayableItem:self.selectedSequence.photos startingFromIndex:self.startingFrameIndex];
             }
         } else {
-            [self.player prepareForPlayableItem:[self fileNameForTrackID:self.selectedSequence.uid] startingFromIndex:self.startingFrameIndex];
+            [self.player prepareForPlayableItem:[OSVUtils fileNameForTrackID:self.selectedSequence.uid] startingFromIndex:self.startingFrameIndex];
         }
         [self.player play];
         [self.player pause];
@@ -152,19 +226,19 @@
 }
 
 - (BOOL)shouldAutorotate {
-    return NO;
+    return YES;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskPortrait;
+    return UIInterfaceOrientationMaskAll;
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         self.player.playerLayer.frame = self.videoPlayerPreview.bounds;
         self.player.playerLayer.position = CGPointMake(CGRectGetMidX(self.videoPlayerPreview.bounds), CGRectGetMidY(self.videoPlayerPreview.bounds));
+        self.player.imageView.frame = self.videoPlayerPreview.bounds;
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        
     }];
 }
 
@@ -179,7 +253,7 @@
         if (self.player.currentPlayableItem) {
             [self.player resume];
         } else {
-            [self.player prepareForPlayableItem:[self fileNameForTrackID:self.selectedSequence.uid] startingFromIndex:self.startingFrameIndex];
+            [self.player prepareForPlayableItem:[OSVUtils fileNameForTrackID:self.selectedSequence.uid] startingFromIndex:self.startingFrameIndex];
             [self.player play];
         }
     }
@@ -222,11 +296,11 @@
 }
 
 - (IBAction)didTapDelete:(id)sender {
-    if (self.frameIndex > 0 && self.selectedSequence.photos.count >= self.frameIndex) {
+    if (self.selectedSequence.photos.count > 0 && self.frameIndex > 0 && self.selectedSequence.photos.count >= self.frameIndex) {
         [[OSVSyncController sharedInstance].tracksController deletePhoto:self.selectedSequence.photos[self.frameIndex - 1] withCompletionBlock:^(NSError *error) {
             [self.selectedSequence.photos removeObjectAtIndex:self.frameIndex-1];
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self totalNumberOfFrames:self.selectedSequence.photos.count];
+                [self.player prepareForPlayableItem:self.selectedSequence.photos startingFromIndex:self.frameIndex - 1];
             });
         }];
     }
@@ -245,12 +319,6 @@
     box.bottomRightCoordinate = seq.bottomRightCoordinate;
     
     [self.mapView fitBounds:box withInsets:UIEdgeInsetsMake(20, 20, 20, 20)];
-}
-
-- (NSURL *)fileNameForTrackID:(NSInteger)trackUID {
-    NSString *folderPathString = [NSString stringWithFormat:@"%@%ld", [OSVSyncController sharedInstance].tracksController.basePathToPhotos, (long)trackUID];
-    
-    return [[NSURL alloc] initWithString:folderPathString];
 }
 
 - (void)addSequenceOnMap:(id<OSVSequence>)sequence {
@@ -454,6 +522,121 @@
     if (index != NSNotFound) {
         [self.player displayFrameAtIndex:index];
     }
+}
+
+- (IBAction)didTapTrackDetails:(id)sender {
+    if ([self.selectedSequence isKindOfClass:[OSVServerSequence class]]) {
+        OSVServerSequence *seq = self.selectedSequence;
+        self.scoreDetails.totalPointsLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Total Points: %ld", @""), seq.points];
+        
+        int i = 0;
+        [seq.scoreHistory sortUsingComparator:^NSComparisonResult(OSVScoreHistory *obj1, OSVScoreHistory *obj2) {
+            if (obj1.multiplier < obj2.multiplier) {
+                return NSOrderedAscending;
+            } else {
+                return NSOrderedDescending;
+            }
+        }];
+        
+        for (OSVScoreHistory *sch in seq.scoreHistory) {
+            self.scoreDetails.pointsLabels[i].text = [@(sch.points) stringValue];
+            self.scoreDetails.pointsLabels[i].hidden = NO;
+            self.scoreDetails.multiplierLabels[i].text = [@(sch.multiplier) stringValue];
+            self.scoreDetails.multiplierLabels[i].hidden = NO;
+            self.scoreDetails.distanceLabels[i].text = [NSString stringWithFormat:@"%ld", sch.photos];
+            self.scoreDetails.distanceLabels[i].hidden = NO;
+            i++;
+        }
+    }
+    
+    if ([self.selectedSequence isKindOfClass:[OSVSequence class]]) {
+
+        OSVSequence *seq = self.selectedSequence;
+        self.scoreDetails.totalPointsLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Total Points: %ld", @""), seq.points];
+        
+        int i = 0;
+        [seq.scoreHistory sortUsingComparator:^NSComparisonResult(OSVScoreHistory *obj1, OSVScoreHistory *obj2) {
+            if (obj1.multiplier < obj2.multiplier) {
+                return NSOrderedAscending;
+            } else {
+                return NSOrderedDescending;
+            }
+        }];
+        
+        for (OSVScoreHistory *sch in seq.scoreHistory) {
+            
+            self.scoreDetails.pointsLabels[i].text = [@(sch.points) stringValue];
+            self.scoreDetails.pointsLabels[i].hidden = NO;
+            self.scoreDetails.multiplierLabels[i].text = sch.multiplier ? [@(sch.multiplier) stringValue] : NSLocalizedString(@"no connection", @"");
+            self.scoreDetails.multiplierLabels[i].hidden = NO;
+            self.scoreDetails.distanceLabels[i].text = [NSString stringWithFormat:@"%ld", sch.photos];
+            self.scoreDetails.distanceLabels[i].hidden = NO;
+
+            i++;
+        }
+        self.scoreDetails.disclosureLabel.hidden = NO;
+        self.scoreDetails.disclosureLabel.text = NSLocalizedString(@"", @"");
+    }
+    
+    if (![self.selectedSequence isKindOfClass:[OSVServerSequencePart class]]) {
+        
+        self.circleAnimation.transform = CGAffineTransformIdentity;
+        
+        [UIView animateWithDuration:0.3 animations:^{
+            self.circleAnimation.transform = CGAffineTransformMakeScale(20, 20);
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+                self.scoreDetails.alpha = 1;
+            } completion:^(BOOL finished) {
+                
+            }];
+        }];
+    }
+}
+
+- (IBAction)didTapDissmissDetails:(id)sender {
+    [UIView animateWithDuration:0.1 animations:^{
+        self.scoreDetails.alpha = 0;
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:0.3 delay:0.1 options:UIViewAnimationOptionCurveEaseOut animations:^{
+            self.circleAnimation.transform = CGAffineTransformIdentity;
+        } completion:^(BOOL finished) {
+            
+        }];
+    }];
+}
+
+- (void)enlageMultiplyerWithCompletion:(void (^)(void))completion {
+    
+    self.pointsLabel.transform = CGAffineTransformIdentity;
+    self.pointsButton.transform = CGAffineTransformIdentity;
+    self.circleAnimation.transform = CGAffineTransformIdentity;
+    [UIView animateWithDuration:0.15 animations:^{
+        self.pointsLabel.transform = CGAffineTransformMakeScale(1.25, 1.25);
+        self.pointsButton.transform = CGAffineTransformMakeScale(1.25, 1.25);
+        self.circleAnimation.transform = CGAffineTransformMakeScale(1.25, 1.25);
+    } completion:^(BOOL finished) {
+        if (finished) {
+            completion();
+        }
+    }];
+}
+
+- (void)diminishMultiplyerWithCompletion:(void (^)(void))completion {
+    
+    [UIView animateWithDuration:0.7
+                          delay:0.0
+         usingSpringWithDamping:0.10
+          initialSpringVelocity:0.2
+                        options:UIViewAnimationOptionCurveLinear animations:^{
+                            self.pointsLabel.transform = CGAffineTransformIdentity;
+                            self.pointsButton.transform = CGAffineTransformIdentity;
+                            self.circleAnimation.transform = CGAffineTransformIdentity;
+                        } completion:^(BOOL finished) {
+                            if (finished) {
+                                completion();
+                            }
+                        }];
 }
 
 @end

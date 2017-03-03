@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface UIView (Additions)
+
 - (void)setColorPatternWithImageName:(NSString *)imageName;
 
 @end

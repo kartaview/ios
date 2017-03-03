@@ -8,7 +8,6 @@
 
 #import "OSVFullScreenAnimationController.h"
 #import "OSVPlayer.h"
-#import "OSVVideoPlayerViewController.h"
 #import "OSVFullScreenImageViewController.h"
 
 @implementation OSVFullScreenAnimationController
