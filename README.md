@@ -1,4 +1,4 @@
-This is the source code for the OpenStreetCam iOS app.
+This is the source code for the KartaView iOS app.
 
 ## OBD2
 
